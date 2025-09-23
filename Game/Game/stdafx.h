@@ -10,12 +10,12 @@
 #endif
 
 #if defined(_MSC_VER)
+#	pragma warning(disable : 4514)
+#	pragma warning(disable : 4820)
 #	pragma warning(push, 3)
 #	pragma warning(disable : 4061)
 #	pragma warning(disable : 4365)
 #	pragma warning(disable : 4464)
-#	pragma warning(disable : 4514)
-#	pragma warning(disable : 4820)
 #	pragma warning(disable : 4865)
 #	pragma warning(disable : 5029)
 #	pragma warning(disable : 5267)
@@ -23,6 +23,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <iostream>
 #include <filesystem>
 #include <optional>
 #include <string>
