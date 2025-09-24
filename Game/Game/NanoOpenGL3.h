@@ -62,12 +62,9 @@ enum class TextureWrap : uint8_t
 	ClampToBorder
 };
 
-
-
 //=============================================================================
 // Shader Program
 //=============================================================================
-
 GLuint CreateShaderProgram(std::string_view vertexShader);
 GLuint CreateShaderProgram(std::string_view vertexShader, std::string_view fragmentShader);
 GLuint CreateShaderProgram(std::string_view vertexShader, std::string_view geometryShader, std::string_view fragmentShader);
@@ -131,6 +128,8 @@ GLuint CreateStaticBuffer(GLenum target, GLsizeiptr size, const void* data);
 //=============================================================================
 GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVertically = false);
 
+GLuint CreateTexture2D(GLint internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels = nullptr);
+
 //=============================================================================
 // Sampler
 //=============================================================================
@@ -151,6 +150,11 @@ struct SamplerInfo final
 };
 
 GLuint CreateSamplerState(const SamplerInfo& info);
+
+//=============================================================================
+// Framebuffer
+//=============================================================================
+
 
 //=============================================================================
 // States
@@ -227,7 +231,6 @@ void BindState(const GLState& state);
 //=============================================================================
 // Get GL States
 //=============================================================================
-
 GLuint GetCurrentBuffer(GLenum target);
 GLuint GetCurrentTexture(GLenum target);
 

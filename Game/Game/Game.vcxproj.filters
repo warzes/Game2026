@@ -60,16 +60,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\bin\data\shaders\2.gamma_correction.fs">
+    <None Include="..\..\bin\data\shaders\NormalPassShader.fs">
       <Filter>shaders</Filter>
     </None>
-    <None Include="..\..\bin\data\shaders\2.gamma_correction.vs">
+    <None Include="..\..\bin\data\shaders\NormalPassShader.vs">
       <Filter>shaders</Filter>
     </None>
-    <None Include="..\..\bin\data\shaders\3.1.1.shadow_mapping_depth.fs">
+    <None Include="..\..\bin\data\shaders\ShadowMappingDepth.fs">
       <Filter>shaders</Filter>
     </None>
-    <None Include="..\..\bin\data\shaders\3.1.1.shadow_mapping_depth.vs">
+    <None Include="..\..\bin\data\shaders\ShadowMappingDepth.vs">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

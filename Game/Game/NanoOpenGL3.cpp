@@ -3,7 +3,7 @@
 #include "NanoLog.h"
 #include "NanoOpenGLExt.h"
 //=============================================================================
-inline GLenum GetGLEnum(CompareFunc func)
+[[nodiscard]] inline GLenum GetGLEnum(CompareFunc func)
 {
 	switch (func) {
 	case CompareFunc::Never:        return GL_NEVER;
@@ -18,7 +18,7 @@ inline GLenum GetGLEnum(CompareFunc func)
 	}
 }
 //=============================================================================
-inline GLenum GetGLEnum(BlendFactor factor)
+[[nodiscard]] inline GLenum GetGLEnum(BlendFactor factor)
 {
 	switch (factor) {
 	case BlendFactor::Zero:             return GL_ZERO;
@@ -35,7 +35,7 @@ inline GLenum GetGLEnum(BlendFactor factor)
 	}
 }
 //=============================================================================
-inline GLenum GetGLEnum(CullFace cull)
+[[nodiscard]] inline GLenum GetGLEnum(CullFace cull)
 {
 	switch (cull) {
 	case CullFace::Front:        return GL_FRONT;
@@ -45,7 +45,7 @@ inline GLenum GetGLEnum(CullFace cull)
 	}
 }
 //=============================================================================
-inline GLenum GetGLEnum(PolygonMode mode)
+[[nodiscard]] inline GLenum GetGLEnum(PolygonMode mode)
 {
 	switch (mode) {
 	case PolygonMode::Point: return GL_POINT;
@@ -55,7 +55,7 @@ inline GLenum GetGLEnum(PolygonMode mode)
 	}
 }
 //=============================================================================
-inline GLenum GetGLEnum(TextureFilter filter)
+[[nodiscard]] inline GLenum GetGLEnum(TextureFilter filter)
 {
 	switch (filter) {
 	case TextureFilter::Nearest:              return GL_NEAREST;
@@ -68,7 +68,7 @@ inline GLenum GetGLEnum(TextureFilter filter)
 	}
 }
 //=============================================================================
-inline GLenum GetGLEnum(TextureWrap wrap)
+[[nodiscard]] inline GLenum GetGLEnum(TextureWrap wrap)
 {
 	switch (wrap) {
 	case TextureWrap::Repeat:         return GL_REPEAT;
@@ -401,6 +401,20 @@ GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVerti
 	return textureID;
 }
 //=============================================================================
+GLuint CreateTexture2D(GLint internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels)
+{
+	GLint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
+
+	GLuint textureID{ 0 };
+	glGenTextures(1, &textureID);
+
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalformat, width, height, 0, format, type, pixels);
+
+	glBindTexture(GL_TEXTURE_2D, currentTexture);
+	return textureID;
+}
+//=============================================================================
 GLuint CreateSamplerState(const SamplerInfo& info)
 {
 	GLuint sampler;
@@ -441,6 +455,28 @@ GLuint CreateSamplerState(const SamplerInfo& info)
 	glSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR, info.borderColor);
 
 	return sampler;
+}
+//=============================================================================
+GLuint CreateFramebuffer(GLuint colorTex, GLuint depthTex)
+{
+	GLuint fbo{ 0 };
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	if (depthTex > 0)
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTex, 0);
+	if (colorTex > 0)
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTex, 0);
+
+	GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (GL_FRAMEBUFFER_COMPLETE != result)
+	{
+		Error("Framebuffer is not complete.");
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	return fbo;
 }
 //=============================================================================
 struct CachedState final
