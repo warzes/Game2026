@@ -4,6 +4,7 @@
 #include "ModelTemp.h"
 #include "NanoLog.h"
 #include "NanoWindow.h"
+#include "NanoEngine.h"
 #include "NanoOpenGL3.h"
 #include "NanoIO.h"
 // https://github.com/Keypekss/OpenGLTechDemo
@@ -21,7 +22,7 @@ void GameAppRun()
 {
 	try
 	{
-		if (!window::Init(SCR_WIDTH, SCR_HEIGHT, "Game"))
+		if (!engine::Init(SCR_WIDTH, SCR_HEIGHT, "Game"))
 			return;
 
 		GLState state;
@@ -29,28 +30,22 @@ void GameAppRun()
 		state.blendState.enable = true;
 		state.blendState.srcAlpha = BlendFactor::OneMinusSrcAlpha;
 
-// timing
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
-
-		while (!window::WindowShouldClose())
+		while (!engine::ShouldClose())
 		{
-			float currentFrame = static_cast<float>(glfwGetTime());
-			deltaTime = currentFrame - lastFrame;
-			lastFrame = currentFrame;
+			engine::BeginFrame();
 
 			// render
 			BindState(state);
 			glClearColor(0.1f, 0.1f, 0.8f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			window::Swap();
+			engine::EndFrame();
 		}
 	}
 	catch (const std::exception& exc)
 	{
 		puts(exc.what());
 	}
-	window::Close();
+	engine::Close();
 }
 //=============================================================================

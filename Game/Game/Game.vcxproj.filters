@@ -57,6 +57,9 @@
       <Filter>temp2</Filter>
     </ClCompile>
     <ClCompile Include="GameApp3.cpp" />
+    <ClCompile Include="NanoEngine.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -120,6 +123,9 @@
     </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>temp2</Filter>
+    </ClInclude>
+    <ClInclude Include="NanoEngine.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

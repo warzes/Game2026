@@ -104,6 +104,7 @@
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="NanoEngine.cpp" />
     <ClCompile Include="NanoIO.cpp" />
     <ClCompile Include="NanoLog.cpp" />
     <ClCompile Include="NanoOpenGL3.cpp" />
@@ -131,6 +132,7 @@
     <ClInclude Include="MeshTemp.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelTemp.h" />
+    <ClInclude Include="NanoEngine.h" />
     <ClInclude Include="NanoIO.h" />
     <ClInclude Include="NanoLog.h" />
     <ClInclude Include="NanoOpenGL3.h" />
