@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Mesh.h"
 
-Mesh::Mesh()
+Mesho2::Mesho2()
 {
 	VAO = 0;
 	VBO = 0;
@@ -9,7 +9,7 @@ Mesh::Mesh()
 	indexCount = 0;
 }
 
-void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices)
+void Mesho2::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices)
 {
 	indexCount = numOfIndices;
 
@@ -37,7 +37,7 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int num
 	glBindVertexArray(0);
 }
 
-void Mesh::RenderMesh()
+void Mesho2::RenderMesh()
 {
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
@@ -46,7 +46,7 @@ void Mesh::RenderMesh()
 	glBindVertexArray(0);
 }
 
-void Mesh::ClearMesh()
+void Mesho2::ClearMesh()
 {
 	if (IBO != 0)
 	{
@@ -70,7 +70,7 @@ void Mesh::ClearMesh()
 }
 
 
-Mesh::~Mesh()
+Mesho2::~Mesho2()
 {
 	ClearMesh();
 }

@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-class Texture
+class TextureO2
 {
 public:
-	Texture();
-	Texture(const char* fileLoc);
+	TextureO2();
+	TextureO2(const char* fileLoc);
 
 	bool LoadTexture();
 	bool LoadTextureA();
@@ -12,7 +12,7 @@ public:
 	void UseTexture();
 	void ClearTexture();
 
-	~Texture();
+	~TextureO2();
 
 private:
 	GLuint textureID;

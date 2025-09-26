@@ -6,38 +6,42 @@
 #include "NanoWindow.h"
 #include "NanoOpenGL3.h"
 #include "NanoIO.h"
-
 //=============================================================================
 void processInput(GLFWwindow* window);
+namespace
+{
+	// settings
+	const unsigned int SCR_WIDTH = 1600;
+	const unsigned int SCR_HEIGHT = 900;
+	bool gammaEnabled = true;
+	bool gammaKeyPressed = false;
 
-// settings
-const unsigned int SCR_WIDTH = 1600;
-const unsigned int SCR_HEIGHT = 900;
-bool gammaEnabled = true;
-bool gammaKeyPressed = false;
+	// camera
+	CameraOld camera(glm::vec3(0.0f, 0.0f, 3.0f));
+	float lastX = (float)SCR_WIDTH / 2.0;
+	float lastY = (float)SCR_HEIGHT / 2.0;
+	bool firstMouse = true;
 
-// camera
-CameraOld camera(glm::vec3(0.0f, 0.0f, 3.0f));
-float lastX = (float)SCR_WIDTH / 2.0;
-float lastY = (float)SCR_HEIGHT / 2.0;
-bool firstMouse = true;
+	// timing
+	float deltaTime = 0.0f;
+	float lastFrame = 0.0f;
 
-// timing
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+	float planeVertices[] = {
+		// positions            // normals         // texcoords
+		25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+		-25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+		-25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
 
-float planeVertices[] = {
-	// positions            // normals         // texcoords
-	25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-	-25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-	-25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+		25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+		-25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+		25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
+	};
+	unsigned int cubeVAO = 0;
+	unsigned int cubeVBO = 0;
 
-	25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-	-25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
-	25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
-};
-unsigned int cubeVAO = 0;
-unsigned int cubeVBO = 0;
+	GLuint planeVAO;
+}
+
 void renderCube()
 {
 	// initialize (if necessary)
@@ -108,8 +112,6 @@ void renderCube()
 	glBindVertexArray(0);
 }
 
-GLuint planeVAO;
-
 void renderScene(GLuint shader)
 {
 	// floor
@@ -135,7 +137,7 @@ void renderScene(GLuint shader)
 	renderCube();
 }
 //=============================================================================
-void GameAppRun3()
+void TempAppRun()
 {
 	try
 	{
@@ -236,7 +238,7 @@ void GameAppRun3()
 
 			// input
 			// -----
-			processInput(window::windowHandle);
+			processInput(window::handle);
 
 			// change light position over time
 			lightPos.x = sin(glfwGetTime()) * 3.0f;

@@ -13,19 +13,19 @@
 class Scene
 {
 public:
-	std::vector<Mesh*> meshList;
+	std::vector<Mesho2*> meshList;
 	std::vector<Shader> shaderList;
 	Shader directionalShadowShader;
 
-	std::vector<Model> modelList;
-	Material shinyMaterial, dullMaterial;
-	Model bishop, king, queen, rook, knight, pawn;
+	std::vector<Modelo2> modelList;
+	Materialo2 shinyMaterial, dullMaterial;
+	Modelo2 bishop, king, queen, rook, knight, pawn;
 
-	Camera camera;
+	CameraO2 camera;
 
-	Texture brickTexture;
-	Texture marbleTexture;
-	Texture plainTexture;
+	TextureO2 brickTexture;
+	TextureO2 marbleTexture;
+	TextureO2 plainTexture;
 
 	DirectionalLight mainLight;
 	PointLight pointLights[MAX_POINT_LIGHTS];
@@ -48,8 +48,8 @@ public:
 	void CreateObjects();
 	void CreateShaders();
 
-	void TransformAndRenderModel(Model* m, Material* mat, GLfloat transX, GLfloat transY, GLfloat transZ, GLfloat scale, GLfloat rotX, GLfloat rotY, GLfloat rotZ);
-	void TransformAndRenderMesh(Mesh* m, Material* mat, GLfloat transX, GLfloat transY, GLfloat transZ, GLfloat scale, GLfloat rotX, GLfloat rotY, GLfloat rotZ);
+	void TransformAndRenderModel(Modelo2* m, Materialo2* mat, GLfloat transX, GLfloat transY, GLfloat transZ, GLfloat scale, GLfloat rotX, GLfloat rotY, GLfloat rotZ);
+	void TransformAndRenderMesh(Mesho2* m, Materialo2* mat, GLfloat transX, GLfloat transY, GLfloat transZ, GLfloat scale, GLfloat rotX, GLfloat rotY, GLfloat rotZ);
 	void RenderScene();
 	void DirectionalShadowMapPass();
 	void RenderPass(glm::mat4 viewMatrix);

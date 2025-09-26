@@ -2,7 +2,7 @@
 #include "Texture.h"
 #include "NanoLog.h"
 
-Texture::Texture()
+TextureO2::TextureO2()
 {
 	textureID = 0;
 	width = 0;
@@ -11,7 +11,7 @@ Texture::Texture()
 	fileLocation = "";
 }
 
-Texture::Texture(const char* fileLoc)
+TextureO2::TextureO2(const char* fileLoc)
 {
 	textureID = 0;
 	width = 0;
@@ -20,7 +20,7 @@ Texture::Texture(const char* fileLoc)
 	fileLocation = fileLoc;
 }
 
-bool Texture::LoadTexture()
+bool TextureO2::LoadTexture()
 {
 	unsigned char* texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
 	if (!texData)
@@ -47,7 +47,7 @@ bool Texture::LoadTexture()
 	return true;
 }
 
-bool Texture::LoadTextureA()
+bool TextureO2::LoadTextureA()
 {
 	unsigned char* texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
 	if (!texData)
@@ -74,13 +74,13 @@ bool Texture::LoadTextureA()
 	return true;
 }
 
-void Texture::UseTexture()
+void TextureO2::UseTexture()
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
-void Texture::ClearTexture()
+void TextureO2::ClearTexture()
 {
 	glDeleteTextures(1, &textureID);
 	textureID = 0;
@@ -91,7 +91,7 @@ void Texture::ClearTexture()
 }
 
 
-Texture::~Texture()
+TextureO2::~TextureO2()
 {
 	ClearTexture();
 }

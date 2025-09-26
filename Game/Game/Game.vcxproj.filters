@@ -3,7 +3,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="GameApp.cpp" />
+    <ClCompile Include="TempApp4.cpp" />
     <ClCompile Include="NanoLog.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
@@ -52,12 +52,24 @@
     <ClCompile Include="Shader.cpp">
       <Filter>temp2</Filter>
     </ClCompile>
-    <ClCompile Include="GameApp2.cpp" />
+    <ClCompile Include="TempApp2.cpp" />
     <ClCompile Include="Scene.cpp">
       <Filter>temp2</Filter>
     </ClCompile>
-    <ClCompile Include="GameApp3.cpp" />
+    <ClCompile Include="TempApp.cpp" />
     <ClCompile Include="NanoEngine.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="NanoMath.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="NanoScene.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="NanoRender.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="NanoCore.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -127,6 +139,18 @@
     <ClInclude Include="NanoEngine.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="NanoMath.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="NanoScene.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="NanoRender.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="NanoCore.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Temp">
@@ -143,6 +167,9 @@
     </Filter>
     <Filter Include="shaders">
       <UniqueIdentifier>{0ccbfeab-b651-4032-ac9d-4d4c35564eba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Example">
+      <UniqueIdentifier>{c4d97539-e4aa-42fb-ae8a-bee90570a857}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
 #include "Camera.h"
 
-Camera::Camera() {}
+CameraO2::CameraO2() {}
 
-Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLfloat startPitch, GLfloat startMoveSpeed, GLfloat startTurnSpeed)
+CameraO2::CameraO2(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLfloat startPitch, GLfloat startMoveSpeed, GLfloat startTurnSpeed)
 {
 	position = startPosition;
 	worldUp = startUp;
@@ -17,7 +17,7 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	update();
 }
 
-void Camera::keyControl(bool* keys, GLfloat deltaTime)
+void CameraO2::keyControl(bool* keys, GLfloat deltaTime)
 {
 	GLfloat velocity = moveSpeed * deltaTime;
 
@@ -52,7 +52,7 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 	}
 }
 
-void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
+void CameraO2::mouseControl(GLfloat xChange, GLfloat yChange)
 {
 	xChange *= turnSpeed;
 	yChange *= turnSpeed;
@@ -73,21 +73,21 @@ void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
 	update();
 }
 
-glm::mat4 Camera::calculateViewMatrix()
+glm::mat4 CameraO2::calculateViewMatrix()
 {
 	return glm::lookAt(position, position + front, up);
 }
 
-glm::vec3 Camera::getCameraPosition()
+glm::vec3 CameraO2::getCameraPosition()
 {
 	return position;
 }
-glm::vec3 Camera::getCameraDirection()
+glm::vec3 CameraO2::getCameraDirection()
 {
 	return glm::normalize(front);
 }
 
-void Camera::update()
+void CameraO2::update()
 {
 	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.y = sin(glm::radians(pitch));
@@ -99,6 +99,6 @@ void Camera::update()
 }
 
 
-Camera::~Camera()
+CameraO2::~CameraO2()
 {
 }

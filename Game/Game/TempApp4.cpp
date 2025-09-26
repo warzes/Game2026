@@ -19,7 +19,7 @@
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 900;
 //=============================================================================
-void GameAppRun()
+void TempAppRun4()
 {
 	try
 	{
@@ -31,13 +31,16 @@ void GameAppRun()
 		state.blendState.enable = true;
 		state.blendState.srcAlpha = BlendFactor::OneMinusSrcAlpha;
 
+		glEnable(GL_FRAMEBUFFER_SRGB);
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 		while (!engine::ShouldClose())
 		{
 			engine::BeginFrame();
 
 			// render
 			BindState(state);
-			glClearColor(0.1f, 0.1f, 0.8f, 1.0f);
+			glClearColor(0.5f, 0.1f, 0.8f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			engine::EndFrame();

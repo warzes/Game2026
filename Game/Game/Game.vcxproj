@@ -96,9 +96,13 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
-    <ClCompile Include="GameApp.cpp" />
-    <ClCompile Include="GameApp2.cpp" />
-    <ClCompile Include="GameApp3.cpp" />
+    <ClCompile Include="NanoCore.cpp" />
+    <ClCompile Include="NanoMath.cpp" />
+    <ClCompile Include="NanoRender.cpp" />
+    <ClCompile Include="NanoScene.cpp" />
+    <ClCompile Include="TempApp4.cpp" />
+    <ClCompile Include="TempApp2.cpp" />
+    <ClCompile Include="TempApp.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -132,11 +136,15 @@
     <ClInclude Include="MeshTemp.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelTemp.h" />
+    <ClInclude Include="NanoCore.h" />
     <ClInclude Include="NanoEngine.h" />
     <ClInclude Include="NanoIO.h" />
     <ClInclude Include="NanoLog.h" />
+    <ClInclude Include="NanoMath.h" />
     <ClInclude Include="NanoOpenGL3.h" />
     <ClInclude Include="NanoOpenGLExt.h" />
+    <ClInclude Include="NanoRender.h" />
+    <ClInclude Include="NanoScene.h" />
     <ClInclude Include="NanoWindow.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="Scene.h" />

@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-class Camera
+class CameraO2
 {
 public:
-	Camera();
-	Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLfloat startPitch, GLfloat startMoveSpeed, GLfloat startTurnSpeed);
+	CameraO2();
+	CameraO2(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLfloat startPitch, GLfloat startMoveSpeed, GLfloat startTurnSpeed);
 
 	void keyControl(bool* keys, GLfloat deltaTime);
 	void mouseControl(GLfloat xChange, GLfloat yChange);
@@ -14,7 +14,7 @@ public:
 
 	glm::mat4 calculateViewMatrix();
 
-	~Camera();
+	~CameraO2();
 
 private:
 	glm::vec3 position;

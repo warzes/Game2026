@@ -1,20 +1,15 @@
 ﻿#pragma once
 
-struct MeshVertex
-{
-
-};
-
-class Mesh
+class Mesho2
 {
 public:
-	Mesh();
+	Mesho2();
 
 	void CreateMesh(GLfloat* vertices, unsigned int* indices, unsigned int numOfVertices, unsigned int numOfIndices);
 	void RenderMesh();
 	void ClearMesh();
 
-	~Mesh();
+	~Mesho2();
 
 private:
 	GLuint VAO, VBO, IBO;

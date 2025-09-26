@@ -3,16 +3,16 @@
 #include "Mesh.h"
 #include "Texture.h"
 
-class Model
+class Modelo2
 {
 public:
-	Model();
+	Modelo2();
 
 	void LoadModel(const std::string& fileName);
 	void RenderModel();
 	void ClearModel();
 
-	~Model();
+	~Modelo2();
 
 private:
 
@@ -20,7 +20,7 @@ private:
 	void LoadMesh(aiMesh* mesh, const aiScene* scene);
 	void LoadMaterials(const aiScene* scene);
 
-	std::vector<Mesh*> meshList;
-	std::vector<Texture*> textureList;
+	std::vector<Mesho2*> meshList;
+	std::vector<TextureO2*> textureList;
 	std::vector<unsigned int> meshToTex;
 };

@@ -97,24 +97,24 @@ void Scene::CreateObjects()
 
 	calcAverageNormals(indices, 12, vertices, 32, 8, 5);
 
-	Mesh* obj1 = new Mesh();
+	Mesho2* obj1 = new Mesho2();
 	obj1->CreateMesh(vertices, indices, 32, 12);
 	meshList.push_back(obj1);
 
-	Mesh* obj2 = new Mesh();
+	Mesho2* obj2 = new Mesho2();
 	obj2->CreateMesh(vertices, indices, 32, 12);
 	meshList.push_back(obj2);
 
-	Mesh* obj3 = new Mesh();
+	Mesho2* obj3 = new Mesho2();
 	obj3->CreateMesh(floorVertices, floorIndices, 32, 6);
 	meshList.push_back(obj3);
 
-	Mesh* obj4 = new Mesh();
+	Mesho2* obj4 = new Mesho2();
 	obj4->CreateMesh(backWallVertices, backWallIndices, 32, 6);
 	meshList.push_back(obj4);
 }
 
-void Scene::TransformAndRenderModel(Model* m, Material* mat, GLfloat transX, GLfloat transY, GLfloat transZ, GLfloat scale, GLfloat rotX, GLfloat rotY, GLfloat rotZ)
+void Scene::TransformAndRenderModel(Modelo2* m, Materialo2* mat, GLfloat transX, GLfloat transY, GLfloat transZ, GLfloat scale, GLfloat rotX, GLfloat rotY, GLfloat rotZ)
 {
 	// First translate, rotate, then scale so that it's executed as scale, rotate, translate
 	glm::mat4 model = glm::mat4(1.0f);
@@ -128,7 +128,7 @@ void Scene::TransformAndRenderModel(Model* m, Material* mat, GLfloat transX, GLf
 	m->RenderModel();
 }
 
-void Scene::TransformAndRenderMesh(Mesh* m, Material* mat, GLfloat transX, GLfloat transY, GLfloat transZ, GLfloat scale, GLfloat rotX, GLfloat rotY, GLfloat rotZ)
+void Scene::TransformAndRenderMesh(Mesho2* m, Materialo2* mat, GLfloat transX, GLfloat transY, GLfloat transZ, GLfloat scale, GLfloat rotX, GLfloat rotY, GLfloat rotZ)
 {
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(transX, transY, transZ));
@@ -256,34 +256,34 @@ void Scene::Init()
 	CreateObjects();
 	CreateShaders();
 
-	camera = Camera(glm::vec3(2.0f, 2.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, 5.0f, 0.5f);
+	camera = CameraO2(glm::vec3(2.0f, 2.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, 5.0f, 0.5f);
 
-	brickTexture = Texture("textures/brick.png");
+	brickTexture = TextureO2("textures/brick.png");
 	brickTexture.LoadTextureA();
-	marbleTexture = Texture("textures/marble.jpg");
+	marbleTexture = TextureO2("textures/marble.jpg");
 	marbleTexture.LoadTexture();
-	plainTexture = Texture("textures/plain.png");
+	plainTexture = TextureO2("textures/plain.png");
 	plainTexture.LoadTextureA();
 
-	shinyMaterial = Material(4.0f, 256);
-	dullMaterial = Material(0.3f, 4);
+	shinyMaterial = Materialo2(4.0f, 256);
+	dullMaterial = Materialo2(0.3f, 4);
 
-	bishop = Model();
+	bishop = Modelo2();
 	bishop.LoadModel("models/bishop.obj");
 
-	king = Model();
+	king = Modelo2();
 	king.LoadModel("models/king.obj");
 
-	queen = Model();
+	queen = Modelo2();
 	queen.LoadModel("models/queen.obj");
 
-	rook = Model();
+	rook = Modelo2();
 	rook.LoadModel("models/rook.obj");
 
-	knight = Model();
+	knight = Modelo2();
 	knight.LoadModel("models/knight.obj");
 
-	pawn = Model();
+	pawn = Modelo2();
 	pawn.LoadModel("models/pawn.obj");
 
 	mainLight = DirectionalLight(2048, 2048,
@@ -324,5 +324,5 @@ void Scene::Init()
 		30.0f);
 	spotLightCount++;
 
-	projection = glm::perspective(45.0f, (GLfloat)window::GetBufferWidth() / (GLfloat)window::GetBufferHeight(), 0.1f, 100.0f);
+	projection = glm::perspective(45.0f, window::GetAspect(), 0.1f, 100.0f);
 }

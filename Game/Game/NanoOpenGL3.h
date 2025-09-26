@@ -62,6 +62,12 @@ enum class TextureWrap : uint8_t
 	ClampToBorder
 };
 
+enum class ColorSpace : uint8_t
+{
+	Linear,
+	sRGB
+};
+
 //=============================================================================
 // Shader Program
 //=============================================================================
@@ -85,6 +91,28 @@ void SetUniform(GLuint id, std::span<const glm::vec4> v);
 void SetUniform(GLuint id, const glm::quat& v);
 void SetUniform(GLuint id, const glm::mat3& m);
 void SetUniform(GLuint id, const glm::mat4& m);
+
+template<typename T>
+struct Uniform final
+{
+	void Init(GLuint program, std::string_view name)
+	{
+		m_program = program;
+		m_location = GetUniformLocation(program, name);
+	}
+
+	void Set(const T& value)
+	{
+		if (m_location >= 0)
+		{
+			SetUniform(m_location, value);
+		}
+	}
+
+private:
+	GLuint m_program{ 0 };
+	int m_location{ -1 };
+};
 
 //=============================================================================
 // VertexAttribute
@@ -126,7 +154,7 @@ GLuint CreateStaticBuffer(GLenum target, GLsizeiptr size, const void* data);
 //=============================================================================
 // Textures
 //=============================================================================
-GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVertically = false);
+GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVertically = false); // TODO: delete
 
 GLuint CreateTexture2D(GLint internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels = nullptr);
 

@@ -1,14 +1,14 @@
 ﻿#pragma once
 
-class Material
+class Materialo2
 {
 public:
-	Material();
-	Material(GLfloat sIntensity, GLfloat shine);
+	Materialo2();
+	Materialo2(GLfloat sIntensity, GLfloat shine);
 
 	void UseMaterial(GLuint specularIntensityLocation, GLuint shininessLocation);
 
-	~Material();
+	~Materialo2();
 
 private:
 	GLfloat specularIntensity;

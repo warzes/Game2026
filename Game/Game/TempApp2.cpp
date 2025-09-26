@@ -17,7 +17,7 @@ namespace
 	float lastFrame = 0.0f;
 }
 //=============================================================================
-void GameAppRun2()
+void TempAppRun2()
 {
 	try
 	{
@@ -41,8 +41,8 @@ void GameAppRun2()
 			deltaTime = currentFrame - lastFrame;
 			lastFrame = currentFrame;
 
-			if (glfwGetKey(window::windowHandle, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-				glfwSetWindowShouldClose(window::windowHandle, true);
+			if (glfwGetKey(window::handle, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+				glfwSetWindowShouldClose(window::handle, true);
 			
 			//BindState(state);
 			//glClearColor(0.3f, 0.1f, 0.8f, 1.0f);

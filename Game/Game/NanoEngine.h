@@ -8,4 +8,6 @@ namespace engine
 	bool ShouldClose();
 	void BeginFrame();
 	void EndFrame();
+
+	void DrawFPS();
 }

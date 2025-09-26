@@ -1,24 +1,24 @@
 ﻿#include "stdafx.h"
 #include "Material.h"
 
-Material::Material()
+Materialo2::Materialo2()
 {
 	specularIntensity = 0.0f;
 	shininess = 0.0f;
 }
 
-Material::Material(GLfloat sIntensity, GLfloat shine)
+Materialo2::Materialo2(GLfloat sIntensity, GLfloat shine)
 {
 	specularIntensity = sIntensity;
 	shininess = shine;
 }
 
-void Material::UseMaterial(GLuint specularIntensityLocation, GLuint shininessLocation)
+void Materialo2::UseMaterial(GLuint specularIntensityLocation, GLuint shininessLocation)
 {
 	glUniform1f(specularIntensityLocation, specularIntensity);
 	glUniform1f(shininessLocation, shininess);
 }
 
-Material::~Material()
+Materialo2::~Materialo2()
 {
 }

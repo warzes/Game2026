@@ -1,11 +1,11 @@
 ﻿#include "stdafx.h"
 #include "Model.h"
 
-Model::Model()
+Modelo2::Modelo2()
 {
 }
 
-void Model::RenderModel()
+void Modelo2::RenderModel()
 {
 	for (size_t i = 0; i < meshList.size(); i++)
 	{
@@ -20,7 +20,7 @@ void Model::RenderModel()
 	}
 }
 
-void Model::LoadModel(const std::string& fileName)
+void Modelo2::LoadModel(const std::string& fileName)
 {
 	Assimp::Importer importer;
 	aiPropertyStore* props = aiCreatePropertyStore();
@@ -42,7 +42,7 @@ void Model::LoadModel(const std::string& fileName)
 	LoadMaterials(scene);
 }
 
-void Model::LoadNode(aiNode* node, const aiScene* scene)
+void Modelo2::LoadNode(aiNode* node, const aiScene* scene)
 {
 	for (size_t i = 0; i < node->mNumMeshes; i++)
 	{
@@ -55,7 +55,7 @@ void Model::LoadNode(aiNode* node, const aiScene* scene)
 	}
 }
 
-void Model::LoadMesh(aiMesh* mesh, const aiScene* scene)
+void Modelo2::LoadMesh(aiMesh* mesh, const aiScene* scene)
 {
 	std::vector<GLfloat> vertices;
 	std::vector<unsigned int> indices;
@@ -82,13 +82,13 @@ void Model::LoadMesh(aiMesh* mesh, const aiScene* scene)
 		}
 	}
 
-	Mesh* newMesh = new Mesh();
+	Mesho2* newMesh = new Mesho2();
 	newMesh->CreateMesh(&vertices[0], &indices[0], vertices.size(), indices.size());
 	meshList.push_back(newMesh);
 	meshToTex.push_back(mesh->mMaterialIndex);
 }
 
-void Model::LoadMaterials(const aiScene* scene)
+void Modelo2::LoadMaterials(const aiScene* scene)
 {
 	textureList.resize(scene->mNumMaterials);
 
@@ -108,7 +108,7 @@ void Model::LoadMaterials(const aiScene* scene)
 
 				std::string texPath = std::string("textures/") + filename;
 
-				textureList[i] = new Texture(texPath.c_str());
+				textureList[i] = new TextureO2(texPath.c_str());
 
 				if (!textureList[i]->LoadTexture())
 				{
@@ -121,13 +121,13 @@ void Model::LoadMaterials(const aiScene* scene)
 
 		if (!textureList[i])
 		{
-			textureList[i] = new Texture("textures/plain.png");
+			textureList[i] = new TextureO2("textures/plain.png");
 			textureList[i]->LoadTextureA();
 		}
 	}
 }
 
-void Model::ClearModel()
+void Modelo2::ClearModel()
 {
 	for (size_t i = 0; i < meshList.size(); i++)
 	{
@@ -148,6 +148,6 @@ void Model::ClearModel()
 	}
 }
 
-Model::~Model()
+Modelo2::~Modelo2()
 {
 }

@@ -1,5 +1,9 @@
 ﻿#pragma once
 
-void GameAppRun();
-void GameAppRun2();
-void GameAppRun3();
+void TempAppRun();
+void TempAppRun2();
+void TempAppRun3();
+void TempAppRun4();
+
+
+void ExampleApp001();
