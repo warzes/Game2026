@@ -495,7 +495,24 @@ void Model::Draw(int modelMatrixLoc, int normalMatrixLoc, GLenum mode)
 		{
 			glm::mat4 finalModel = m_model * m_meshes[i].GetModelMatrix();
 			SetUniform(modelMatrixLoc, finalModel);
-			if (normalMatrixLoc > -1) SetUniform(normalMatrixLoc, glm::transpose(glm::inverse(finalModel)));
+			if (normalMatrixLoc > -1) 
+				SetUniform(normalMatrixLoc, glm::transpose(glm::inverse(finalModel)));
+		}
+		m_meshes[i].Draw(mode);
+	}
+}
+//=============================================================================
+void Model::Draw(const glm::mat4& modelMat, int modelMatrixLoc, int normalMatrixLoc, GLenum mode)
+{
+	glm::mat4 model = modelMat * m_model;
+	for (size_t i = 0; i < m_meshes.size(); i++)
+	{
+		if (modelMatrixLoc > -1)
+		{
+			glm::mat4 finalModel = model * m_meshes[i].GetModelMatrix();
+			SetUniform(modelMatrixLoc, finalModel);
+			if (normalMatrixLoc > -1) 
+				SetUniform(normalMatrixLoc, glm::transpose(glm::inverse(finalModel)));
 		}
 		m_meshes[i].Draw(mode);
 	}

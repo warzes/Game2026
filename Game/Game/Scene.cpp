@@ -11,6 +11,11 @@ void Scene::Init()
 //=============================================================================
 void Scene::Close()
 {
+	for (auto it = m_models.begin(); it != m_models.end(); it++)
+	{
+		it->second.Free();
+	}
+	m_models.clear();
 	m_gridAxis.reset();
 }
 //=============================================================================
@@ -34,8 +39,24 @@ Model* Scene::LoadModel(const std::string& fileName)
 	}
 	else
 	{
-		m_models[fileName] = Model{ .id = textureID, .width = (uint32_t)width, .height = (uint32_t)height };
-		return m_models[fileName];
+		m_models[fileName] = Model();
+		m_models[fileName].Load(fileName);
+		return &m_models[fileName];
+	}
+}
+//=============================================================================
+Model* Scene::AddModel(const std::string& name, const MeshCreateInfo& createInfo)
+{
+	auto it = m_models.find(name);
+	if (it != m_models.end())
+	{
+		return &it->second;
+	}
+	else
+	{
+		m_models[name] = Model();
+		m_models[name].Create(createInfo);
+		return &m_models[name];
 	}
 }
 //=============================================================================

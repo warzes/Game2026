@@ -86,7 +86,7 @@ private:
 	GLuint                  m_vao{ 0 };
 	GLuint                  m_vbo{ 0 };
 	GLuint                  m_ebo{ 0 };
-	glm::mat4               m_model{ glm::mat4(1.0f) };
+	glm::mat4               m_model{ glm::mat4(1.0f) }; // TODO: нужно ли?
 	std::optional<Material> m_material{};
 	AABB                    m_aabb{};
 };
@@ -102,7 +102,8 @@ public:
 
 	void DrawSubMesh(size_t id, GLenum mode = GL_TRIANGLES);
 	void Draw(GLenum mode = GL_TRIANGLES);
-	void Draw(int modelMatrixLoc, int normalMatrixLoc, GLenum mode = GL_TRIANGLES);// TODO: не нужно. модель может быть одна, а объектов с ней много. у них своя матрица и она должна умножаться на эту
+	void Draw(int modelMatrixLoc, int normalMatrixLoc, GLenum mode = GL_TRIANGLES);
+	void Draw(const glm::mat4& modelMat, int modelMatrixLoc, int normalMatrixLoc, GLenum mode = GL_TRIANGLES);
 
 	size_t GetNumMeshes() const noexcept { return m_meshes.size(); }
 	const std::vector<Mesh>& GetMeshes() const noexcept { return m_meshes; }

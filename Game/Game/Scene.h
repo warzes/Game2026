@@ -5,15 +5,12 @@
 #include "Light.h"
 #include "GridAxis.h"
 
-struct ModelObject final
+struct Entity final
 {
-	//void SetModelMatrix(const glm::mat4& m) { model.SetModelMatrix(m); }
-	//const glm::mat4& GetModelMatrix() const noexcept { return model.GetModelMatrix(); }
-
 	const AABB& GetAABB() const noexcept { return model->GetAABB(); }
 
 	Model*    model{ nullptr };
-	glm::mat4 modelMat;
+	glm::mat4 modelMat{ glm::mat4(1.0f) };
 	bool      visible{ true };
 };
 
@@ -52,7 +49,7 @@ private:
 	std::vector<Camera>                    m_cameras{ 1u };
 
 	std::unordered_map<std::string, Model> m_models;
-	std::vector<ModelObject>               m_objModel;
+	std::vector<Entity>                    m_entities;
 
 	std::vector<DirectionalLight>          m_directionalLights;
 	std::vector<SpotLight>                 m_spotLights;

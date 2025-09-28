@@ -71,6 +71,7 @@ void main()
 	Model modelBox;
 	Model modelSphere;
 	Model modelTest;
+	Model modelTest2;
 
 	Texture2D texturePlane;
 	Texture2D textureBox;
@@ -94,7 +95,9 @@ void ExampleApp002()
 		modelPlane.Create(GeometryGenerator::CreatePlane(100, 100, 100, 100));
 		modelBox.Create(GeometryGenerator::CreateBox());
 		modelSphere.Create(GeometryGenerator::CreateSphere());
-		modelTest.Load("data/models/school/school.obj");
+		modelTest.Load("data/models/tree.glb");
+		modelTest2.Load("data/models/cottage/cottage_obj.obj");
+		modelTest2.SetModelMatrix(glm::scale(glm::mat4(1.0f), glm::vec3(0.2f)));
 
 		texturePlane = textures::GetDefaultDiffuse2D();
 		textureBox = textures::LoadTexture2D("data/textures/temp.png", ColorSpace::sRGB, true);
@@ -130,8 +133,13 @@ void ExampleApp002()
 			BindTexture2D(0, texturePlane.id);
 			//modelPlane.Draw();
 
-			modelTest.SetModelMatrix(glm::scale(glm::mat4(1.0f), glm::vec3(0.2f)));
+			//modelTest.SetModelMatrix(glm::scale(glm::mat4(1.0f), glm::vec3(0.2f)));
 			modelTest.Draw(GetUniformLocation(shader, "modelMatrix"), GetUniformLocation(shader, "normalMatrix"));
+
+			modelTest2.Draw(
+				glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 0.0f, -3.0f)), 
+				GetUniformLocation(shader, "modelMatrix"), 
+				GetUniformLocation(shader, "normalMatrix"));
 
 			BindTexture2D(0, texturePlane.id);
 			SetUniform(GetUniformLocation(shader, "modelMatrix"), glm::translate(glm::mat4(1.0f), glm::vec3(-3.0f, 1.0f, 0.0f)));
