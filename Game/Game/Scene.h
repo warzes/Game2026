@@ -52,14 +52,16 @@ private:
 	enum class drawScenePass : uint8_t
 	{
 		ShadowMapping,
-
+		BlinnPhong,
 		Temp
 	};
 
 	bool initMainShader();
 	bool initShadowMappingShader();
+	bool initBlinnPhongShader();
 	void updateSize();
 	void directionalShadowPass();
+	void colorMultisamplePass();
 	void drawScene(drawScenePass scenePass);
 
 	//GLState                       m_state;
@@ -74,6 +76,12 @@ private:
 	int                           m_shadowMappingShaderProjectionMatrixId{ -1 };
 	int                           m_shadowMappingShaderViewMatrixId{ -1 };
 	int                           m_shadowMappingShaderModelMatrixId{ -1 };
+
+	GLuint                        m_blinnPhong{ 0 };
+	int                           m_blinnPhongShaderProjectionMatrixId{ -1 };
+	int                           m_blinnPhongShaderViewMatrixId{ -1 };
+	int                           m_blinnPhongShaderModelMatrixId{ -1 };
+	int                           m_blinnPhongShaderNormalMatrixId{ -1 };
 
 	glm::mat4                     m_perspective{ 1.0f };
 	uint16_t                      m_framebufferWidth{ 0 };
@@ -99,7 +107,6 @@ private:
 	int m_show_depth_map;
 	glm::mat4 m_orthoProjection; // for directional lights
 
-	GLuint m_blinnPhong;
 	GLuint m_pbr;
 	GLuint m_postProcessing;
 

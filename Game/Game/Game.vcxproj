@@ -167,6 +167,7 @@
   <ItemGroup>
     <None Include="..\..\bin\data\shaders\axis\fragment.glsl" />
     <None Include="..\..\bin\data\shaders\axis\vertex.glsl" />
+    <None Include="..\..\bin\data\shaders\blinn_phong\fragment — копия.glsl" />
     <None Include="..\..\bin\data\shaders\blinn_phong\fragment.glsl" />
     <None Include="..\..\bin\data\shaders\blinn_phong\vertex.glsl" />
     <None Include="..\..\bin\data\shaders\grid\fragment.glsl" />

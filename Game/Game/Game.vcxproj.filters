@@ -317,5 +317,8 @@
     <None Include="..\..\bin\data\shaders\shadowMapping\vertex.glsl">
       <Filter>shaders\shadowMapping</Filter>
     </None>
+    <None Include="..\..\bin\data\shaders\blinn_phong\fragment — копия.glsl">
+      <Filter>shaders\blinn_phong</Filter>
+    </None>
   </ItemGroup>
 </Project>

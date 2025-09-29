@@ -46,6 +46,16 @@ void ExampleApp002()
 
 		scene.GetDirectionalLights().push_back(DirectionalLight{ glm::vec3(-6.0f, 10.0f, 2.0f), glm::vec3(0.025f), glm::vec3(5.0f), glm::vec3(1.0f), glm::vec3(0.5f, -1.5f, -0.25f) });
 
+		auto spot = SpotLight(
+			glm::vec3(0.0f, 0.5f, 4.5f),  // pos
+			glm::vec3(0.025f), // amb
+			glm::vec3(100.0f), // diff
+			glm::vec3(1.0f), // spec
+			glm::vec3(-4.37, -0.5f, -3.5f), // dir
+			30.0f, // innerAngle
+			35.0f); // outerAngle
+		scene.GetSpotLight().push_back(spot);
+
 		while (!engine::ShouldClose())
 		{
 			engine::BeginFrame();
@@ -68,6 +78,7 @@ void ExampleApp002()
 			}
 
 			scene.BindCamera(&camera);
+			scene.BindEntity(&modelTest);
 			scene.BindEntity(&modelTest2);
 			scene.Draw();
 
