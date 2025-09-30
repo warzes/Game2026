@@ -26,16 +26,16 @@ bool Scene::Init()
 	m_orthoDimension = 10.0f;
 	m_orthoProjection = glm::ortho(-m_orthoDimension, m_orthoDimension, -m_orthoDimension, m_orthoDimension, 0.1f, 100.0f);
 
-	m_pbr = CreateShaderProgram(io::ReadShaderCode("data/shaders/PBR/vertex.glsl"), io::ReadShaderCode("data/shaders/PBR/fragment.glsl"));
-	m_postProcessing = CreateShaderProgram(io::ReadShaderCode("data/shaders/post_processing/vertex.glsl"), io::ReadShaderCode("data/shaders/post_processing/fragment.glsl"));
+	//m_pbr = CreateShaderProgram(io::ReadShaderCode("data/shaders/PBR/vertex.glsl"), io::ReadShaderCode("data/shaders/PBR/fragment.glsl"));
+	//m_postProcessing = CreateShaderProgram(io::ReadShaderCode("data/shaders/post_processing/vertex.glsl"), io::ReadShaderCode("data/shaders/post_processing/fragment.glsl"));
 	
 	if (!initShadowMappingShader())
 		return false;
 	if (!initBlinnPhongShader())
 		return false;
 
-
 	m_multisample = { std::make_unique<Framebuffer>(true, true, true) };
+
 	m_normal = { std::make_unique<Framebuffer>(true, false, true) };
 	m_stdDepth = {
 			std::make_unique<Framebuffer>(false),
@@ -101,8 +101,14 @@ void Scene::Draw()
 		// COLOR PASS : multisampling
 		colorMultisamplePass();
 
-		// TEMP PASS
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_multisample->GetId());
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // 0 = default framebuffer (экран)
+		glBlitFramebuffer(0, 0, m_framebufferWidth, m_framebufferHeight, 0, 0, m_framebufferWidth, m_framebufferHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+		// TEMP PASS
+	/*	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glEnable(GL_DEPTH_TEST);
 		glViewport(0, 0, static_cast<int>(m_framebufferWidth), static_cast<int>(m_framebufferHeight));
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
@@ -123,7 +129,7 @@ void Scene::Draw()
 				SetUniform(m_mainShaderNormalMatrixId, glm::transpose(glm::inverse(m_entities[i]->modelMat)));
 
 			m_entities[i]->model.Draw(drawInfo);
-		}
+		}*/
 		// blit to normal framebuffer (resolve multisampling)
 
 		// bind to default framebuffer
@@ -188,7 +194,7 @@ bool Scene::initShadowMappingShader()
 
 	glUseProgram(m_shadowMapping);
 	SetUniform(GetUniformLocation(m_shadowMapping, "diffuseTexture"), 0);
-	SetUniform(GetUniformLocation(m_shadowMapping, "hasDiffuse"), 1);
+	SetUniform(GetUniformLocation(m_shadowMapping, "hasDiffuse"), 0);
 	m_shadowMappingShaderProjectionMatrixId = GetUniformLocation(m_shadowMapping, "projectionMatrix");
 	m_shadowMappingShaderViewMatrixId = GetUniformLocation(m_shadowMapping, "viewMatrix");
 	m_shadowMappingShaderModelMatrixId = GetUniformLocation(m_shadowMapping, "modelMatrix");
@@ -207,6 +213,13 @@ bool Scene::initBlinnPhongShader()
 
 	glUseProgram(m_blinnPhong);
 	SetUniform(GetUniformLocation(m_blinnPhong, "diffuseTexture"), 0);
+	SetUniform(GetUniformLocation(m_blinnPhong, "specularTexture"), 1);
+	SetUniform(GetUniformLocation(m_blinnPhong, "normalTexture"), 2);
+	for (size_t i = 0; i < 10; i++)
+	{
+		SetUniform(GetUniformLocation(m_blinnPhong, "depthMap[" + std::to_string(i) + "]"), 4+(int)i);
+	}
+
 	m_blinnPhongShaderProjectionMatrixId = GetUniformLocation(m_blinnPhong, "projectionMatrix");
 	m_blinnPhongShaderViewMatrixId = GetUniformLocation(m_blinnPhong, "viewMatrix");
 	m_blinnPhongShaderModelMatrixId = GetUniformLocation(m_blinnPhong, "modelMatrix");
@@ -302,6 +315,10 @@ void Scene::colorMultisamplePass()
 	SetUniform(m_blinnPhongShaderViewMatrixId, m_camera->GetViewMatrix());
 	SetUniform(GetUniformLocation(m_blinnPhong, "cam.viewPos"), m_camera->Position);
 
+	SetUniform(GetUniformLocation(m_blinnPhong, "shadowOn"), 1);
+	SetUniform(GetUniformLocation(m_blinnPhong, "shadowMethod"), static_cast<int>(m_shadowMethod));
+	SetUniform(GetUniformLocation(m_blinnPhong, "bias"), m_bias);
+
 	// shader set light
 	{
 		int dCount = m_directionalLights.size();
@@ -366,7 +383,22 @@ void Scene::colorMultisamplePass()
 
 	for (int i{ 0 }; i < m_spotLights.size(); ++i)
 	{
-		3
+		float outerCutOff = m_spotLights[i].GetOuterCutOff();
+		glm::vec3 lightPosition = m_spotLights[i].GetPosition();
+		glm::vec3 lightTarget = lightPosition + m_spotLights[i].GetDirection();
+		glm::mat4 lightView = glm::lookAt(lightPosition, lightTarget, glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 spotProj = glm::perspective(
+			outerCutOff * 2.0f, 1.0f,
+			0.01f,
+			1000.0f
+		);
+
+		glActiveTexture(GL_TEXTURE0 + textureOffset);
+		glBindTexture(GL_TEXTURE_2D, m_stdDepth[depthMapIndex]->GetAttachments().at(0).id);
+		SetUniform(GetUniformLocation(m_blinnPhong, "depthMap[" + std::to_string(depthMapIndex) + "]"), textureOffset);
+		SetUniform(GetUniformLocation(m_blinnPhong, "light[" + std::to_string(i + nbDLights) + "].lightSpaceMatrix"), spotProj * lightView);
+		depthMapIndex++;
+		textureOffset++;
 	}
 
 	drawScene(drawScenePass::BlinnPhong);
@@ -401,6 +433,12 @@ void Scene::drawScene(drawScenePass scenePass)
 	drawInfo.mode = GL_TRIANGLES;
 	for (size_t i = 0; i < m_maxEnts; i++)
 	{
+		if (scenePass == drawScenePass::BlinnPhong)
+		{
+			drawInfo.shaderProgram = m_blinnPhong;
+			SetUniform(GetUniformLocation(m_blinnPhong, "solid"), 1);
+		}
+		
 		if (modelMatrixId >= 0) SetUniform(modelMatrixId, m_entities[i]->modelMat);
 		if (normalMatrixId >= 0) SetUniform(normalMatrixId, glm::transpose(glm::inverse(m_entities[i]->modelMat)));
 		m_entities[i]->model.Draw(drawInfo);

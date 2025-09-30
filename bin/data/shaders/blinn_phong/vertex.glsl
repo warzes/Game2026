@@ -14,8 +14,8 @@ uniform mat4 normalMatrix;
 out vec3 fsColor;
 out vec3 fsNormal;
 out vec2 fsTexCoord;
-out vec3 fragPos;
-out mat3 TBN;
+out vec3 fsFragPos;
+out mat3 fsTBN;
 
 void main()
 {
@@ -24,7 +24,7 @@ void main()
 	fsNormal   = mat3(normalMatrix) * vertexNormal;
 	fsTexCoord = vertexTexCoord;
 
-	fragPos = vec3(modelMatrix * vec4(vertexPosition, 1.0f));
+	fsFragPos = vec3(modelMatrix * vec4(vertexPosition, 1.0f));
 
 	// compute TBN matrix
 	// TODO: может bitangent хранить в вершине?
@@ -36,5 +36,5 @@ void main()
 
 	T = normalize(T - dot(T, N) * N);
 	B = cross(N, T);
-	TBN = transpose(mat3(T, B, N));
+	fsTBN = transpose(mat3(T, B, N));
 }

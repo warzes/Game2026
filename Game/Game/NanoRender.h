@@ -70,7 +70,7 @@ public:
 	Mesh& operator=(const Mesh&) = delete;
 	Mesh& operator=(Mesh&& mesh) noexcept;
 
-	void Draw(GLenum mode = GL_TRIANGLES, bool bindMaterial = true, bool instancing = false, int amount = 1);
+	void Draw(GLenum mode = GL_TRIANGLES, GLuint program = 0, bool bindMaterial = true, bool instancing = false, int amount = 1);
 
 	uint32_t GetVertexCount() const noexcept { return m_vertexCount; }
 	uint32_t GetIndexCount() const noexcept { return m_indicesCount; }
@@ -91,6 +91,7 @@ struct ModelDrawInfo final
 {
 	GLenum mode{ GL_TRIANGLES };
 	bool   bindMaterials{ true };
+	GLuint shaderProgram{ 0 };
 };
 
 class Model final
