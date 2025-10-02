@@ -320,7 +320,7 @@ void SetMeshVertexAttributes()
 		{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(MeshVertex, normal)},
 		{.type = GL_FLOAT, .size = 2, .offset = (void*)offsetof(MeshVertex, texCoord)},
 		{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(MeshVertex, tangent)},
-		//{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(MeshVertex, bitangent)},
+		{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(MeshVertex, bitangent)},
 	};
 	SpecifyVertexAttributes(vertexSize, attributes);
 }
@@ -590,9 +590,9 @@ Mesh Model::processMesh(const aiScene* scene, struct aiMesh* mesh, std::string_v
 			v.tangent.y = mesh->mTangents[i].y;
 			v.tangent.z = mesh->mTangents[i].z;
 
-			//v.bitangent.x = mesh->mBitangents[i].x;
-			//v.bitangent.y = mesh->mBitangents[i].y;
-			//v.bitangent.z = mesh->mBitangents[i].z;
+			v.bitangent.x = mesh->mBitangents[i].x;
+			v.bitangent.y = mesh->mBitangents[i].y;
+			v.bitangent.z = mesh->mBitangents[i].z;
 		}
 	}
 

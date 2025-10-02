@@ -3,6 +3,10 @@
 #include "NanoWindow.h"
 #include "NanoIO.h"
 #include "NanoLog.h"
+
+пройти по точечному источнику света и случаю без текстур
+отрефакторить шейдер убрав условия, вынеся в начало vec diffuseColor и подобное которое берет или текстуру или материал
+
 //=============================================================================
 bool Scene::Init()
 {
@@ -11,10 +15,7 @@ bool Scene::Init()
 	m_perspective = glm::perspective(glm::radians(60.0f), window::GetAspect(), 0.01f, 1000.0f);
 
 	m_entities.reserve(100000);
-
-	if (!initMainShader())
-		return false;
-	
+		
 	//m_state.depthState.enable = true;
 	//m_state.blendState.enable = true;
 	//m_state.blendState.srcAlpha = BlendFactor::OneMinusSrcAlpha;
@@ -66,8 +67,6 @@ bool Scene::Init()
 //=============================================================================
 void Scene::Close()
 {
-	if (m_mainShader) glDeleteProgram(m_mainShader);
-	m_mainShader = 0;
 	m_gridAxis.reset();
 }
 //=============================================================================
@@ -138,25 +137,6 @@ void Scene::SetShadowQuality(SHADOW_QUALITY quality)
 		for (int i{ 0 }; i < 10; ++i)
 			m_stdDepth.at(i)->UpdateAttachment(AttachmentType::Texture, AttachmentTarget::Depth, static_cast<int>(m_shadowQuality), static_cast<int>(m_shadowQuality));
 	}
-}
-//=============================================================================
-bool Scene::initMainShader()
-{
-	m_mainShader = CreateShaderProgram(io::ReadShaderCode("data/shaders/Model.vert"), io::ReadShaderCode("data/shaders/Model.frag"));
-	if (!m_mainShader)
-	{
-		Fatal("Scene Main Shader failed!");
-		return false;
-	}
-
-	glUseProgram(m_mainShader);
-	SetUniform(GetUniformLocation(m_mainShader, "diffuseTexture"), 0);
-	m_mainShaderProjectionMatrixId = GetUniformLocation(m_mainShader, "projectionMatrix");
-	m_mainShaderViewMatrixId = GetUniformLocation(m_mainShader, "viewMatrix");
-	m_mainShaderModelMatrixId = GetUniformLocation(m_mainShader, "modelMatrix");
-	m_mainShaderNormalMatrixId = GetUniformLocation(m_mainShader, "normalMatrix");
-	glUseProgram(0);
-	return true;
 }
 //=============================================================================
 bool Scene::initShadowMappingShader()
@@ -234,6 +214,7 @@ void Scene::directionalShadowPass()
 
 		m_stdDepth[i]->Bind();
 		glClear(GL_DEPTH_BUFFER_BIT);
+		glClearDepth(1.0f);
 
 		glm::vec3 lightPosition = dlight.GetPosition();
 		glm::vec3 lightTarget = dlight.GetDirection();
@@ -270,9 +251,24 @@ void Scene::directionalShadowPass()
 		// draw scene
 		// TODO: доделать
 		if (m_shadowMethod == SHADOW_METHOD::LANCE_WILLIAMS)
+		{
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
 			drawScene(drawScenePass::ShadowMapping);
+		}
 		else
+		{
+			//if (solid)
+			{
+				glEnable(GL_CULL_FACE);
+				glCullFace(GL_FRONT);
+			}
+			//else
+			//{
+			//	glDisable(GL_CULL_FACE);
+			//}
 			drawScene(drawScenePass::ShadowMapping);
+		}
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -400,11 +396,6 @@ void Scene::drawScene(drawScenePass scenePass)
 		modelMatrixId = m_blinnPhongShaderModelMatrixId;
 		normalMatrixId = m_blinnPhongShaderNormalMatrixId;
 	}
-	else if (scenePass == drawScenePass::Temp)
-	{
-		shader = m_mainShader;
-		modelMatrixId = m_mainShaderModelMatrixId;
-	}
 
 	ModelDrawInfo drawInfo;
 	drawInfo.bindMaterials = true;
@@ -417,8 +408,8 @@ void Scene::drawScene(drawScenePass scenePass)
 			SetUniform(GetUniformLocation(m_blinnPhong, "solid"), 1);
 		}
 		
-		if (modelMatrixId >= 0) SetUniform(modelMatrixId, m_entities[i]->modelMat);
-		if (normalMatrixId >= 0) SetUniform(normalMatrixId, glm::transpose(glm::inverse(m_entities[i]->modelMat)));
+		if (modelMatrixId >= 0)  SetUniform(modelMatrixId, m_entities[i]->modelMat);
+		if (normalMatrixId >= 0) SetUniform(normalMatrixId, glm::mat3(glm::transpose(glm::inverse(m_entities[i]->modelMat))));
 		m_entities[i]->model.Draw(drawInfo);
 	}
 }

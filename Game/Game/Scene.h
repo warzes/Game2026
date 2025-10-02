@@ -53,10 +53,8 @@ private:
 	{
 		ShadowMapping,
 		BlinnPhong,
-		Temp
 	};
 
-	bool initMainShader();
 	bool initShadowMappingShader();
 	bool initBlinnPhongShader();
 	void updateSize();
@@ -65,12 +63,6 @@ private:
 	void drawScene(drawScenePass scenePass);
 
 	//GLState                       m_state;
-
-	GLuint                        m_mainShader{ 0 };
-	int                           m_mainShaderProjectionMatrixId{ -1 };
-	int                           m_mainShaderViewMatrixId{ -1 };
-	int                           m_mainShaderModelMatrixId{ -1 };
-	int                           m_mainShaderNormalMatrixId{ -1 };
 
 	GLuint                        m_shadowMapping{ 0 };
 	int                           m_shadowMappingShaderProjectionMatrixId{ -1 };
