@@ -16,6 +16,12 @@ enum class SHADOW_QUALITY
 	ULTRA = 4096
 };
 
+enum class SceneTypeRender
+{
+	Forward,
+	Deffered
+};
+
 enum class SHADOW_METHOD
 {
 	LANCE_WILLIAMS,
@@ -53,6 +59,8 @@ private:
 	{
 		ShadowMapping,
 		BlinnPhong,
+
+		GBuffer
 	};
 
 	bool initShadowMappingShader();
@@ -61,6 +69,8 @@ private:
 	void directionalShadowPass();
 	void colorMultisamplePass();
 	void drawScene(drawScenePass scenePass);
+
+	bool initDefferedShader();
 
 	//GLState                       m_state;
 
@@ -101,5 +111,22 @@ private:
 
 	GLuint m_pbr;
 	GLuint m_postProcessing;
+
+	SceneTypeRender m_typeRender{ SceneTypeRender::Deffered };
+
+
+	// temp deffered
+	GLuint m_outputGeoShader{ 0 };
+	GLuint m_directionalLightShader{ 0 };
+
+	GLuint m_gBufferFBO{ 0 };
+	// these four textures are the gbuffer.
+	GLuint colorTexture;
+	GLuint normalTexture;
+	GLuint positionTexture;
+	GLuint tangentTexture;
+	GLuint bitangentTexture;
+	GLuint depthRenderbuffer;
+	GLuint vao;
 
 };

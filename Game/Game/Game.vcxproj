@@ -169,6 +169,10 @@
     <None Include="..\..\bin\data\shaders\axis\vertex.glsl" />
     <None Include="..\..\bin\data\shaders\blinn_phong\fragment.glsl" />
     <None Include="..\..\bin\data\shaders\blinn_phong\vertex.glsl" />
+    <None Include="..\..\bin\data\shaders\deffered\directionalLight.frag" />
+    <None Include="..\..\bin\data\shaders\deffered\directionalLight.vert" />
+    <None Include="..\..\bin\data\shaders\deffered\gBuffer.frag" />
+    <None Include="..\..\bin\data\shaders\deffered\gBuffer.vert" />
     <None Include="..\..\bin\data\shaders\grid\fragment.glsl" />
     <None Include="..\..\bin\data\shaders\grid\vertex.glsl" />
     <None Include="..\..\bin\data\shaders\Model.frag" />

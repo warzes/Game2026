@@ -246,6 +246,9 @@
     <Filter Include="shaders\shadowMapping">
       <UniqueIdentifier>{79e8d4d5-b27f-435c-852d-1dd9b15e499b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shaders\deffered">
+      <UniqueIdentifier>{b1109cbf-a6d6-42c7-a620-e6661543df47}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\bin\data\shaders\NormalPassShader.fs">
@@ -316,6 +319,18 @@
     </None>
     <None Include="..\..\bin\data\shaders\shadowMapping\vertex.glsl">
       <Filter>shaders\shadowMapping</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders\deffered\gBuffer.frag">
+      <Filter>shaders\deffered</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders\deffered\gBuffer.vert">
+      <Filter>shaders\deffered</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders\deffered\directionalLight.frag">
+      <Filter>shaders\deffered</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders\deffered\directionalLight.vert">
+      <Filter>shaders\deffered</Filter>
     </None>
   </ItemGroup>
 </Project>

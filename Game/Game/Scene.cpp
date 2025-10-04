@@ -4,8 +4,8 @@
 #include "NanoIO.h"
 #include "NanoLog.h"
 
-пройти по точечному источнику света и случаю без текстур
-отрефакторить шейдер убрав условия, вынеся в начало vec diffuseColor и подобное которое берет или текстуру или материал
+//пройти по точечному источнику света и случаю без текстур
+//отрефакторить шейдер убрав условия, вынеся в начало vec diffuseColor и подобное которое берет или текстуру или материал
 
 //=============================================================================
 bool Scene::Init()
@@ -33,6 +33,8 @@ bool Scene::Init()
 	if (!initShadowMappingShader())
 		return false;
 	if (!initBlinnPhongShader())
+		return false;
+	if (!initDefferedShader())
 		return false;
 
 	m_multisample = { std::make_unique<Framebuffer>(true, true, true) };
@@ -87,37 +89,107 @@ void Scene::BindEntity(Entity* ent)
 //=============================================================================
 void Scene::Draw()
 {
-	assert(m_camera);
 	updateSize();
 
-	glEnable(GL_DEPTH_TEST);
-
-	if (m_shadowQuality != SHADOW_QUALITY::OFF) 
+	if (m_typeRender == SceneTypeRender::Deffered)
 	{
-		// SHADOW PASS : directional & spot light sources
-		directionalShadowPass();
+		// gBuffer render
+		{
+			// setup GL state.
+			glEnable(GL_DEPTH_TEST);
+			glDepthMask(true);
+			glDisable(GL_BLEND);
+			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+			//glEnable(GL_CULL_FACE);
+			//glFrontFace(GL_CCW);
 
-		// COLOR PASS : multisampling
-		colorMultisamplePass();
+			//
+			// In the first pass, we just write to the gbuffer.
+			//
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_gBufferFBO); // bind g buffer for writing.
 
-		// TEMP blit
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_multisample->GetId());
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // 0 = default framebuffer (экран)
-		glBlitFramebuffer(0, 0, m_framebufferWidth, m_framebufferHeight, 0, 0, m_framebufferWidth, m_framebufferHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			glViewport(0, 0, m_framebufferWidth, m_framebufferHeight);
+			glClearColor(0.0f, 0.0f, 0.3f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// blit to normal framebuffer (resolve multisampling)
+			glUseProgram(m_outputGeoShader); // "output geometry to gbuffer" shader
+			SetUniform(glGetUniformLocation(m_outputGeoShader, "projectionMatrix"), m_perspective);
+			SetUniform(glGetUniformLocation(m_outputGeoShader, "viewMatrix"), m_camera->GetViewMatrix());
 
-		// bind to default framebuffer
+			drawScene(drawScenePass::GBuffer);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		}
 
-		// draw post processing quad
-	}
-	else // без теней
-	{
+		//
+		{
+
+			glViewport(0, 0, m_framebufferWidth, m_framebufferHeight);
+			glClearColor(0.0f, 0.0f, 0.3f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			//
+			// first, we render a single directional light, with a fullscreen pass.
+			//
+			glUseProgram(m_directionalLightShader);
+
+			// bind gbuffer textures.
+			glActiveTexture(GL_TEXTURE0 + 0);
+			glBindTexture(GL_TEXTURE_2D, colorTexture);
+
+			glActiveTexture(GL_TEXTURE0 + 1);
+			glBindTexture(GL_TEXTURE_2D, normalTexture);
+
+			glActiveTexture(GL_TEXTURE0 + 2);
+			glBindTexture(GL_TEXTURE_2D, positionTexture);
+
+			glActiveTexture(GL_TEXTURE0 + 3);
+			glBindTexture(GL_TEXTURE_2D, tangentTexture);
+
+			glActiveTexture(GL_TEXTURE0 + 4);
+			glBindTexture(GL_TEXTURE_2D, bitangentTexture);
+
+			glUniform3f(glGetUniformLocation(m_directionalLightShader, "uCameraPos"), m_camera->Position.x, m_camera->Position.y, m_camera->Position.z);
+
+			glBindVertexArray(vao);
+			// we use attribute-less rendering to render a full-screen triangle.
+			// so the triangle vertices are basically stored in the vertex shader.
+			// see the vertex shader for more details.
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+			glBindVertexArray(0);
+		}
+
 		
 	}
-	
+	else if (m_typeRender == SceneTypeRender::Forward)
+	{
+		glEnable(GL_DEPTH_TEST);
+
+		if (m_shadowQuality != SHADOW_QUALITY::OFF)
+		{
+			// SHADOW PASS : directional & spot light sources
+			directionalShadowPass();
+
+			// COLOR PASS : multisampling
+			colorMultisamplePass();
+
+			// TEMP blit
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			glBindFramebuffer(GL_READ_FRAMEBUFFER, m_multisample->GetId());
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // 0 = default framebuffer (экран)
+			glBlitFramebuffer(0, 0, m_framebufferWidth, m_framebufferHeight, 0, 0, m_framebufferWidth, m_framebufferHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+			// blit to normal framebuffer (resolve multisampling)
+
+			// bind to default framebuffer
+
+			// draw post processing quad
+		}
+		else // без теней
+		{
+		}
+	}
+
 	m_maxEnts = 0;
 }
 //=============================================================================
@@ -181,6 +253,116 @@ bool Scene::initBlinnPhongShader()
 	m_blinnPhongShaderModelMatrixId = GetUniformLocation(m_blinnPhong, "modelMatrix");
 	m_blinnPhongShaderNormalMatrixId = GetUniformLocation(m_blinnPhong, "normalMatrix");
 	glUseProgram(0);
+
+	return true;
+}
+//=============================================================================
+bool Scene::initDefferedShader()
+{
+	glGenVertexArrays(1, &vao);
+
+	{
+		m_outputGeoShader = CreateShaderProgram(io::ReadShaderCode("data/shaders/deffered/gBuffer.vert"), io::ReadShaderCode("data/shaders/deffered/gBuffer.frag"));
+		if (!m_outputGeoShader)
+		{
+			Fatal("Scene Geo Shader failed!");
+			return false;
+		}
+
+		glUseProgram(m_outputGeoShader);
+		SetUniform(GetUniformLocation(m_outputGeoShader, "diffuseTexture"), 0);
+		glUseProgram(0);
+	}
+
+	{
+		m_directionalLightShader = CreateShaderProgram(io::ReadShaderCode("data/shaders/deffered/directionalLight.vert"), io::ReadShaderCode("data/shaders/deffered/directionalLight.frag"));
+		if (!m_directionalLightShader)
+		{
+			Fatal("Scene Directional Light Shader failed!");
+			return false;
+		}
+
+		glUseProgram(m_directionalLightShader);
+		SetUniform(GetUniformLocation(m_directionalLightShader, "uColorTex"), 0);
+		SetUniform(GetUniformLocation(m_directionalLightShader, "uNormalTex"), 1);
+		SetUniform(GetUniformLocation(m_directionalLightShader, "uPositionTex"), 2);
+		SetUniform(GetUniformLocation(m_directionalLightShader, "uTangentTex"), 3);
+		SetUniform(GetUniformLocation(m_directionalLightShader, "uBitangentTex"), 4);
+
+		glUseProgram(0);
+	}
+
+	{
+		glGenFramebuffers(1, &m_gBufferFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_gBufferFBO);
+
+		// RGBA8 color texture-p
+		glGenTextures(1, &colorTexture);
+		glBindTexture(GL_TEXTURE_2D, colorTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_framebufferWidth, m_framebufferHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		//  RGBA16F normal texture.
+		glGenTextures(1, &normalTexture);
+		glBindTexture(GL_TEXTURE_2D, normalTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_framebufferWidth, m_framebufferHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normalTexture, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		//  RGBA16F position texture.
+		glGenTextures(1, &positionTexture);
+		glBindTexture(GL_TEXTURE_2D, positionTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_framebufferWidth, m_framebufferHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, positionTexture, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		//  RGBA16F tangent texture.
+		glGenTextures(1, &tangentTexture);
+		glBindTexture(GL_TEXTURE_2D, tangentTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_framebufferWidth, m_framebufferHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, tangentTexture, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		//  RGBA16F bitangent texture.
+		glGenTextures(1, &bitangentTexture);
+		glBindTexture(GL_TEXTURE_2D, bitangentTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_framebufferWidth, m_framebufferHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, bitangentTexture, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		// we need a z-buffer for the gbuffer. but we don't need to read from it.
+		// so instead create a renderbuffer.
+		glGenRenderbuffers(1, &depthRenderbuffer);
+		glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, m_framebufferWidth, m_framebufferHeight);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);
+
+		// specify that we can render to all three attachments.
+		// this is very important! It won't work otherwise.
+		GLenum tgts[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
+		glDrawBuffers(5, tgts);
+
+		// make sure nothing went wrong:
+		GLenum status;
+		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE) {
+			printf("Framebuffer not complete. Status: %d", status);
+			exit(1);
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
 
 	return true;
 }
@@ -395,6 +577,10 @@ void Scene::drawScene(drawScenePass scenePass)
 		shader = m_blinnPhong;
 		modelMatrixId = m_blinnPhongShaderModelMatrixId;
 		normalMatrixId = m_blinnPhongShaderNormalMatrixId;
+	}
+	else if (scenePass == drawScenePass::GBuffer)
+	{
+		modelMatrixId = glGetUniformLocation(m_outputGeoShader, "modelMatrix");
 	}
 
 	ModelDrawInfo drawInfo;
