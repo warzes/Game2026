@@ -27,7 +27,6 @@ bool Scene::Init()
 	//m_state.blendState.srcAlpha = BlendFactor::OneMinusSrcAlpha;
 
 	m_shadowQuality = SHADOW_QUALITY::ULTRA;
-	m_shadowMethod = SHADOW_METHOD::LANCE_WILLIAMS;
 	m_bias = 0.0005f;
 	m_show_depth_map = 0;
 	m_orthoDimension = 10.0f;
@@ -407,7 +406,7 @@ void Scene::directionalShadowPass()
 		glClearDepth(1.0f);
 
 		glm::vec3 lightPosition = dlight.GetPosition();
-		glm::vec3 lightTarget = dlight.GetDirection();
+		glm::vec3 lightTarget = lightPosition + dlight.GetDirection();
 		glm::mat4 lightView = glm::lookAt(lightPosition, lightTarget, glm::vec3(0.0f, 1.0f, 0.0f));
 		SetUniform(m_shadowMappingShaderViewMatrixId, lightView);
 
@@ -439,26 +438,9 @@ void Scene::directionalShadowPass()
 		SetUniform(m_shadowMappingShaderViewMatrixId, lightView);
 
 		// draw scene
-		// TODO: доделать
-		if (m_shadowMethod == SHADOW_METHOD::LANCE_WILLIAMS)
-		{
-			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
-			drawScene(drawScenePass::ShadowMapping);
-		}
-		else
-		{
-			//if (solid)
-			{
-				glEnable(GL_CULL_FACE);
-				glCullFace(GL_FRONT);
-			}
-			//else
-			//{
-			//	glDisable(GL_CULL_FACE);
-			//}
-			drawScene(drawScenePass::ShadowMapping);
-		}
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		drawScene(drawScenePass::ShadowMapping);
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -480,12 +462,9 @@ void Scene::colorMultisamplePass()
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, m_blinnPhongMatrixUBOShaderId, m_blinnPhongMatrixUBO);
 
-	//SetUniform(m_blinnPhongShaderProjectionMatrixId, m_perspective);
-	//SetUniform(m_blinnPhongShaderViewMatrixId, m_camera->GetViewMatrix());
 	SetUniform(GetUniformLocation(m_blinnPhong, "cam.viewPos"), m_camera->Position);
 
 	SetUniform(GetUniformLocation(m_blinnPhong, "shadowOn"), 1);
-	SetUniform(GetUniformLocation(m_blinnPhong, "shadowMethod"), static_cast<int>(m_shadowMethod));
 	SetUniform(GetUniformLocation(m_blinnPhong, "bias"), m_bias);
 
 	// shader set light

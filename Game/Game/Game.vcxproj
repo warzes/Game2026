@@ -105,6 +105,7 @@
     <ClCompile Include="NanoMath.cpp" />
     <ClCompile Include="NanoRender.cpp" />
     <ClCompile Include="NanoScene.cpp" />
+    <ClCompile Include="Region.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneRenderPass.cpp" />
     <ClCompile Include="TempApp4.cpp" />
@@ -131,6 +132,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -157,6 +159,7 @@
     <ClInclude Include="NanoScene.h" />
     <ClInclude Include="NanoWindow.h" />
     <ClInclude Include="PointLighto2.h" />
+    <ClInclude Include="Region.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Sceneo2.h" />
     <ClInclude Include="SceneRenderPass.h" />
@@ -165,6 +168,7 @@
     <ClInclude Include="SpotLighto2.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\bin\data\shaders\axis\fragment.glsl" />

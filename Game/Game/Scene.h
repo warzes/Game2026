@@ -23,12 +23,6 @@ enum class SceneTypeRender
 	Deffered
 };
 
-enum class SHADOW_METHOD
-{
-	LANCE_WILLIAMS,
-	SECOND_DEPTH
-};
-
 struct Entity final
 {
 	const AABB& GetAABB() const noexcept { return model.GetAABB(); }
@@ -108,7 +102,6 @@ private:
 
 	float m_orthoDimension;
 	SHADOW_QUALITY m_shadowQuality;
-	SHADOW_METHOD m_shadowMethod;
 	float m_bias;
 	int m_show_depth_map;
 	glm::mat4 m_orthoProjection; // for directional lights

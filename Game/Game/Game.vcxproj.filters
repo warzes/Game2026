@@ -99,6 +99,12 @@
     <ClCompile Include="SceneRenderPass.cpp">
       <Filter>Example\tmp</Filter>
     </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>GameApp</Filter>
+    </ClCompile>
+    <ClCompile Include="Region.cpp">
+      <Filter>GameApp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -193,6 +199,12 @@
     <ClInclude Include="SceneRenderPass.h">
       <Filter>Example\tmp</Filter>
     </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>GameApp</Filter>
+    </ClInclude>
+    <ClInclude Include="Region.h">
+      <Filter>GameApp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="shaders">
@@ -254,6 +266,9 @@
     </Filter>
     <Filter Include="shaders\deffered">
       <UniqueIdentifier>{b1109cbf-a6d6-42c7-a620-e6661543df47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameApp">
+      <UniqueIdentifier>{442e05ba-91a3-44f5-90a4-b7226fdd4404}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

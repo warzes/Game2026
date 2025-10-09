@@ -8,6 +8,7 @@
 #include "NanoScene.h"
 #include "GridAxis.h"
 #include "Scene.h"
+#include "Region.h"
 //=============================================================================
 namespace
 {
@@ -31,7 +32,7 @@ void ExampleApp002()
 
 		scene.Init();
 		camera.SetPosition(glm::vec3(0.0f, 0.5f, 4.5f));
-		scene.SetGridAxis(22);
+		//scene.SetGridAxis(22);
 
 		modelPlane.model.Create(GeometryGenerator::CreatePlane(100, 100, 100, 100));
 		modelBox.model.Create(GeometryGenerator::CreateBox());
@@ -39,6 +40,7 @@ void ExampleApp002()
 		modelTest.model.Load("data/models/tree.glb");
 		//modelTest.model.Load("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj");
 
+		gRegion.Init();
 		
 		modelTest2.model.Load("data/models/cottage/cottage_obj.obj");
 		// TRS matrix
@@ -80,8 +82,11 @@ void ExampleApp002()
 			}
 
 			scene.BindCamera(&camera);
-			scene.BindEntity(&modelTest);
-			scene.BindEntity(&modelTest2);
+			//scene.BindEntity(&modelTest);
+			//scene.BindEntity(&modelTest2);
+
+			scene.BindEntity(&gRegion.model);
+
 			scene.Draw();
 
 			engine::DrawFPS();

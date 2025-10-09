@@ -9,7 +9,6 @@ layout (location = 3) in vec2 vertexTexCoord;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
-//uniform mat4 normalMatrix;
 
 out vec2 fragTexCoord;
 

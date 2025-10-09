@@ -80,9 +80,14 @@ vec3 calculateDiffuse(vec3 lightDir, vec3 diffuseStrength, vec3 objColor)
 vec3 calculateSpecular(vec3 viewPos, vec3 fragPos, vec3 lightDir, vec3 specularStrength, vec3 objColor)
 {
 	vec3 viewDir = normalize(viewPos - fragPos);
-	vec3 reflectDir = reflect(lightDir, Normal);
 
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+	// if (blinnPhong){
+	vec3 halfwayDir = normalize(-lightDir + viewDir);
+	float spec = pow(max(dot(Normal, halfwayDir), 0.0), material.shininess * 4);
+	// else
+	//vec3 reflectDir = reflect(lightDir, Normal);
+	//float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+
 	return spec * specularStrength * objColor;
 }
 
@@ -113,60 +118,6 @@ float calculateShadow(vec4 fragPosLightSpace, int l)
 	return shadow / 9.0; // усредняем
 }
 
-float percentIllumination(int l)
-{
-	float illumCount = 0.0f;
-	float virtualIllumCount = 0.0f;
-	vec2 texelSize = 1.0 / textureSize(depthMap[l], 0);
-
-	// get pixel world coordinates
-	vec3 pW = fsFragPos;
-
-	// do normal depth comparisons
-	vec4 pL = light[l].lightSpaceMatrix * vec4(pW, 1.0f);
-	vec3 point = pL.xyz / pL.w;
-	point = (point * 0.5) + 0.5;
-	
-	for(int x = -1; x <= 1; ++x)
-	{
-		for(int y = -1; y <= 1; ++y)
-		{
-			float depth = texture(depthMap[l], point.xy + vec2(x, y) * texelSize).r;
-			if(solid == 1)
-				illumCount += point.z <= depth ? 1.0f : 0.0f;
-			else if(solid == 0)
-				illumCount += point.z <= (depth + bias) ? 1.0f : 0.0f;
-		}
-	}
-
-	if(illumCount < 9.0f && illumCount > 0.0f)
-	{
-		// get normal at pixel in world coordinates
-		vec3 nW = fsNormal;
-		float dW = -(nW.x * pW.x + nW.y * pW.y + nW.z * pW.z);
-		// get tangent plane in lightsource coordinates
-		vec4 tL = transpose(inverse(light[l].lightSpaceMatrix)) * vec4(nW, dW);
-
-		for(int x = -1; x <= 1; ++x)
-		{
-			for(int y = -1; y <= 1; ++y)
-			{
-				float xL = x * texelSize.x + point.x;
-				float yL = y * texelSize.y + point.y;
-				float depth = (-tL.x * xL) / tL.z + (-tL.y * yL) / tL.z + (-tL.w / tL.z);
-				if(solid == 1)
-					illumCount += point.z <= depth ? 1.0f : 0.0f;
-				else if(solid == 0)
-					illumCount += point.z <= (depth + bias) ? 1.0f : 0.0f;
-			}
-		}
-
-		return illumCount / 9.0f;
-	}
-	else
-		return illumCount;
-}
-
 void main()
 {
 	vec4 rawDiffuse = 
@@ -191,20 +142,13 @@ void main()
 	vec3 currentColor = vec3(0.0);
 	for(int l = 0; l < lightCount; ++l)
 	{
-		vec3 lightPos = (material.hasNormal == 1) ? fsTBN * light[l].position : light[l].position;
+		//vec3 lightPos = (material.hasNormal == 1) ? fsTBN * light[l].position : light[l].position;
 
 		// ambient
 		vec3 ambient = light[l].ambientStrength * rawDiffuse.rgb;
 		
 		if(light[l].type == 0)
 		{
-			// calculate shadow
-			float illumination = 1.0;
-			if(shadowOn == 1)
-				illumination = (shadowMethod == 0) 
-					? 1.0f - calculateShadow(light[l].lightSpaceMatrix * vec4(fsFragPos, 1.0f), l) 
-					: percentIllumination(l);
-
 			// diffuse
 			vec3 lightDir = (material.hasNormal == 1) ? normalize(fsTBN * light[l].direction) : normalize(light[l].direction);	
 			vec3 diffuse = calculateDiffuse(lightDir, light[l].diffuseStrength, rawDiffuse.rgb);
@@ -212,12 +156,16 @@ void main()
 			// specular
 			vec3 specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, rawSpecular.rgb);
 
- 			//currentColor = ambient + diffuse + specular;
+			// calculate shadow
+			float illumination = 1.0;
+			if(shadowOn == 1)
+				illumination = 1.0 - calculateShadow(light[l].lightSpaceMatrix * vec4(fragPos, 1.0), l);
+
+			// result
 			currentColor += (ambient + illumination * (diffuse + specular)) * rawDiffuse.rgb;
 		}
 		else if(light[l].type == 1)
 		{
-			currentColor = rawDiffuse.rgb;
 		}
 	}
 
@@ -242,9 +190,7 @@ void main222()
 		// calculate shadow
 		float illumination = 1.0;
 		if(shadowOn == 1)
-			illumination = (shadowMethod == 0) 
-				? 1.0f - calculateShadow(light[l].lightSpaceMatrix * vec4(fsFragPos, 1.0f), l) 
-				: percentIllumination(l);
+			illumination = 1.0f - calculateShadow(light[l].lightSpaceMatrix * vec4(fsFragPos, 1.0f), l);
 
 		vec3 lightPos = light[l].position;
 		vec3 fragPos = fsFragPos;
