@@ -106,6 +106,7 @@
     <ClCompile Include="NanoRender.cpp" />
     <ClCompile Include="NanoScene.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneRenderPass.cpp" />
     <ClCompile Include="TempApp4.cpp" />
     <ClCompile Include="TempApp2.cpp" />
     <ClCompile Include="TempApp.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="PointLighto2.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Sceneo2.h" />
+    <ClInclude Include="SceneRenderPass.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="SpotLighto2.h" />

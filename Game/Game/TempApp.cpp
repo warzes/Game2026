@@ -189,7 +189,7 @@ void TempAppRun()
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
 
-		GLuint planeVBO = CreateStaticBuffer(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices);
+		GLuint planeVBO = CreateBuffer(GL_ARRAY_BUFFER, BufferUsage::Static, sizeof(planeVertices), planeVertices);
 
 		glGenVertexArrays(1, &planeVAO);
 		glBindVertexArray(planeVAO);

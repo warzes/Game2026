@@ -5,6 +5,7 @@
 #include "Light.h"
 #include "GridAxis.h"
 #include "Framebuffer.h"
+#include "SceneRenderPass.h"
 
 enum class SHADOW_QUALITY
 {
@@ -79,11 +80,14 @@ private:
 	int                           m_shadowMappingShaderViewMatrixId{ -1 };
 	int                           m_shadowMappingShaderModelMatrixId{ -1 };
 
-	GLuint                        m_blinnPhong{ 0 };
-	int                           m_blinnPhongShaderProjectionMatrixId{ -1 };
-	int                           m_blinnPhongShaderViewMatrixId{ -1 };
-	int                           m_blinnPhongShaderModelMatrixId{ -1 };
-	int                           m_blinnPhongShaderNormalMatrixId{ -1 };
+	GLuint                       m_blinnPhong{ 0 };
+	int                          m_blinnPhongShaderModelMatrixId{ -1 };
+	int                          m_blinnPhongShaderNormalMatrixId{ -1 };
+	GLuint                       m_blinnPhongMatrixUBO{ 0 };
+	GLuint                       m_blinnPhongMatrixUBOShaderId{ 0 };
+	SceneBlinnPhongMatrices      m_blinnPhongMatrix;
+
+
 
 	glm::mat4                     m_perspective{ 1.0f };
 	uint16_t                      m_framebufferWidth{ 0 };
@@ -112,7 +116,7 @@ private:
 	GLuint m_pbr;
 	GLuint m_postProcessing;
 
-	SceneTypeRender m_typeRender{ SceneTypeRender::Deffered };
+	SceneTypeRender m_typeRender{ SceneTypeRender::Forward };
 
 
 	// temp deffered

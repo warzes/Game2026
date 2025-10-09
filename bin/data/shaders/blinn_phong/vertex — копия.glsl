@@ -7,11 +7,8 @@ layout(location = 3) in vec2 vertexTexCoord;
 layout(location = 4) in vec3 vertexTangent;
 layout(location = 5) in vec3 vertexBitangent;
 
-uniform MatricesUBO {
-	mat4 projection;
-	mat4 view;
-};
-
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 uniform mat3 normalMatrix;
 
@@ -28,16 +25,14 @@ mat3 computeTBN()
 	vec3 B = normalize(mat3(modelMatrix) * vertexBitangent);
 	//vec3 B = normalize(cross(N, T)); // правая система => N*T
 
-	return transpose(mat3(T, B, N));
+	return mat3(T, B, N);
 }
 
 void main()
 {
-	gl_Position  = projection * view * modelMatrix * vec4(vertexPosition, 1.0);
+	gl_Position  = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
 	fsColor      = vertexColor;
-	//fsNormal     = normalMatrix * vertexNormal;
-	fsNormal     = mat3(transpose(inverse(modelMatrix))) * vertexNormal;
-
+	fsNormal     = normalMatrix * vertexNormal;
 	fsTexCoord   = vertexTexCoord;
 	fsFragPos    = vec3(modelMatrix * vec4(vertexPosition, 1.0f));
 

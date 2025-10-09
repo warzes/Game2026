@@ -36,8 +36,8 @@ void ExampleApp002()
 		modelPlane.model.Create(GeometryGenerator::CreatePlane(100, 100, 100, 100));
 		modelBox.model.Create(GeometryGenerator::CreateBox());
 		modelSphere.model.Create(GeometryGenerator::CreateSphere());
-		//modelTest.model.Load("data/models/tree.glb");
-		modelTest.model.Load("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj");
+		modelTest.model.Load("data/models/tree.glb");
+		//modelTest.model.Load("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj");
 
 		
 		modelTest2.model.Load("data/models/cottage/cottage_obj.obj");

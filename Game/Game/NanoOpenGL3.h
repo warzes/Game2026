@@ -149,7 +149,14 @@ void SetVertexPNTAttributes();
 //=============================================================================
 // Buffer
 //=============================================================================
-GLuint CreateStaticBuffer(GLenum target, GLsizeiptr size, const void* data);
+enum class BufferUsage : uint8_t
+{
+	Static,
+	Dynamic
+};
+GLuint CreateBuffer(GLenum target, BufferUsage usage, GLsizeiptr size, const void* data);
+
+void BufferSubData(GLuint bufferId, GLenum target, GLintptr offset, GLsizeiptr size, const void* data);
 
 //=============================================================================
 // Textures

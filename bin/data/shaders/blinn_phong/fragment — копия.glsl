@@ -54,33 +54,51 @@ uniform sampler2D normalTexture;
 
 uniform sampler2D depthMap[10];
 
+
 layout(location = 0) out vec4 fragColor;
 
-const float alphaTestThreshold = 0.0;
-vec3 Normal;
+const float alphaTestThreshold = 0.1;
 
-void calculateNormal()
+float linearizeDepth(float depth)
 {
-	if(material.hasNormal == 1)
-	{
-		Normal = texture(normalTexture, fsTexCoord).rgb;
-		Normal = normalize(Normal * 2.0f - 1.0f); // преобразуем из [0,1] в [-1,1]
-		Normal = normalize(fsTBN * Normal);
-	}
-	else
-		Normal = normalize(fsNormal);
+	float near = 0.1;
+	float far = 100.0;
+	float ndc = depth * 2.0f - 1.0f;
+	float z = (2.0f * near * far) / (far + near - ndc * (far - near));
+	return z / far;
 }
 
 vec3 calculateDiffuse(vec3 lightDir, vec3 diffuseStrength, vec3 objColor)
 {
-	float diff = max(dot(Normal, -lightDir), 0.0);
+	vec3 norm; // TODO: вычислить один раз
+	if(material.hasNormal == 1)
+	{
+		norm = texture(normalTexture, fsTexCoord).rgb;
+		norm = normalize(norm * 2.0f - 1.0f); // преобразуем из [0,1] в [-1,1]
+		norm = normalize(fsTBN * norm);
+	}
+	else
+		norm = normalize(fsNormal);
+
+	float diff = max(dot(norm, lightDir), 0.0);
 	return diff * diffuseStrength * objColor;
 }
 
-vec3 calculateSpecular(vec3 viewPos, vec3 fragPos, vec3 lightDir, vec3 specularStrength, vec3 objColor)
+vec3 calculateSpecular(vec3 viewPos, vec3 lightDir, vec3 specularStrength, vec3 objColor)
 {
-	vec3 viewDir = normalize(viewPos - fragPos);
-	vec3 reflectDir = reflect(lightDir, Normal);
+	vec3 norm; // TODO: вычислить один раз
+	if(material.hasNormal == 1)
+	{
+		norm = texture(normalTexture, fsTexCoord).rgb;
+		norm = normalize(norm * 2.0f - 1.0f);
+		norm = normalize(fsTBN * norm);
+	}
+	else
+	{
+		norm = normalize(fsNormal);
+	}
+	vec3 viewDir = normalize(viewPos - fsFragPos);
+	vec3 reflectDir = reflect(-lightDir, norm);
 
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 	return spec * specularStrength * objColor;
@@ -169,64 +187,6 @@ float percentIllumination(int l)
 
 void main()
 {
-	vec4 rawDiffuse = 
-		((material.hasDiffuse == 1) ? texture(diffuseTexture, fsTexCoord) : vec4(material.color_diffuse, 1.0)) 
-		* vec4(fsColor, 1.0);
-
-	// early discard
-	if(rawDiffuse.a == alphaTestThreshold) discard;
-
-	vec4 rawSpecular = ((material.hasSpecular == 1) ? texture(specularTexture, fsTexCoord) : vec4(material.color_specular, 1.0));
-
-	calculateNormal();
-
-	vec3 fragPos = fsFragPos;
-	vec3 viewPos = cam.viewPos;
-	if(material.hasNormal == 1)
-	{
-		fragPos = fsTBN * fsFragPos;
-		viewPos = fsTBN * cam.viewPos;
-	}
-
-	vec3 currentColor = vec3(0.0);
-	for(int l = 0; l < lightCount; ++l)
-	{
-		vec3 lightPos = (material.hasNormal == 1) ? fsTBN * light[l].position : light[l].position;
-
-		// ambient
-		vec3 ambient = light[l].ambientStrength * rawDiffuse.rgb;
-		
-		if(light[l].type == 0)
-		{
-			// calculate shadow
-			float illumination = 1.0;
-			if(shadowOn == 1)
-				illumination = (shadowMethod == 0) 
-					? 1.0f - calculateShadow(light[l].lightSpaceMatrix * vec4(fsFragPos, 1.0f), l) 
-					: percentIllumination(l);
-
-			// diffuse
-			vec3 lightDir = (material.hasNormal == 1) ? normalize(fsTBN * light[l].direction) : normalize(light[l].direction);	
-			vec3 diffuse = calculateDiffuse(lightDir, light[l].diffuseStrength, rawDiffuse.rgb);
-
-			// specular
-			vec3 specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, rawSpecular.rgb);
-
- 			//currentColor = ambient + diffuse + specular;
-			currentColor += (ambient + illumination * (diffuse + specular)) * rawDiffuse.rgb;
-		}
-		else if(light[l].type == 1)
-		{
-			currentColor = rawDiffuse.rgb;
-		}
-	}
-
-	float alpha = rawDiffuse.a * material.opacity;
-	fragColor = vec4(currentColor, alpha);
-}
-
-void main222()
-{
 	// early discard
 	if(material.nbTextures > 0)
 	{
@@ -292,9 +252,9 @@ void main222()
 				// specular
 				vec3 specular;
 				if(material.hasSpecular == 1)
-					specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, texture(specularTexture, fsTexCoord).rgb);
+					specular = calculateSpecular(viewPos, lightDir, light[l].specularStrength, texture(specularTexture, fsTexCoord).rgb);
 				else
-					specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, material.color_specular);
+					specular = calculateSpecular(viewPos, lightDir, light[l].specularStrength, material.color_specular);
 				
 				diffuse = diffuse * intensity * illumination;
 				specular = specular * intensity * illumination;
@@ -316,9 +276,9 @@ void main222()
 				// specular
 				vec3 specular;
 				if(material.hasSpecular == 1)
-					specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, texture(specularTexture, fsTexCoord).rgb);
+					specular = calculateSpecular(viewPos, lightDir, light[l].specularStrength, texture(specularTexture, fsTexCoord).rgb);
 				else
-					specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, material.color_specular);
+					specular = calculateSpecular(viewPos, lightDir, light[l].specularStrength, material.color_specular);
 				
 				color += (ambient + illumination * (diffuse + specular)) * difTex;
 			}
@@ -334,7 +294,7 @@ void main222()
 				vec3 diffuse = calculateDiffuse(lightDir, light[l].diffuseStrength, material.color_diffuse) * illumination;
 
 				// specular
-				vec3 specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, material.color_specular) * illumination;
+				vec3 specular = calculateSpecular(viewPos, lightDir, light[l].specularStrength, material.color_specular) * illumination;
 				
 				diffuse = diffuse * intensity;
 				specular = specular * intensity;
@@ -352,7 +312,7 @@ void main222()
 				vec3 diffuse = calculateDiffuse(lightDir, light[l].diffuseStrength, material.color_diffuse) * illumination;
 
 				// specular
-				vec3 specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, material.color_specular) * illumination;
+				vec3 specular = calculateSpecular(viewPos, lightDir, light[l].specularStrength, material.color_specular) * illumination;
 
 				// putting it all together
 				color += (ambient + diffuse + specular);

@@ -338,9 +338,9 @@ Mesh::Mesh(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>&
 	GLuint currentEBO = GetCurrentBuffer(GL_ELEMENT_ARRAY_BUFFER);
 
 	// Buffers
-	m_vbo = CreateStaticBuffer(GL_ARRAY_BUFFER, vertices.size() * sizeof(MeshVertex), vertices.data());
+	m_vbo = CreateBuffer(GL_ARRAY_BUFFER, BufferUsage::Static, vertices.size() * sizeof(MeshVertex), vertices.data());
 	if (!indices.empty())
-		m_ebo = CreateStaticBuffer(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t), indices.data());
+		m_ebo = CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferUsage::Static, indices.size() * sizeof(uint32_t), indices.data());
 
 	// VAO
 	glGenVertexArrays(1, &m_vao);
@@ -649,7 +649,7 @@ Mesh Model::processMesh(const aiScene* scene, struct aiMesh* mesh, std::string_v
 		material.ambientColor = glm::vec3(colorAmbient.r, colorAmbient.g, colorAmbient.b);
 
 		material.opacity = opacity;
-		material.shininess = shininess;
+		//material.shininess = shininess; // TODO: не работает
 		material.roughness = roughness;
 		material.metallic = metallic;
 	}

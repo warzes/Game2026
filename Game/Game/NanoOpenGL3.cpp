@@ -330,16 +330,33 @@ void SetVertexPNTAttributes()
 	SpecifyVertexAttributes(vertexSize, attributes);
 }
 //=============================================================================
-GLuint CreateStaticBuffer(GLenum target, GLsizeiptr size, const void* data)
+GLuint CreateBuffer(GLenum target, BufferUsage usage, GLsizeiptr size, const void* data)
 {
 	GLuint currentBuffer = GetCurrentBuffer(target);
+	GLenum glUsage = 0;
+	switch (usage)
+	{
+	case BufferUsage::Static:  glUsage = GL_STATIC_DRAW; break;
+	case BufferUsage::Dynamic: glUsage = GL_DYNAMIC_DRAW; break;
+	default: std::unreachable(); break;
+	}
 
 	GLuint buffer{ 0 };
 	glGenBuffers(1, &buffer);
 	glBindBuffer(target, buffer);
-	glBufferData(target, size, data, GL_STATIC_DRAW);
+	glBufferData(target, size, data, glUsage);
 	glBindBuffer(target, currentBuffer);
+
 	return buffer;
+}
+//=============================================================================
+void BufferSubData(GLuint bufferId, GLenum target, GLintptr offset, GLsizeiptr size, const void* data)
+{
+	GLuint currentBuffer = GetCurrentBuffer(target);
+
+	glBindBuffer(target, bufferId);
+	glBufferSubData(target, offset, size, data);
+	glBindBuffer(target, currentBuffer);
 }
 //=============================================================================
 GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVertically)

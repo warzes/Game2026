@@ -96,6 +96,9 @@
     <ClCompile Include="NanoWindow.cpp">
       <Filter>NanoEngine\App</Filter>
     </ClCompile>
+    <ClCompile Include="SceneRenderPass.cpp">
+      <Filter>Example\tmp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -186,6 +189,9 @@
     </ClInclude>
     <ClInclude Include="NanoWindow.h">
       <Filter>NanoEngine\App</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneRenderPass.h">
+      <Filter>Example\tmp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
