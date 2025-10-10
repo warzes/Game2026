@@ -351,6 +351,8 @@ Mesh::Mesh(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>&
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, currentVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentEBO);
+
+	initAABB(vertices, indices);
 }
 //=============================================================================
 Mesh::Mesh(Mesh&& old) noexcept
@@ -456,6 +458,24 @@ void Mesh::Draw(GLenum mode, GLuint program, bool bindMaterial, bool instancing,
 			glDrawArrays(mode, 0, m_vertexCount);
 	}
 	glBindVertexArray(0);
+}
+//=============================================================================
+void Mesh::initAABB(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indexData)
+{
+	if (indexData.size() > 0)
+	{
+		for (size_t index_id = 0; index_id < indexData.size(); index_id++)
+		{
+			m_aabb.CombinePoint(vertices[indexData[index_id]].position);
+		}
+	}
+	else
+	{
+		for (size_t vertex_id = 0; vertex_id < vertices.size(); vertex_id++)
+		{
+			m_aabb.CombinePoint(vertices[vertex_id].position);
+		}
+	}
 }
 //=============================================================================
 bool Model::Load(const std::string& fileName)

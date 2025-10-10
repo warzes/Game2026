@@ -79,6 +79,7 @@ public:
 	const AABB& GetAABB() const noexcept { return m_aabb; }
 
 private:
+	void initAABB(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices);
 	uint32_t                m_vertexCount{ 0 };
 	uint32_t                m_indicesCount{ 0 };
 	GLuint                  m_vao{ 0 };

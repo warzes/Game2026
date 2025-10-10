@@ -97,6 +97,7 @@
     <ClCompile Include="ExampleApp001.cpp" />
     <ClCompile Include="ExampleApp002.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
+    <ClCompile Include="GameApp.cpp" />
     <ClCompile Include="GridAxis.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="NanoCore.cpp" />

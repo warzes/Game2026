@@ -66,6 +66,7 @@
     <ClCompile Include="ExampleApp001.cpp">
       <Filter>Example</Filter>
     </ClCompile>
+    <ClCompile Include="GameApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -126,20 +127,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="shaders">
-      <UniqueIdentifier>{0ccbfeab-b651-4032-ac9d-4d4c35564eba}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Example">
       <UniqueIdentifier>{c4d97539-e4aa-42fb-ae8a-bee90570a857}</UniqueIdentifier>
     </Filter>
     <Filter Include="Example\tmp">
       <UniqueIdentifier>{37b1790f-a2e6-43ad-a292-f9f8d8c80509}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="shaders\grid">
-      <UniqueIdentifier>{7e54933b-d17c-4e37-b837-ce9ac103fc9b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="shaders\axis">
-      <UniqueIdentifier>{89558e03-1aff-4ce2-aaf6-0f4e5cdef307}</UniqueIdentifier>
     </Filter>
     <Filter Include="NanoEngine">
       <UniqueIdentifier>{d8f71863-d93a-4335-80a6-267ea4c979a5}</UniqueIdentifier>
@@ -162,40 +154,55 @@
     <Filter Include="NanoEngine\App">
       <UniqueIdentifier>{39a56dec-9451-4530-aca5-2403c0f563a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="shaders\blinn_phong">
-      <UniqueIdentifier>{7f12fd78-5b61-4396-90ac-8c12ed495c05}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="shaders\shadowMapping">
-      <UniqueIdentifier>{79e8d4d5-b27f-435c-852d-1dd9b15e499b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GameApp">
       <UniqueIdentifier>{442e05ba-91a3-44f5-90a4-b7226fdd4404}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameApp\Render">
+      <UniqueIdentifier>{6119cb67-3adb-4f87-b97c-8425a8204a48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameApp\shader">
+      <UniqueIdentifier>{c2717875-67cb-4e3f-a4db-67fe9f33c53f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Example\shaders">
+      <UniqueIdentifier>{0ccbfeab-b651-4032-ac9d-4d4c35564eba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Example\shaders\grid">
+      <UniqueIdentifier>{7e54933b-d17c-4e37-b837-ce9ac103fc9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Example\shaders\axis">
+      <UniqueIdentifier>{89558e03-1aff-4ce2-aaf6-0f4e5cdef307}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Example\shaders\blinn_phong">
+      <UniqueIdentifier>{7f12fd78-5b61-4396-90ac-8c12ed495c05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Example\shaders\shadowMapping">
+      <UniqueIdentifier>{79e8d4d5-b27f-435c-852d-1dd9b15e499b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\bin\data\shaders\axis\fragment.glsl">
-      <Filter>shaders\axis</Filter>
+      <Filter>Example\shaders\axis</Filter>
     </None>
     <None Include="..\..\bin\data\shaders\axis\vertex.glsl">
-      <Filter>shaders\axis</Filter>
+      <Filter>Example\shaders\axis</Filter>
     </None>
     <None Include="..\..\bin\data\shaders\grid\fragment.glsl">
-      <Filter>shaders\grid</Filter>
+      <Filter>Example\shaders\grid</Filter>
     </None>
     <None Include="..\..\bin\data\shaders\grid\vertex.glsl">
-      <Filter>shaders\grid</Filter>
+      <Filter>Example\shaders\grid</Filter>
     </None>
     <None Include="..\..\bin\data\shaders\blinn_phong\fragment.glsl">
-      <Filter>shaders\blinn_phong</Filter>
+      <Filter>Example\shaders\blinn_phong</Filter>
     </None>
     <None Include="..\..\bin\data\shaders\blinn_phong\vertex.glsl">
-      <Filter>shaders\blinn_phong</Filter>
+      <Filter>Example\shaders\blinn_phong</Filter>
     </None>
     <None Include="..\..\bin\data\shaders\shadowMapping\fragment.glsl">
-      <Filter>shaders\shadowMapping</Filter>
+      <Filter>Example\shaders\shadowMapping</Filter>
     </None>
     <None Include="..\..\bin\data\shaders\shadowMapping\vertex.glsl">
-      <Filter>shaders\shadowMapping</Filter>
+      <Filter>Example\shaders\shadowMapping</Filter>
     </None>
   </ItemGroup>
 </Project>
