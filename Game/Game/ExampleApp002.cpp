@@ -82,8 +82,8 @@ void ExampleApp002()
 			}
 
 			scene.BindCamera(&camera);
-			//scene.BindEntity(&modelTest);
-			//scene.BindEntity(&modelTest2);
+			scene.BindEntity(&modelTest);
+			scene.BindEntity(&modelTest2);
 
 			scene.BindEntity(&gRegion.model);
 

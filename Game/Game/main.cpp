@@ -18,10 +18,8 @@ int main(
 	[[maybe_unused]] int   argc,
 	[[maybe_unused]] char* argv[])
 {
-	//TempAppRun4();
-
+	//MinimalAppRun();
 	//ExampleApp001();
 	ExampleApp002();
-
 }
 //=============================================================================

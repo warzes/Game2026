@@ -3,54 +3,6 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="Mesh.cpp">
-      <Filter>tmp\temp2</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>tmp\temp2</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>tmp\temp2</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>tmp\temp2</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>tmp\temp2</Filter>
-    </ClCompile>
-    <ClCompile Include="ShadowMap.cpp">
-      <Filter>tmp\temp2</Filter>
-    </ClCompile>
-    <ClCompile Include="Lighto2.cpp">
-      <Filter>tmp\temp2</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectionalLighto2.cpp">
-      <Filter>tmp\temp2</Filter>
-    </ClCompile>
-    <ClCompile Include="PointLighto2.cpp">
-      <Filter>tmp\temp2</Filter>
-    </ClCompile>
-    <ClCompile Include="SpotLighto2.cpp">
-      <Filter>tmp\temp2</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>tmp\temp2</Filter>
-    </ClCompile>
-    <ClCompile Include="Sceneo2.cpp">
-      <Filter>tmp\temp2</Filter>
-    </ClCompile>
-    <ClCompile Include="TempApp.cpp">
-      <Filter>tmp</Filter>
-    </ClCompile>
-    <ClCompile Include="TempApp2.cpp">
-      <Filter>tmp</Filter>
-    </ClCompile>
-    <ClCompile Include="TempApp4.cpp">
-      <Filter>tmp</Filter>
-    </ClCompile>
-    <ClCompile Include="ExampleApp001.cpp">
-      <Filter>Example</Filter>
-    </ClCompile>
     <ClCompile Include="ExampleApp002.cpp">
       <Filter>Example</Filter>
     </ClCompile>
@@ -105,55 +57,19 @@
     <ClCompile Include="Region.cpp">
       <Filter>GameApp</Filter>
     </ClCompile>
+    <ClCompile Include="SceneShadowMap.cpp">
+      <Filter>Example\tmp</Filter>
+    </ClCompile>
+    <ClCompile Include="Minimal.cpp">
+      <Filter>Example</Filter>
+    </ClCompile>
+    <ClCompile Include="ExampleApp001.cpp">
+      <Filter>Example</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="GameApp.h" />
-    <ClInclude Include="CameraOld.h">
-      <Filter>tmp\Temp</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshTemp.h">
-      <Filter>tmp\Temp</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelTemp.h">
-      <Filter>tmp\Temp</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>tmp\temp2</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>tmp\temp2</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>tmp\temp2</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>tmp\temp2</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>tmp\temp2</Filter>
-    </ClInclude>
-    <ClInclude Include="ShadowMap.h">
-      <Filter>tmp\temp2</Filter>
-    </ClInclude>
-    <ClInclude Include="Lighto2.h">
-      <Filter>tmp\temp2</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectionalLighto2.h">
-      <Filter>tmp\temp2</Filter>
-    </ClInclude>
-    <ClInclude Include="PointLighto2.h">
-      <Filter>tmp\temp2</Filter>
-    </ClInclude>
-    <ClInclude Include="SpotLighto2.h">
-      <Filter>tmp\temp2</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>tmp\temp2</Filter>
-    </ClInclude>
-    <ClInclude Include="Sceneo2.h">
-      <Filter>tmp\temp2</Filter>
-    </ClInclude>
     <ClInclude Include="Framebuffer.h">
       <Filter>NanoEngine\addon</Filter>
     </ClInclude>
@@ -205,6 +121,9 @@
     <ClInclude Include="Region.h">
       <Filter>GameApp</Filter>
     </ClInclude>
+    <ClInclude Include="SceneShadowMap.h">
+      <Filter>Example\tmp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="shaders">
@@ -212,15 +131,6 @@
     </Filter>
     <Filter Include="Example">
       <UniqueIdentifier>{c4d97539-e4aa-42fb-ae8a-bee90570a857}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="tmp">
-      <UniqueIdentifier>{f1b3ca49-34c2-4cb3-aca4-882e0b45e01a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="tmp\Temp">
-      <UniqueIdentifier>{a6b2b7b3-836c-4269-aec2-773f8eda25e1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="tmp\temp2">
-      <UniqueIdentifier>{4a886297-09d9-49bc-a40e-ebef0199be09}</UniqueIdentifier>
     </Filter>
     <Filter Include="Example\tmp">
       <UniqueIdentifier>{37b1790f-a2e6-43ad-a292-f9f8d8c80509}</UniqueIdentifier>
@@ -255,50 +165,14 @@
     <Filter Include="shaders\blinn_phong">
       <UniqueIdentifier>{7f12fd78-5b61-4396-90ac-8c12ed495c05}</UniqueIdentifier>
     </Filter>
-    <Filter Include="shaders\PBR">
-      <UniqueIdentifier>{e285a240-2336-486f-87b5-baef3602a1fe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="shaders\post_processing">
-      <UniqueIdentifier>{6f331c69-0905-4ea3-a5db-74c8f4cae25c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="shaders\shadowMapping">
       <UniqueIdentifier>{79e8d4d5-b27f-435c-852d-1dd9b15e499b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="shaders\deffered">
-      <UniqueIdentifier>{b1109cbf-a6d6-42c7-a620-e6661543df47}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameApp">
       <UniqueIdentifier>{442e05ba-91a3-44f5-90a4-b7226fdd4404}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\bin\data\shaders\NormalPassShader.fs">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\..\bin\data\shaders\NormalPassShader.vs">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\..\bin\data\shaders\ShadowMappingDepth.fs">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\..\bin\data\shaders\ShadowMappingDepth.vs">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\..\bin\data\shaders\NormalPassShaderOLD.fs">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\..\bin\shaders\directionalShadowMap.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\..\bin\shaders\directionalShadowMap.vert">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\..\bin\shaders\shader.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\..\bin\shaders\shader.vert">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="..\..\bin\data\shaders\axis\fragment.glsl">
       <Filter>shaders\axis</Filter>
     </None>
@@ -311,47 +185,17 @@
     <None Include="..\..\bin\data\shaders\grid\vertex.glsl">
       <Filter>shaders\grid</Filter>
     </None>
-    <None Include="..\..\bin\data\shaders\Model.vert">
-      <Filter>Example\tmp</Filter>
-    </None>
-    <None Include="..\..\bin\data\shaders\Model.frag">
-      <Filter>Example\tmp</Filter>
-    </None>
     <None Include="..\..\bin\data\shaders\blinn_phong\fragment.glsl">
       <Filter>shaders\blinn_phong</Filter>
     </None>
     <None Include="..\..\bin\data\shaders\blinn_phong\vertex.glsl">
       <Filter>shaders\blinn_phong</Filter>
     </None>
-    <None Include="..\..\bin\data\shaders\PBR\fragment.glsl">
-      <Filter>shaders\PBR</Filter>
-    </None>
-    <None Include="..\..\bin\data\shaders\PBR\vertex.glsl">
-      <Filter>shaders\PBR</Filter>
-    </None>
-    <None Include="..\..\bin\data\shaders\post_processing\fragment.glsl">
-      <Filter>shaders\post_processing</Filter>
-    </None>
-    <None Include="..\..\bin\data\shaders\post_processing\vertex.glsl">
-      <Filter>shaders\post_processing</Filter>
-    </None>
     <None Include="..\..\bin\data\shaders\shadowMapping\fragment.glsl">
       <Filter>shaders\shadowMapping</Filter>
     </None>
     <None Include="..\..\bin\data\shaders\shadowMapping\vertex.glsl">
       <Filter>shaders\shadowMapping</Filter>
-    </None>
-    <None Include="..\..\bin\data\shaders\deffered\gBuffer.frag">
-      <Filter>shaders\deffered</Filter>
-    </None>
-    <None Include="..\..\bin\data\shaders\deffered\gBuffer.vert">
-      <Filter>shaders\deffered</Filter>
-    </None>
-    <None Include="..\..\bin\data\shaders\deffered\directionalLight.frag">
-      <Filter>shaders\deffered</Filter>
-    </None>
-    <None Include="..\..\bin\data\shaders\deffered\directionalLight.vert">
-      <Filter>shaders\deffered</Filter>
     </None>
   </ItemGroup>
 </Project>

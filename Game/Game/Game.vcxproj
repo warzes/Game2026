@@ -94,8 +94,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="DirectionalLighto2.cpp" />
     <ClCompile Include="ExampleApp001.cpp" />
     <ClCompile Include="ExampleApp002.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
@@ -108,46 +106,26 @@
     <ClCompile Include="Region.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneRenderPass.cpp" />
-    <ClCompile Include="TempApp4.cpp" />
-    <ClCompile Include="TempApp2.cpp" />
-    <ClCompile Include="TempApp.cpp" />
-    <ClCompile Include="Lighto2.cpp" />
+    <ClCompile Include="SceneShadowMap.cpp" />
+    <ClCompile Include="Minimal.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
     <ClCompile Include="NanoEngine.cpp" />
     <ClCompile Include="NanoIO.cpp" />
     <ClCompile Include="NanoLog.cpp" />
     <ClCompile Include="NanoOpenGL3.cpp" />
     <ClCompile Include="NanoOpenGLExt.cpp" />
     <ClCompile Include="NanoWindow.cpp" />
-    <ClCompile Include="PointLighto2.cpp" />
-    <ClCompile Include="Sceneo2.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="ShadowMap.cpp" />
-    <ClCompile Include="SpotLighto2.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="CameraOld.h" />
-    <ClInclude Include="DirectionalLighto2.h" />
     <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="GameApp.h" />
     <ClInclude Include="GridAxis.h" />
     <ClInclude Include="Light.h" />
-    <ClInclude Include="Lighto2.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="MeshTemp.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="ModelTemp.h" />
     <ClInclude Include="NanoCore.h" />
     <ClInclude Include="NanoEngine.h" />
     <ClInclude Include="NanoIO.h" />
@@ -158,16 +136,11 @@
     <ClInclude Include="NanoRender.h" />
     <ClInclude Include="NanoScene.h" />
     <ClInclude Include="NanoWindow.h" />
-    <ClInclude Include="PointLighto2.h" />
     <ClInclude Include="Region.h" />
     <ClInclude Include="Scene.h" />
-    <ClInclude Include="Sceneo2.h" />
     <ClInclude Include="SceneRenderPass.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="ShadowMap.h" />
-    <ClInclude Include="SpotLighto2.h" />
+    <ClInclude Include="SceneShadowMap.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Texture.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
@@ -175,29 +148,10 @@
     <None Include="..\..\bin\data\shaders\axis\vertex.glsl" />
     <None Include="..\..\bin\data\shaders\blinn_phong\fragment.glsl" />
     <None Include="..\..\bin\data\shaders\blinn_phong\vertex.glsl" />
-    <None Include="..\..\bin\data\shaders\deffered\directionalLight.frag" />
-    <None Include="..\..\bin\data\shaders\deffered\directionalLight.vert" />
-    <None Include="..\..\bin\data\shaders\deffered\gBuffer.frag" />
-    <None Include="..\..\bin\data\shaders\deffered\gBuffer.vert" />
     <None Include="..\..\bin\data\shaders\grid\fragment.glsl" />
     <None Include="..\..\bin\data\shaders\grid\vertex.glsl" />
-    <None Include="..\..\bin\data\shaders\Model.frag" />
-    <None Include="..\..\bin\data\shaders\Model.vert" />
-    <None Include="..\..\bin\data\shaders\NormalPassShader.fs" />
-    <None Include="..\..\bin\data\shaders\NormalPassShader.vs" />
-    <None Include="..\..\bin\data\shaders\NormalPassShaderOLD.fs" />
-    <None Include="..\..\bin\data\shaders\PBR\fragment.glsl" />
-    <None Include="..\..\bin\data\shaders\PBR\vertex.glsl" />
-    <None Include="..\..\bin\data\shaders\post_processing\fragment.glsl" />
-    <None Include="..\..\bin\data\shaders\post_processing\vertex.glsl" />
-    <None Include="..\..\bin\data\shaders\ShadowMappingDepth.fs" />
-    <None Include="..\..\bin\data\shaders\ShadowMappingDepth.vs" />
     <None Include="..\..\bin\data\shaders\shadowMapping\fragment.glsl" />
     <None Include="..\..\bin\data\shaders\shadowMapping\vertex.glsl" />
-    <None Include="..\..\bin\shaders\directionalShadowMap.frag" />
-    <None Include="..\..\bin\shaders\directionalShadowMap.vert" />
-    <None Include="..\..\bin\shaders\shader.frag" />
-    <None Include="..\..\bin\shaders\shader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
