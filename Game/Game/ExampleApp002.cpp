@@ -48,7 +48,7 @@ void ExampleApp002()
 		// rotate mat
 		modelTest2.modelMat = glm::scale(modelTest2.modelMat, glm::vec3(0.2f));
 
-		scene.GetDirectionalLights().push_back(DirectionalLight{ glm::vec3(-6.0f, 10.0f, 2.0f), glm::vec3(0.25f), glm::vec3(5.0f), glm::vec3(1.0f), glm::vec3(0.5f, -1.5f, -0.25f) });
+		scene.GetDirectionalLights().push_back(DirectionalLightO{ glm::vec3(-6.0f, 10.0f, 2.0f), glm::vec3(0.25f), glm::vec3(5.0f), glm::vec3(1.0f), glm::vec3(0.5f, -1.5f, -0.25f) });
 
 		//auto spot = SpotLight(
 		//	glm::vec3(0.0f, 0.5f, 4.5f),  // pos

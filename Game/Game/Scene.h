@@ -2,7 +2,7 @@
 
 #include "NanoRender.h"
 #include "NanoScene.h"
-#include "Light.h"
+#include "LightO.h"
 #include "GridAxis.h"
 #include "Framebuffer.h"
 #include "SceneRenderPass.h"
@@ -36,8 +36,8 @@ public:
 	void BindCamera(Camera* camera);
 	void BindEntity(Entity2* ent);
 
-	std::vector<DirectionalLight>& GetDirectionalLights() { return m_directionalLights; }
-	std::vector<SpotLight>& GetSpotLight() { return m_spotLights; }
+	std::vector<DirectionalLightO>& GetDirectionalLights() { return m_directionalLights; }
+	std::vector<SpotLightO>& GetSpotLight() { return m_spotLights; }
 
 	void SetGridAxis(int gridDim);
 
@@ -81,8 +81,8 @@ private:
 	std::vector<Entity2*>         m_entities;
 	size_t                        m_maxEnts{ 0 };
 
-	std::vector<DirectionalLight> m_directionalLights;
-	std::vector<SpotLight>        m_spotLights;
+	std::vector<DirectionalLightO> m_directionalLights;
+	std::vector<SpotLightO>        m_spotLights;
 
 	std::unique_ptr<GridAxis>     m_gridAxis;
 

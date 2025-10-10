@@ -100,7 +100,7 @@
     <ClCompile Include="GameApp.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="GridAxis.cpp" />
-    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="LightO.cpp" />
     <ClCompile Include="NanoCore.cpp" />
     <ClCompile Include="NanoMath.cpp" />
     <ClCompile Include="NanoRender.cpp" />
@@ -111,6 +111,8 @@
     <ClCompile Include="NanoRenderTextures.cpp" />
     <ClCompile Include="NanoScene.cpp" />
     <ClCompile Include="Region.cpp" />
+    <ClCompile Include="RPDirShadowMap.cpp" />
+    <ClCompile Include="RPMainScene.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneRenderPass.cpp" />
     <ClCompile Include="SceneShadowMap.cpp" />
@@ -133,7 +135,7 @@
     <ClInclude Include="GameApp.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="GridAxis.h" />
-    <ClInclude Include="Light.h" />
+    <ClInclude Include="LightO.h" />
     <ClInclude Include="NanoCore.h" />
     <ClInclude Include="NanoEngine.h" />
     <ClInclude Include="NanoIO.h" />
@@ -150,6 +152,8 @@
     <ClInclude Include="NanoScene.h" />
     <ClInclude Include="NanoWindow.h" />
     <ClInclude Include="Region.h" />
+    <ClInclude Include="RPDirShadowMap.h" />
+    <ClInclude Include="RPMainScene.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneRenderPass.h" />
     <ClInclude Include="SceneShadowMap.h" />
@@ -163,6 +167,8 @@
     <None Include="..\..\bin\data\shaders\blinn_phong\vertex.glsl" />
     <None Include="..\..\bin\data\shaders\grid\fragment.glsl" />
     <None Include="..\..\bin\data\shaders\grid\vertex.glsl" />
+    <None Include="..\..\bin\data\shaders\main\fragment.glsl" />
+    <None Include="..\..\bin\data\shaders\main\vertex.glsl" />
     <None Include="..\..\bin\data\shaders\shadowMapping\fragment.glsl" />
     <None Include="..\..\bin\data\shaders\shadowMapping\vertex.glsl" />
   </ItemGroup>

@@ -1,18 +1,18 @@
-#pragma once
+﻿#pragma once
 
 #include "NanoRender.h"
 
-enum class LightType : uint8_t
+enum class LightTypeO : uint8_t
 {
 	Directional,
 	Spot
 };
 
-class Light
+class LightO
 {
 public:
-	Light(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
-	virtual ~Light();
+	LightO(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
+	virtual ~LightO();
 
 	virtual void Draw() = 0;
 	
@@ -29,7 +29,7 @@ public:
 	void SetViewMatrix(glm::mat4 m);
 	void SetProjMatrix(glm::mat4 m);
 
-	virtual LightType GetType() = 0;
+	virtual LightTypeO GetType() = 0;
 
 protected:
 	glm::vec3 m_ambientStrength;
@@ -47,27 +47,27 @@ protected:
 	Texture2D m_icon;
 };
 
-class DirectionalLight final : public Light
+class DirectionalLightO final : public LightO
 {
 public:
-	DirectionalLight(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 dir);
+	DirectionalLightO(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 dir);
 	void Draw() final;
 	void Draw(float orthoDim);
 
 	glm::vec3 GetDirection();
 	void SetDirection(glm::vec3 dir);
 
-	LightType GetType() final;
+	LightTypeO GetType() final;
 private:
 	glm::vec3 m_direction;
 	GLuint    m_shaderIcon;
 	GLuint    m_shaderDirection;
 };
 
-class SpotLight final : public Light
+class SpotLightO final : public LightO
 {
 public:
-	SpotLight(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 dir, float innerAngle, float outerAngle);
+	SpotLightO(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 dir, float innerAngle, float outerAngle);
 	
 	void Draw() final;
 
@@ -78,7 +78,7 @@ public:
 	float GetOuterCutOff();
 	void SetOuterCutOff(float out);
 
-	LightType GetType() final;
+	LightTypeO GetType() final;
 private:
 	glm::vec3 m_direction;
 	float     m_cutOff; // radians

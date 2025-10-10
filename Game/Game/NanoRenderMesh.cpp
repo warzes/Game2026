@@ -80,7 +80,7 @@ Mesh& Mesh::operator=(Mesh&& old) noexcept
 	return *this;
 }
 //=============================================================================
-void Mesh::Draw(GLenum mode, GLuint program, bool bindMaterial, bool instancing, int amount)
+void Mesh::tDraw(GLenum mode, GLuint program, bool bindMaterial, bool instancing, int amount)
 {
 	assert(m_vao);
 

@@ -1,7 +1,7 @@
-#include "stdafx.h"
-#include "Light.h"
+﻿#include "stdafx.h"
+#include "LightO.h"
 
-Light::Light(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec)
+LightO::LightO(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec)
 	: m_position(pos)
 	, m_ambientStrength(amb)
 	, m_diffuseStrength(diff)
@@ -10,7 +10,7 @@ Light::Light(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec)
 	m_model = glm::mat4(1.0f);
 }
 
-Light::~Light()
+LightO::~LightO()
 {
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -20,8 +20,8 @@ Light::~Light()
 	glDeleteTextures(1, &m_icon.id);
 }
 
-DirectionalLight::DirectionalLight(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 dir)
-	: Light(pos, amb, diff, spec)
+DirectionalLightO::DirectionalLightO(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 dir)
+	: LightO(pos, amb, diff, spec)
 	, m_direction(glm::normalize(dir))
 	/*, m_shaderIcon("../shaders/light/directional/vertex.glsl", "../shaders/light/directional/geometry.glsl", "../shaders/light/directional/fragment.glsl")
 	, m_shaderDirection("../shaders/light/directional/vertex_direction.glsl", "../shaders/light/directional/geometry_direction.glsl", "../shaders/light/directional/fragment_direction.glsl")*/
@@ -47,7 +47,7 @@ DirectionalLight::DirectionalLight(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff,
 	//m_icon = createTexture("../assets/light_icons/directional.png", TEXTURE_TYPE::DIFFUSE, true);
 }
 
-void DirectionalLight::Draw()
+void DirectionalLightO::Draw()
 {
 	glBindVertexArray(m_vao);
 
@@ -76,7 +76,7 @@ void DirectionalLight::Draw()
 	glBindVertexArray(0);
 }
 
-void DirectionalLight::Draw(float orthoDim)
+void DirectionalLightO::Draw(float orthoDim)
 {
 	glBindVertexArray(m_vao);
 
@@ -105,23 +105,23 @@ void DirectionalLight::Draw(float orthoDim)
 	glBindVertexArray(0);
 }
 
-LightType DirectionalLight::GetType()
+LightTypeO DirectionalLightO::GetType()
 {
-	return LightType::Directional;
+	return LightTypeO::Directional;
 }
 
-glm::vec3 DirectionalLight::GetDirection()
+glm::vec3 DirectionalLightO::GetDirection()
 {
 	return m_direction;
 }
 
-void DirectionalLight::SetDirection(glm::vec3 dir)
+void DirectionalLightO::SetDirection(glm::vec3 dir)
 {
 	m_direction = glm::normalize(dir);
 }
 
-SpotLight::SpotLight(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 dir, float innerAngle, float outerAngle)
-	: Light(pos, amb, diff, spec)
+SpotLightO::SpotLightO(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 dir, float innerAngle, float outerAngle)
+	: LightO(pos, amb, diff, spec)
 	, m_direction(dir)
 	, m_cutOff(glm::radians(innerAngle))
 	, m_outerCutOff(glm::radians(outerAngle))
@@ -150,7 +150,7 @@ SpotLight::SpotLight(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spe
 	m_icon = createTexture("../assets/light_icons/spot.png", TEXTURE_TYPE::DIFFUSE, true);*/
 }
 
-void SpotLight::Draw()
+void SpotLightO::Draw()
 {
 	glBindVertexArray(m_vao);
 	//m_shaderIcon.use();
@@ -172,93 +172,93 @@ void SpotLight::Draw()
 	glBindVertexArray(0);
 }
 
-LightType SpotLight::GetType()
+LightTypeO SpotLightO::GetType()
 {
-	return LightType::Spot;
+	return LightTypeO::Spot;
 }
 
-glm::vec3 SpotLight::GetDirection()
+glm::vec3 SpotLightO::GetDirection()
 {
 	return m_direction;
 }
 
-void SpotLight::SetDirection(glm::vec3 dir)
+void SpotLightO::SetDirection(glm::vec3 dir)
 {
 	m_direction = glm::normalize(dir);
 }
 
-float SpotLight::GetCutOff()
+float SpotLightO::GetCutOff()
 {
 	return m_cutOff;
 }
 
-void SpotLight::SetCutOff(float cutoff)
+void SpotLightO::SetCutOff(float cutoff)
 {
 	m_cutOff = glm::radians(cutoff);
 }
 
-float SpotLight::GetOuterCutOff()
+float SpotLightO::GetOuterCutOff()
 {
 	return m_outerCutOff;
 }
 
-void SpotLight::SetOuterCutOff(float out)
+void SpotLightO::SetOuterCutOff(float out)
 {
 	m_outerCutOff = glm::radians(out);
 }
 
-glm::vec3 Light::GetPosition()
+glm::vec3 LightO::GetPosition()
 {
 	return m_model * glm::vec4(m_position, 1.0f);
 }
 
-void Light::SetPosition(glm::vec3 pos)
+void LightO::SetPosition(glm::vec3 pos)
 {
 	m_model = glm::translate(glm::mat4(1.0f), pos - m_position);
 }
 
-glm::vec3 Light::GetAmbientStrength()
+glm::vec3 LightO::GetAmbientStrength()
 {
 	return m_ambientStrength;
 }
 
-glm::vec3 Light::GetDiffuseStrength()
+glm::vec3 LightO::GetDiffuseStrength()
 {
 	return m_diffuseStrength;
 }
 
-glm::vec3 Light::GetSpecularStrength()
+glm::vec3 LightO::GetSpecularStrength()
 {
 	return m_specularStrength;
 }
 
-void Light::SetAmbientStrength(glm::vec3 c)
+void LightO::SetAmbientStrength(glm::vec3 c)
 {
 	m_ambientStrength = c;
 }
 
-void Light::SetDiffuseStrength(glm::vec3 c)
+void LightO::SetDiffuseStrength(glm::vec3 c)
 {
 	m_diffuseStrength = c;
 }
 
-void Light::SetSpecularStrength(glm::vec3 c)
+void LightO::SetSpecularStrength(glm::vec3 c)
 {
 	m_specularStrength = c;
 }
 
-void Light::SetModelMatrix(glm::mat4 m)
+void LightO::SetModelMatrix(glm::mat4 m)
 {
 	m_model = m;
 	m_position = glm::vec3(m * glm::vec4(m_position, 1.0f));
 }
 
-void Light::SetViewMatrix(glm::mat4 m)
+void LightO::SetViewMatrix(glm::mat4 m)
 {
 	m_view = m;
 }
 
-void Light::SetProjMatrix(glm::mat4 m)
+void LightO::SetProjMatrix(glm::mat4 m)
 {
 	m_proj = m;
 }

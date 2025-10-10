@@ -70,14 +70,14 @@ void Model::Free()
 void Model::DrawSubMesh(size_t id, GLenum mode)
 {
 	if (id < m_meshes.size())
-		m_meshes[id].Draw(mode);
+		m_meshes[id].tDraw(mode);
 }
 //=============================================================================
 void Model::Draw(GLenum mode)
 {
 	for (size_t i = 0; i < m_meshes.size(); i++)
 	{
-		m_meshes[i].Draw(mode);
+		m_meshes[i].tDraw(mode);
 	}
 }
 //=============================================================================
@@ -85,7 +85,7 @@ void Model::Draw(const ModelDrawInfo& drawInfo)
 {
 	for (int i = 0; i < m_meshes.size(); i++)
 	{
-		m_meshes[i].Draw(drawInfo.mode, drawInfo.shaderProgram, drawInfo.bindMaterials);
+		m_meshes[i].tDraw(drawInfo.mode, drawInfo.shaderProgram, drawInfo.bindMaterials);
 	}
 }
 //=============================================================================

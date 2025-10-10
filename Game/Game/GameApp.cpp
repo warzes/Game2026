@@ -14,8 +14,8 @@ namespace
 	GameScene scene;
 
 	Camera camera;
-
 	Entity modelTest;
+	DirectionalLight dirLight;
 }
 //=============================================================================
 void GameApp()
@@ -26,12 +26,14 @@ void GameApp()
 			return;
 
 		scene.Init();
+
 		camera.SetPosition(glm::vec3(0.0f, 0.5f, 4.5f));
 
 		modelTest.model.Load("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj");
 		modelTest.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(-30.0f, 0.0f, 15.0f));
 
-		scene.GetDirectionalLights().push_back(DirectionalLight{ glm::vec3(-6.0f, 10.0f, 2.0f), glm::vec3(0.25f), glm::vec3(5.0f), glm::vec3(1.0f), glm::vec3(0.5f, -1.5f, -0.25f) });
+		dirLight.position = glm::vec3(-6.0f, 10.0f, 2.0f);
+		dirLight.direction = glm::vec3(0.5f, -1.5f, -0.25f);
 
 		while (!engine::ShouldClose())
 		{
@@ -56,7 +58,7 @@ void GameApp()
 
 			scene.BindCamera(&camera);
 			scene.BindEntity(&modelTest);
-
+			scene.BindLight(&dirLight);
 			scene.Draw();
 
 			engine::DrawFPS();

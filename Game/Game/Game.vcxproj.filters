@@ -12,7 +12,7 @@
     <ClCompile Include="GridAxis.cpp">
       <Filter>NanoEngine\addon</Filter>
     </ClCompile>
-    <ClCompile Include="Light.cpp">
+    <ClCompile Include="LightO.cpp">
       <Filter>Example\tmp</Filter>
     </ClCompile>
     <ClCompile Include="Scene.cpp">
@@ -85,6 +85,12 @@
     <ClCompile Include="NanoRenderGeometryGen.cpp">
       <Filter>NanoEngine\Render</Filter>
     </ClCompile>
+    <ClCompile Include="RPDirShadowMap.cpp">
+      <Filter>GameApp\Render\SceneRenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="RPMainScene.cpp">
+      <Filter>GameApp\Render\SceneRenderPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -95,7 +101,7 @@
     <ClInclude Include="GridAxis.h">
       <Filter>NanoEngine\addon</Filter>
     </ClInclude>
-    <ClInclude Include="Light.h">
+    <ClInclude Include="LightO.h">
       <Filter>Example\tmp</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
@@ -161,6 +167,12 @@
     <ClInclude Include="NanoRenderGeometryGen.h">
       <Filter>NanoEngine\Render</Filter>
     </ClInclude>
+    <ClInclude Include="RPDirShadowMap.h">
+      <Filter>GameApp\Render\SceneRenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="RPMainScene.h">
+      <Filter>GameApp\Render\SceneRenderPass</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Example">
@@ -211,8 +223,14 @@
     <Filter Include="Example\shaders\blinn_phong">
       <UniqueIdentifier>{7f12fd78-5b61-4396-90ac-8c12ed495c05}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Example\shaders\shadowMapping">
+    <Filter Include="GameApp\Render\SceneRenderPass">
+      <UniqueIdentifier>{dc214a13-b723-4b6c-b7f3-c9790647173a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameApp\shader\shadowMapping">
       <UniqueIdentifier>{79e8d4d5-b27f-435c-852d-1dd9b15e499b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameApp\shader\main">
+      <UniqueIdentifier>{b7559b57-bee7-4e96-8cce-996e3c8dbf9b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -235,10 +253,16 @@
       <Filter>Example\shaders\blinn_phong</Filter>
     </None>
     <None Include="..\..\bin\data\shaders\shadowMapping\fragment.glsl">
-      <Filter>Example\shaders\shadowMapping</Filter>
+      <Filter>GameApp\shader\shadowMapping</Filter>
     </None>
     <None Include="..\..\bin\data\shaders\shadowMapping\vertex.glsl">
-      <Filter>Example\shaders\shadowMapping</Filter>
+      <Filter>GameApp\shader\shadowMapping</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders\main\fragment.glsl">
+      <Filter>GameApp\shader\main</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders\main\vertex.glsl">
+      <Filter>GameApp\shader\main</Filter>
     </None>
   </ItemGroup>
 </Project>
