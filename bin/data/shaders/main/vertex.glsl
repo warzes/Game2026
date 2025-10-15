@@ -28,7 +28,7 @@ mat3 computeTBN()
 
 void main()
 {
-	gl_Position  = projection * view * modelMatrix * vec4(vertexPosition, 1.0);
+	gl_Position  = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
 	fsColor      = vertexColor;
 	//fsNormal     = normalMatrix * vertexNormal;
 	fsNormal     = mat3(transpose(inverse(modelMatrix))) * vertexNormal;

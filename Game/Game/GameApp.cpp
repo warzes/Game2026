@@ -34,6 +34,9 @@ void GameApp()
 
 		dirLight.position = glm::vec3(-6.0f, 10.0f, 2.0f);
 		dirLight.direction = glm::vec3(0.5f, -1.5f, -0.25f);
+		dirLight.ambientStrength = glm::vec3(0.25f);
+		dirLight.diffuseStrength = glm::vec3(1.0f);
+		dirLight.specularStrength = glm::vec3(1.0f);
 
 		while (!engine::ShouldClose())
 		{

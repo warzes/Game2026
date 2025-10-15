@@ -294,15 +294,16 @@ void Scene::colorMultisamplePass()
 		{
 			auto& l = m_directionalLights[i];
 
-			SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i + dOffset) + "].type")), static_cast<int>(l.GetType()));
-			SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i + dOffset) + "].position")), l.GetPosition());
-			SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i + dOffset) + "].direction")), l.GetDirection());
+			SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i) + "].type")), static_cast<int>(l.GetType()));
+			SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i) + "].position")), l.GetPosition());
+			SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i) + "].direction")), l.GetDirection());
 			// if BLINN_PHONG
-			SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i + dOffset) + "].ambientStrength")), l.GetAmbientStrength());
-			SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i + dOffset) + "].diffuseStrength")), l.GetDiffuseStrength());
-			SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i + dOffset) + "].specularStrength")), l.GetSpecularStrength());
+			SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i) + "].ambientStrength")), l.GetAmbientStrength());
+			SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i) + "].diffuseStrength")), l.GetDiffuseStrength());
+			SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i) + "].specularStrength")), l.GetSpecularStrength());
 			// elif PBR
 			//SetUniform(GetUniformLocation(m_blinnPhong, std::string("light[" + std::to_string(i + dOffset) + "].color")), l.GetDiffuseStrength());
+			dOffset++;
 		}
 		for (int i{ 0 }; i < m_spotLights.size(); ++i)
 		{

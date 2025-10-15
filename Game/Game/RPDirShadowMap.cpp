@@ -7,6 +7,7 @@
 bool RPDirShadowMap::Init()
 {
 	m_shadowQuality = ShadowQuality::Ultra;
+	m_bias = 0.0005f;
 	m_orthoDimension = 10.0f;
 	m_orthoProjection = glm::ortho(-m_orthoDimension, m_orthoDimension, -m_orthoDimension, m_orthoDimension, 0.1f, 100.0f);
 

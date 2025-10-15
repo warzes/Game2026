@@ -49,7 +49,7 @@ public:
 	void BlitFramebuffer(Framebuffer& writeFBO, int width, int height);
 	void BlitFramebuffer(std::unique_ptr<Framebuffer>& writeFBO, int width, int height);
 	
-	GLuint GetId();
+	GLuint GetId() const { return m_fbo; }
 
 private:
 	void addColorTextureAttachment(int width, int height, int insertPos);

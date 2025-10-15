@@ -29,6 +29,10 @@ public:
 		const std::vector<Entity*>& entites, size_t numEntities);
 
 	void SetShadowQuality(ShadowQuality quality);
+	float GetBias() const { return m_bias; }
+
+	const auto& GetDepthFBO() const { return m_depthFBO; }
+	const auto& GetProjection() const { return m_orthoProjection; }
 
 private:
 	void drawScene(const std::vector<Entity*>& entites, size_t numEntities);
@@ -39,6 +43,7 @@ private:
 	//int           m_hasDiffuseId{ -1 };
 
 	ShadowQuality m_shadowQuality;
+	float         m_bias;
 	float         m_orthoDimension;
 	glm::mat4     m_orthoProjection; // for directional lights
 

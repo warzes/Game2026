@@ -1,6 +1,11 @@
 ﻿#pragma once
 
+#include "Framebuffer.h"
+
+class Camera;
 struct Entity;
+class RPDirShadowMap;
+struct DirectionalLight;
 
 class RPMainScene final
 {
@@ -10,7 +15,14 @@ public:
 
 	void Resize(uint16_t framebufferWidth, uint16_t framebufferHeight);
 
-	void Draw(const std::vector<Entity*>& entites, size_t numEntities);
+	void Draw(const RPDirShadowMap& rpShadowMap, 
+		const std::vector<DirectionalLight*>& dirLights, size_t numDirLights,
+		const std::vector<Entity*>& entites, size_t numEntities, 
+		Camera* camera);
+
+	GLuint GetFBOId() const { return m_fbo->GetId(); }
+	uint16_t GetWidth() const { return m_framebufferWidth; }
+	uint16_t GetHeight() const { return m_framebufferHeight; }
 
 private:
 	void drawScene(const std::vector<Entity*>& entites, size_t numEntities);
@@ -25,4 +37,6 @@ private:
 	glm::mat4 m_perspective{ 1.0f };
 
 	std::unique_ptr<Framebuffer> m_fbo; // color + depth + stencil
+
+	GLuint    m_sampler{ 0 };
 };

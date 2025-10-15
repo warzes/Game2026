@@ -2,7 +2,7 @@
 
 struct Light
 {
-	int type; // 0 => directional, 1 => spot
+	int type; // 0 => directional, 1 => spot, 2 => point
 	vec3 position;
 	vec3 direction;
 	float cutOff;
@@ -39,9 +39,7 @@ in mat3 fsTBN;
 
 uniform Camera cam;
 
-uniform int solid;
 uniform int shadowOn;
-uniform int shadowMethod;
 uniform float bias;
 uniform int lightCount;
 uniform Light light[10];
@@ -127,6 +125,12 @@ void main()
 	// early discard
 	if(rawDiffuse.a == alphaTestThreshold) discard;
 
+{
+	//fragColor = texture(diffuseTexture, fsTexCoord);
+	//return;
+}
+
+
 	vec4 rawSpecular = ((material.hasSpecular == 1) ? texture(specularTexture, fsTexCoord) : vec4(material.color_specular, 1.0));
 
 	calculateNormal();
@@ -171,141 +175,4 @@ void main()
 
 	float alpha = rawDiffuse.a * material.opacity;
 	fragColor = vec4(currentColor, alpha);
-}
-
-void main222()
-{
-	// early discard
-	if(material.nbTextures > 0)
-	{
-		if(texture(diffuseTexture, fsTexCoord).a == 0.0)
-			discard;
-	}
-
-	// start
-	vec3 color = vec3(0.0);
-
-	for(int l = 0; l < lightCount; ++l)
-	{
-		// calculate shadow
-		float illumination = 1.0;
-		if(shadowOn == 1)
-			illumination = 1.0f - calculateShadow(light[l].lightSpaceMatrix * vec4(fsFragPos, 1.0f), l);
-
-		vec3 lightPos = light[l].position;
-		vec3 fragPos = fsFragPos;
-		vec3 viewPos = cam.viewPos;
-		if(material.hasNormal == 1)
-		{
-			lightPos = fsTBN * light[l].position;
-			fragPos = fsTBN * fsFragPos;
-			viewPos = fsTBN * cam.viewPos;
-		}
-
-		vec3 lightDir;
-		float dist = length(lightPos - fragPos);
-		float theta = 0.0;
-		float epsilon = 0.0;
-		float intensity = 1.0;
-
-		if(light[l].type == 0)
-		{
-			lightDir = normalize(-light[l].direction);
-		}
-		else if(light[l].type == 1)
-		{
-			lightDir = normalize(light[l].position - fsFragPos);
-			if(material.hasNormal == 1)
-			{
-				lightDir = fsTBN * lightDir;
-			}
-
-			theta = dot(lightDir, normalize(light[l].direction));
-			epsilon = light[l].cutOff - light[l].outerCutOff;
-			intensity = clamp((theta - light[l].outerCutOff) / epsilon, 0.0f, 1.0f);
-		}
-
-		if(material.nbTextures > 0)
-		{
-			// ambient
-			vec3 ambient = light[l].ambientStrength * texture(diffuseTexture, fsTexCoord).rgb;
-
-			if(light[l].type == 1 && theta > light[l].outerCutOff)
-			{
-				// diffuse
-				vec3 diffuse = calculateDiffuse(lightDir, light[l].diffuseStrength, texture(diffuseTexture, fsTexCoord).rgb);
-
-				// specular
-				vec3 specular;
-				if(material.hasSpecular == 1)
-					specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, texture(specularTexture, fsTexCoord).rgb);
-				else
-					specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, material.color_specular);
-				
-				diffuse = diffuse * intensity * illumination;
-				specular = specular * intensity * illumination;
-			
-				// putting it all together
-				color += ambient + diffuse + specular;
-			}
-			else if(light[l].type == 1)
-			{
-				color += ambient;
-			}
-			else
-			{
-				vec3 difTex = texture(diffuseTexture, fsTexCoord).rgb;
-
-				// diffuse
-				vec3 diffuse = calculateDiffuse(lightDir, light[l].diffuseStrength, difTex);
-
-				// specular
-				vec3 specular;
-				if(material.hasSpecular == 1)
-					specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, texture(specularTexture, fsTexCoord).rgb);
-				else
-					specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, material.color_specular);
-				
-				color += (ambient + illumination * (diffuse + specular)) * difTex;
-			}
-		}
-		else
-		{
-			// ambient
-			vec3 ambient = light[l].ambientStrength * material.color_ambient;
-
-			if(light[l].type == 1 && theta > light[l].outerCutOff)
-			{
-				// diffuse
-				vec3 diffuse = calculateDiffuse(lightDir, light[l].diffuseStrength, material.color_diffuse) * illumination;
-
-				// specular
-				vec3 specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, material.color_specular) * illumination;
-				
-				diffuse = diffuse * intensity;
-				specular = specular * intensity;
-			
-				// putting it all together
-				color += ambient + diffuse + specular;
-			}
-			else if(light[l].type == 1)
-			{
-				color += ambient;
-			}
-			else
-			{
-				// diffuse
-				vec3 diffuse = calculateDiffuse(lightDir, light[l].diffuseStrength, material.color_diffuse) * illumination;
-
-				// specular
-				vec3 specular = calculateSpecular(viewPos, fragPos, lightDir, light[l].specularStrength, material.color_specular) * illumination;
-
-				// putting it all together
-				color += (ambient + diffuse + specular);
-			}
-		}
-	}
-
-	float alpha = (material.hasDiffuse == 1) ? texture(diffuseTexture, fsTexCoord).a * material.opacity : material.opacity;
-	fragColor = vec4(color, alpha);
 }

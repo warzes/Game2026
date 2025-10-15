@@ -358,11 +358,6 @@ void Framebuffer::BlitFramebuffer(std::unique_ptr<Framebuffer>& writeFBO, int wi
 	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 //=============================================================================
-GLuint Framebuffer::GetId()
-{
-	return m_fbo;
-}
-//=============================================================================
 void Framebuffer::addColorTextureAttachment(int width, int height, int insertPos)
 {
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };

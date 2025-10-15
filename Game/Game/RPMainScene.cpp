@@ -4,8 +4,8 @@
 #include "NanoIO.h"
 #include "NanoLog.h"
 #include "NanoWindow.h"
-https://github.com/Mikepicker/opengl-sandbox/blob/master/res/shaders/ubershader.vs
-https://github.com/cforfang/opengl-shadowmapping/blob/master/src/pcf/main.cpp
+//https://github.com/Mikepicker/opengl-sandbox/blob/master/res/shaders/ubershader.vs
+//https://github.com/cforfang/opengl-shadowmapping/blob/master/src/pcf/main.cpp
 //=============================================================================
 bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
@@ -34,6 +34,11 @@ bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_fbo->AddAttachment(AttachmentType::Texture, AttachmentTarget::Color, m_framebufferWidth, m_framebufferHeight);
 	m_fbo->AddAttachment(AttachmentType::RenderBuffer, AttachmentTarget::DepthStencil, m_framebufferWidth, m_framebufferHeight);
 
+	SamplerInfo samperCI{};
+	samperCI.minFilter = TextureFilter::Nearest;
+	samperCI.magFilter = TextureFilter::Nearest;
+	m_sampler = CreateSamplerState(samperCI);
+
 	return true;
 }
 //=============================================================================
@@ -41,9 +46,10 @@ void RPMainScene::Close()
 {
 	m_fbo.reset();
 	glDeleteProgram(m_program);
+	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
-void RPMainScene::Draw(const std::vector<Entity*>& entites, size_t numEntities)
+void RPMainScene::Draw(const RPDirShadowMap& rpShadowMap, const std::vector<DirectionalLight*>& dirLights, size_t numDirLights, const std::vector<Entity*>& entites, size_t numEntities, Camera* camera)
 {
 	m_fbo->Bind();
 	glViewport(0, 0, static_cast<int>(m_framebufferWidth), static_cast<int>(m_framebufferHeight));
@@ -54,6 +60,40 @@ void RPMainScene::Draw(const std::vector<Entity*>& entites, size_t numEntities)
 	SetUniform(m_projectionMatrixId, m_perspective);
 	SetUniform(m_viewMatrixId, camera->GetViewMatrix());
 
+	SetUniform(GetUniformLocation(m_program, "cam.viewPos"), camera->Position);
+	SetUniform(GetUniformLocation(m_program, "shadowOn"), 1);
+	SetUniform(GetUniformLocation(m_program, "bias"), rpShadowMap.GetBias());
+
+	int textureOffset{ 4 };
+	int depthMapIndex{ 0 };
+	int lightCount = 0;
+	for (int i = lightCount; i < numDirLights; ++i)
+	{
+		auto& l = dirLights[i];
+
+		SetUniform(GetUniformLocation(m_program, std::string("light[" + std::to_string(i) + "].type")), 0);
+		SetUniform(GetUniformLocation(m_program, std::string("light[" + std::to_string(i) + "].position")), l->position);
+		SetUniform(GetUniformLocation(m_program, std::string("light[" + std::to_string(i) + "].direction")), l->direction);
+		SetUniform(GetUniformLocation(m_program, std::string("light[" + std::to_string(i) + "].ambientStrength")), l->ambientStrength);
+		SetUniform(GetUniformLocation(m_program, std::string("light[" + std::to_string(i) + "].diffuseStrength")), l->diffuseStrength);
+		SetUniform(GetUniformLocation(m_program, std::string("light[" + std::to_string(i) + "].specularStrength")), l->specularStrength);
+
+		glm::vec3 lightPosition = l->position;
+		glm::vec3 lightTarget = lightPosition + l->direction;
+		glm::mat4 lightView = glm::lookAt(lightPosition, lightTarget, glm::vec3(0.0f, 1.0f, 0.0f));
+		glActiveTexture(GL_TEXTURE0 + textureOffset);
+		glBindTexture(GL_TEXTURE_2D, rpShadowMap.GetDepthFBO()[depthMapIndex]->GetAttachments().at(0).id);
+		SetUniform(GetUniformLocation(m_program, "depthMap[" + std::to_string(depthMapIndex) + "]"), textureOffset);
+		SetUniform(GetUniformLocation(m_program, "light[" + std::to_string(i) + "].lightSpaceMatrix"), rpShadowMap.GetProjection() * lightView);
+		depthMapIndex++;
+		textureOffset++;
+
+		lightCount++;
+	}
+
+	SetUniform(GetUniformLocation(m_program, "lightCount"), lightCount);
+
+	glBindSampler(0, m_sampler);
 	drawScene(entites, numEntities);
 }
 //=============================================================================

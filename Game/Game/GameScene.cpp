@@ -11,7 +11,7 @@ bool GameScene::Init()
 
 	if (!m_rpDirShadowMap.Init())
 		return false;
-	if (!m_rpMainScene.Init())
+	if (!m_rpMainScene.Init(window::GetWidth(), window::GetHeight()))
 		return false;
 		
 	return true;
@@ -80,7 +80,17 @@ void GameScene::beginDraw()
 void GameScene::draw()
 {
 	m_rpDirShadowMap.Draw(m_dirLights, m_numDirLights, m_entities, m_numEntities);
-	m_rpMainScene.Draw(m_entities, m_numEntities);
+	m_rpMainScene.Draw(m_rpDirShadowMap, m_dirLights, m_numDirLights, m_entities, m_numEntities, m_camera);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_rpMainScene.GetFBOId());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // 0 = default framebuffer (экран)
+	glBlitFramebuffer(
+		0, 0, m_rpMainScene.GetWidth(), m_rpMainScene.GetHeight(), 
+		0, 0, m_rpMainScene.GetWidth(), m_rpMainScene.GetHeight(),
+		GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 //=============================================================================
 void GameScene::endDraw()
