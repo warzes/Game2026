@@ -3,7 +3,7 @@
 #include "Framebuffer.h"
 #include "NanoScene.h"
 
-constexpr size_t MaxDirectionalLight = 4;
+constexpr size_t MaxDirectionalLight = 16;
 
 enum class ShadowQuality 
 {

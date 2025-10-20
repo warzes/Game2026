@@ -45,7 +45,7 @@ void GameScene::BindLight(DirectionalLight* ent)
 {
 	if (m_numDirLights >= MaxDirectionalLight)
 	{
-		Error("Max dir light 4");
+		Error("Max dir light");
 		return;
 	}
 	m_dirLights[m_numDirLights] = ent;
@@ -83,12 +83,23 @@ void GameScene::beginDraw()
 //=============================================================================
 void GameScene::draw()
 {
+	//================================================================================
+	// 1 Render Pass: draw shadow maps
+	//		Set state: glEnable(GL_DEPTH_TEST);
 	m_rpDirShadowMap.Draw(m_dirLights, m_numDirLights, m_entities, m_numEntities);
+	
+	//================================================================================
+	// 2 Render Pass: main scenes
 	m_rpMainScene.Draw(m_rpDirShadowMap, m_dirLights, m_numDirLights, m_entities, m_numEntities, m_camera);
+	
+	//================================================================================
+	// 3 Render Pass: post frame
+	//		Set state: glDisable(GL_DEPTH_TEST);
 	m_rpPostFrame.Draw(m_rpMainScene.GetFBO());
 
+	//================================================================================
+	// 4 Render Pass: blitting main fbo
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDisable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_rpPostFrame.GetFBOId());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // 0 = default framebuffer (экран)

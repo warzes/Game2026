@@ -2,8 +2,11 @@
   <Configurations>
     <Platform Name="x64" />
   </Configurations>
+  <Folder Name="/Элементы решения/">
+    <File Path="TODO.md" />
+  </Folder>
+  <Project Path="3rdparty/3rdparty.vcxproj" Id="09962266-edc2-47d4-9674-7962bbfd0cf1" />
   <Project Path="Game/Game.vcxproj" Id="904b36c2-e631-4e7e-b7e4-7c12fffa894a">
     <BuildDependency Project="3rdparty/3rdparty.vcxproj" />
-  </Project>  
-  <Project Path="3rdparty/3rdparty.vcxproj" Id="09962266-edc2-47d4-9674-7962bbfd0cf1" />
+  </Project>
 </Solution>

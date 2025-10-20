@@ -80,5 +80,6 @@ void RPPostFrame::Draw(Framebuffer* preFBO)
 	glBindTexture(GL_TEXTURE_2D, preFBO->GetAttachments()[0].id);
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindSampler(0, 0);
 }
 //=============================================================================

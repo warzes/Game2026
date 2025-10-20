@@ -95,6 +95,7 @@ void RPMainScene::Draw(const RPDirShadowMap& rpShadowMap, const std::vector<Dire
 
 	glBindSampler(0, m_sampler);
 	drawScene(entites, numEntities);
+	glBindSampler(0, 0);
 }
 //=============================================================================
 void RPMainScene::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
