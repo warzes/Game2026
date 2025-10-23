@@ -33,9 +33,6 @@
     <ClCompile Include="NanoOpenGL3.cpp">
       <Filter>NanoEngine\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="NanoOpenGLExt.cpp">
-      <Filter>NanoEngine\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="NanoRender.cpp">
       <Filter>NanoEngine\Render</Filter>
     </ClCompile>
@@ -94,6 +91,9 @@
     <ClCompile Include="RPPostFrame.cpp">
       <Filter>GameApp\Render\SceneRenderPass</Filter>
     </ClCompile>
+    <ClCompile Include="ExampleApp003.cpp">
+      <Filter>Example</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -123,9 +123,6 @@
       <Filter>NanoEngine\NanoCore</Filter>
     </ClInclude>
     <ClInclude Include="NanoOpenGL3.h">
-      <Filter>NanoEngine\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="NanoOpenGLExt.h">
       <Filter>NanoEngine\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="NanoRender.h">

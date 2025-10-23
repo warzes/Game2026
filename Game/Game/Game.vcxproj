@@ -96,6 +96,7 @@
   <ItemGroup>
     <ClCompile Include="ExampleApp001.cpp" />
     <ClCompile Include="ExampleApp002.cpp" />
+    <ClCompile Include="ExampleApp003.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GameApp.cpp" />
     <ClCompile Include="GameScene.cpp" />
@@ -123,7 +124,6 @@
     <ClCompile Include="NanoIO.cpp" />
     <ClCompile Include="NanoLog.cpp" />
     <ClCompile Include="NanoOpenGL3.cpp" />
-    <ClCompile Include="NanoOpenGLExt.cpp" />
     <ClCompile Include="NanoWindow.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -143,7 +143,6 @@
     <ClInclude Include="NanoLog.h" />
     <ClInclude Include="NanoMath.h" />
     <ClInclude Include="NanoOpenGL3.h" />
-    <ClInclude Include="NanoOpenGLExt.h" />
     <ClInclude Include="NanoRender.h" />
     <ClInclude Include="NanoRenderGeometryGen.h" />
     <ClInclude Include="NanoRenderMaterial.h" />

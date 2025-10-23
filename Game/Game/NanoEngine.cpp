@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "NanoEngine.h"
 #include "NanoWindow.h"
-#include "NanoOpenGLExt.h"
 #include "NanoRender.h"
 #include "NanoLog.h"
 //=============================================================================
@@ -96,8 +95,6 @@ bool engine::Init(uint16_t width, uint16_t height, std::string_view title)
 	if (!window::Init(width, height, title))
 		return false;
 	input::Init();
-
-	ext::Init();
 
 	// initOpenGL
 	{

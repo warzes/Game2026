@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "NanoOpenGL3.h"
 #include "NanoLog.h"
-#include "NanoOpenGLExt.h"
 //=============================================================================
 [[nodiscard]] inline GLenum GetGLEnum(CompareFunc func)
 {
@@ -452,7 +451,7 @@ GLuint CreateSamplerState(const SamplerInfo& info)
 	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_R, GetGLEnum(info.wrapR));
 
 	// Устанавливаем максимальное значение анизотропии (если поддерживается)
-	if (info.maxAnisotropy > 1.0f && ext::ARB_texture_filter_anisotropic)
+	if (info.maxAnisotropy > 1.0f && (GLAD_GL_ARB_texture_filter_anisotropic == 1))
 	{
 		glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY, info.maxAnisotropy);
 	}
