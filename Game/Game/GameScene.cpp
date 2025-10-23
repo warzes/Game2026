@@ -105,7 +105,7 @@ void GameScene::draw()
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // 0 = default framebuffer (экран)
 	glBlitFramebuffer(
 		0, 0, m_rpPostFrame.GetWidth(), m_rpPostFrame.GetHeight(),
-		0, 0, window::GetWidth(), window::GetHeight(),
+		0, 0,       window::GetWidth(),       window::GetHeight(),
 		GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 //=============================================================================

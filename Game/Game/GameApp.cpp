@@ -17,6 +17,12 @@ namespace
 	Entity modelTest;
 	DirectionalLight dirLight;
 	//DirectionalLight dirLight2;
+
+	Entity sphereEntity;
+	Entity box1Entity;
+	Entity box2Entity;
+	Entity box3Entity;
+	Entity box4Entity;
 }
 //=============================================================================
 void GameApp()
@@ -33,8 +39,20 @@ void GameApp()
 		modelTest.model.Load("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj");
 		modelTest.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(-30.0f, 0.0f, 15.0f));
 
-		dirLight.position = glm::vec3(0.0f, 10.0f, 0.0f);
-		dirLight.direction = glm::vec3(0.0f, 9.0f, -10.0f);
+		sphereEntity.model.Create(GeometryGenerator::CreateSphere(0.5f, 16, 16));
+		sphereEntity.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.0f, 0.0f));
+
+		box1Entity.model.Create(GeometryGenerator::CreateBox());
+		box1Entity.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 2.0f, 0.0f));
+		box2Entity.model.Create(GeometryGenerator::CreateBox());
+		box2Entity.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 2.0f, 0.0f));
+		box3Entity.model.Create(GeometryGenerator::CreateBox());
+		box3Entity.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.0f, -1.0f));
+		box4Entity.model.Create(GeometryGenerator::CreateBox());
+		box4Entity.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		dirLight.position = glm::vec3(-6.0f, 10.0f, 2.0f);
+		dirLight.direction = glm::vec3(0.5f, -1.5f, -0.25f);
 		dirLight.ambientStrength = glm::vec3(0.25f);
 		dirLight.diffuseStrength = glm::vec3(1.0f);
 		dirLight.specularStrength = glm::vec3(1.0f);
@@ -69,6 +87,12 @@ void GameApp()
 
 			scene.BindCamera(&camera);
 			scene.BindEntity(&modelTest);
+			scene.BindEntity(&sphereEntity);
+			scene.BindEntity(&box1Entity);
+			scene.BindEntity(&box2Entity);
+			scene.BindEntity(&box3Entity);
+			scene.BindEntity(&box4Entity);
+
 			scene.BindLight(&dirLight);
 			//scene.BindLight(&dirLight2);
 			scene.Draw();

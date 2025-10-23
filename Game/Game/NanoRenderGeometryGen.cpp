@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "NanoRenderGeometryGen.h"
+#include "NanoRenderTextures.h"
 //=============================================================================
 MeshCreateInfo GeometryGenerator::CreatePlane(float width, float height, float wSegment, float hSegment)
 {
@@ -49,6 +50,10 @@ MeshCreateInfo GeometryGenerator::CreatePlane(float width, float height, float w
 			meshInfo.indices.push_back(static_cast<uint32_t>(d));
 		}
 	}
+
+	Material mat;
+	mat.diffuseTextures.push_back(textures::GetDefaultDiffuse2D());
+	meshInfo.material = mat;
 
 	return meshInfo;
 }
@@ -133,6 +138,10 @@ MeshCreateInfo GeometryGenerator::CreateBox(float width, float height, float dep
 	buildBoxPlane(meshInfo, numberOfVertices, 0, 1, 2, 1, -1, width, height, depth, widthSegments, heightSegments); // +Z
 	buildBoxPlane(meshInfo, numberOfVertices, 0, 1, 2, -1, -1, width, height, -depth, widthSegments, heightSegments); // -Z
 
+	Material mat;
+	mat.diffuseTextures.push_back(textures::GetDefaultDiffuse2D());
+	meshInfo.material = mat;
+
 	return meshInfo;
 }
 //=============================================================================
@@ -213,6 +222,10 @@ MeshCreateInfo GeometryGenerator::CreateSphere(float radius, float widthSeg, flo
 			}
 		}
 	}
+
+	Material mat;
+	mat.diffuseTextures.push_back(textures::GetDefaultDiffuse2D());
+	meshInfo.material = mat;
 
 	return meshInfo;
 }

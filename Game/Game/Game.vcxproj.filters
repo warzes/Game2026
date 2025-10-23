@@ -238,6 +238,9 @@
     <Filter Include="GameApp\shader\main">
       <UniqueIdentifier>{b7559b57-bee7-4e96-8cce-996e3c8dbf9b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TempPhysics">
+      <UniqueIdentifier>{c7007c31-eb29-4fd4-896f-b25981d8333f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\bin\data\shaders\axis\fragment.glsl">
