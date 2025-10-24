@@ -22,7 +22,6 @@ void MinimalAppRun()
 		state.blendState.enable = true;
 		state.blendState.srcAlpha = BlendFactor::OneMinusSrcAlpha;
 
-		glEnable(GL_FRAMEBUFFER_SRGB);
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 		while (!engine::ShouldClose())

@@ -742,6 +742,16 @@ GLuint GetCurrentTexture(GLenum target)
 	return currentState;
 }
 //=============================================================================
+void EnableSRGB(bool enable)
+{
+#if DISABLE_SRGB
+	(void)enable;
+#else
+	if (enable) glEnable(GL_FRAMEBUFFER_SRGB);
+	else        glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
+}
+//=============================================================================
 void DrawArrays(GLuint vao, GLenum mode, GLint first, GLsizei count)
 {
 	glBindVertexArray(vao);

@@ -271,6 +271,8 @@ void BindState(const GLState& state);
 GLuint GetCurrentBuffer(GLenum target);
 GLuint GetCurrentTexture(GLenum target);
 
+void EnableSRGB(bool enable);
+
 //=============================================================================
 // Draw Command
 //=============================================================================

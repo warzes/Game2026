@@ -176,6 +176,7 @@
     <ClInclude Include="RPPostFrame.h">
       <Filter>GameApp\Render\SceneRenderPass</Filter>
     </ClInclude>
+    <ClInclude Include="GameConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Example">

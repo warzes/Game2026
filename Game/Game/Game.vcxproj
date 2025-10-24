@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="GameApp.h" />
+    <ClInclude Include="GameConfig.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="GridAxis.h" />
     <ClInclude Include="LightO.h" />

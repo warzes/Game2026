@@ -36,10 +36,6 @@ namespace window
 	uint16_t GetHeight() noexcept;
 	float    GetAspect() noexcept;
 
-	bool* GetsKeys(); // OLD
-	float GetXChange();// OLD
-	float GetYChange();// OLD
-
 	inline GLFWwindow* handle{ nullptr };
 
 } // namespace window

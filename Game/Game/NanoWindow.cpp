@@ -1,19 +1,11 @@
 ﻿#include "stdafx.h"
 #include "NanoWindow.h"
 #include "NanoLog.h"
-#include "NanoOpenGLExt.h"
 //=============================================================================
 namespace
 {
 	uint16_t windowWidth, windowHeight;
 	float windowAspect{ 1.0f };
-
-	bool keys[1024]; // OLD
-	float lastX; // OLD
-	float lastY; // OLD
-	float xChange; // OLD
-	float yChange; // OLD
-	bool mouseFirstMoved; // OLD
 
 	glm::vec2 cursorPos{};
 	glm::vec2 cursorOffset{};
@@ -55,7 +47,7 @@ void mousePos(double xPos, double yPos) noexcept
 	cursorPos.y = static_cast<float>(yPos);
 
 	cursorOffset.x += cursorPos.x - cursorPosLastFrame.x;
-	cursorOffset.y += cursorPosLastFrame.y - cursorPos.y;
+	cursorOffset.y += cursorPosLastFrame.y - cursorPos.y; // Reversed Y since y-coordinates go from bottom to left
 	cursorPosLastFrame = cursorPos;
 }
 //=============================================================================
@@ -87,12 +79,6 @@ void handleKeysCallback(GLFWwindow* window, int key, int scanCode, int action, i
 {
 	ImGui_ImplGlfw_KeyCallback(window, key, scanCode, action, mods);
 	keyPress(key, action);
-
-	if (key >= 0 && key < 1024) // OLD
-	{
-		if (action == GLFW_PRESS) keys[key] = true;
-		else if (action == GLFW_RELEASE) keys[key] = false;
-	}
 }
 //=============================================================================
 void handleCharCallback(GLFWwindow* window, unsigned int c) noexcept
@@ -115,18 +101,6 @@ void handleMouseCursorPosCallback(GLFWwindow* window, double xPos, double yPos) 
 {
 	ImGui_ImplGlfw_CursorPosCallback(window, xPos, yPos);
 	mousePos(xPos, yPos);
-
-	// OLD
-	if (mouseFirstMoved)
-	{
-		lastX = xPos;
-		lastY = yPos;
-		mouseFirstMoved = false;
-	}
-	xChange = xPos - lastX;
-	yChange = lastY - yPos;
-	lastX = xPos;
-	lastY = yPos;
 }
 //=============================================================================
 void handleMouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset) noexcept
@@ -230,12 +204,6 @@ bool window::Init(uint16_t width, uint16_t height, std::string_view title, bool 
 		return false;
 	}
 
-	for (size_t i = 0; i < 1024; i++)
-	{
-		keys[i] = 0;
-	}
-	mouseFirstMoved = true;
-
 	glfwSwapInterval(vsync ? 1 : 0);
 
 	return true;
@@ -261,22 +229,6 @@ void window::Swap()
 uint16_t window::GetWidth() noexcept { return windowWidth; }
 uint16_t window::GetHeight() noexcept { return windowHeight; }
 float window::GetAspect() noexcept { return windowAspect; }
-//=============================================================================
-bool* window::GetsKeys() { return keys; }
-//=============================================================================
-float window::GetXChange()
-{
-	float theChange = xChange;
-	xChange = 0.0f;
-	return theChange;
-}
-//=============================================================================
-float window::GetYChange()
-{
-	float theChange = yChange;
-	yChange = 0.0f;
-	return theChange;
-}
 //=============================================================================
 void input::Init()
 {

@@ -105,7 +105,7 @@ bool engine::Init(uint16_t width, uint16_t height, std::string_view title)
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 #endif
 
-		glEnable(GL_FRAMEBUFFER_SRGB);
+		EnableSRGB(true);
 		glDisable(GL_DITHER);
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		glViewport(0, 0, window::GetWidth(), window::GetHeight());
@@ -192,10 +192,9 @@ void engine::EndFrame()
 	auto* drawData = ImGui::GetDrawData();
 	if (drawData->CmdListsCount > 0)
 	{
-		glDisable(GL_FRAMEBUFFER_SRGB);
-		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		EnableSRGB(false);
 		ImGui_ImplOpenGL3_RenderDrawData(drawData);
-		glEnable(GL_FRAMEBUFFER_SRGB);
+		EnableSRGB(true);
 	}
 
 	window::Swap();
