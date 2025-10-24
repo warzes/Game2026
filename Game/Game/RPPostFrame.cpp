@@ -10,7 +10,7 @@ bool RPPostFrame::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_framebufferWidth = framebufferWidth;
 	m_framebufferHeight = framebufferHeight;
 
-	m_program = CreateShaderProgram(ReadShaderCode("data/shaders/postFrame/vertex.glsl"), ReadShaderCode("data/shaders/postFrame/fragment.glsl"));
+	m_program = CreateShaderProgram(LoadShaderCode("data/shaders/postFrame/vertex.glsl"), LoadShaderCode("data/shaders/postFrame/fragment.glsl"));
 	if (!m_program)
 	{
 		Fatal("Scene Main RenderPass Shader failed!");

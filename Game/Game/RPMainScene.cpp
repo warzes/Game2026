@@ -13,7 +13,7 @@ bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_framebufferHeight = framebufferHeight;
 	m_perspective = glm::perspective(glm::radians(60.0f), window::GetAspect(), 0.01f, 1000.0f);
 
-	m_program = CreateShaderProgram(ReadShaderCode("data/shaders/main/vertex.glsl"), ReadShaderCode("data/shaders/main/fragment.glsl"));
+	m_program = CreateShaderProgram(LoadShaderCode("data/shaders/main/vertex.glsl"), LoadShaderCode("data/shaders/main/fragment.glsl"));
 	if (!m_program)
 	{
 		Fatal("Scene Main RenderPass Shader failed!");

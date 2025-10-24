@@ -28,8 +28,8 @@ bool Scene::Init()
 	m_orthoDimension = 10.0f;
 	m_orthoProjection = glm::ortho(-m_orthoDimension, m_orthoDimension, -m_orthoDimension, m_orthoDimension, 0.1f, 100.0f);
 
-	//m_pbr = CreateShaderProgram(ReadShaderCode("data/shaders/PBR/vertex.glsl"), ReadShaderCode("data/shaders/PBR/fragment.glsl"));
-	//m_postProcessing = CreateShaderProgram(ReadShaderCode("data/shaders/post_processing/vertex.glsl"), ReadShaderCode("data/shaders/post_processing/fragment.glsl"));
+	//m_pbr = CreateShaderProgram(LoadShaderCode("data/shaders/PBR/vertex.glsl"), LoadShaderCode("data/shaders/PBR/fragment.glsl"));
+	//m_postProcessing = CreateShaderProgram(LoadShaderCode("data/shaders/post_processing/vertex.glsl"), LoadShaderCode("data/shaders/post_processing/fragment.glsl"));
 	
 	if (!initShadowMappingShader())
 		return false;
@@ -142,7 +142,7 @@ void Scene::SetShadowQuality(SHADOW_QUALITY quality)
 //=============================================================================
 bool Scene::initShadowMappingShader()
 {
-	m_shadowMapping = CreateShaderProgram(ReadShaderCode("data/shaders/shadowMapping/vertex.glsl"), ReadShaderCode("data/shaders/shadowMapping/fragment.glsl"));
+	m_shadowMapping = CreateShaderProgram(LoadShaderCode("data/shaders/shadowMapping/vertex.glsl"), LoadShaderCode("data/shaders/shadowMapping/fragment.glsl"));
 	if (!m_shadowMapping)
 	{
 		Fatal("Scene Shadow Mapping Shader failed!");
@@ -161,7 +161,7 @@ bool Scene::initShadowMappingShader()
 //=============================================================================
 bool Scene::initBlinnPhongShader()
 {
-	m_blinnPhong = CreateShaderProgram(ReadShaderCode("data/shaders/blinn_phong/vertex.glsl"), ReadShaderCode("data/shaders/blinn_phong/fragment.glsl"));
+	m_blinnPhong = CreateShaderProgram(LoadShaderCode("data/shaders/blinn_phong/vertex.glsl"), LoadShaderCode("data/shaders/blinn_phong/fragment.glsl"));
 	if (!m_blinnPhong)
 	{
 		Fatal("Scene Blinn Phong Shader failed!");

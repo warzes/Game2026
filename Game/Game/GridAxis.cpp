@@ -8,8 +8,8 @@ GridAxis::GridAxis(int gridDim)
 	m_dim = gridDim;
 	m_nbPoints = (m_dim + 1) * (m_dim + 1);
 	m_nbIndices = 2 * (m_dim + 1) * (2 * m_dim);
-	m_gridShader = CreateShaderProgram(ReadShaderCode("data/shaders/grid/vertex.glsl"), ReadShaderCode("data/shaders/grid/fragment.glsl"));
-	m_axisShader = CreateShaderProgram(ReadShaderCode("data/shaders/axis/vertex.glsl"), ReadShaderCode("data/shaders/axis/fragment.glsl"));
+	m_gridShader = CreateShaderProgram(LoadShaderCode("data/shaders/grid/vertex.glsl"), LoadShaderCode("data/shaders/grid/fragment.glsl"));
+	m_axisShader = CreateShaderProgram(LoadShaderCode("data/shaders/axis/vertex.glsl"), LoadShaderCode("data/shaders/axis/fragment.glsl"));
 
 	m_grid = new float[m_nbPoints * 3];
 	m_indices = new int[m_nbIndices];

@@ -71,7 +71,7 @@ enum class ColorSpace : uint8_t
 //=============================================================================
 // Shader Program
 //=============================================================================
-std::string ReadShaderCode(const std::string& filename, const std::vector<std::string>& defines = {});
+std::string LoadShaderCode(const std::string& filename, const std::vector<std::string>& defines = {});
 
 GLuint CreateShaderProgram(std::string_view vertexShader);
 GLuint CreateShaderProgram(std::string_view vertexShader, std::string_view fragmentShader);

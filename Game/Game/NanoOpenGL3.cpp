@@ -124,7 +124,7 @@ std::string loadShaderCode(const std::string& path, unsigned int level)
 	return shaderStream.str();
 }
 //=============================================================================
-std::string loadShaderCode(const std::string& path, const std::vector<std::string>& defines)
+std::string LoadShaderCode(const std::string& path, const std::vector<std::string>& defines)
 {
 	Debug("Load Shader file: " + path);
 
@@ -155,11 +155,6 @@ std::string loadShaderCode(const std::string& path, const std::vector<std::strin
 	}
 
 	return shaderStream.str();
-}
-//=============================================================================
-std::string ReadShaderCode(const std::string& filename, const std::vector<std::string>& defines)
-{
-	return loadShaderCode(filename, defines);
 }
 //=============================================================================
 [[nodiscard]] inline std::string shaderStageToString(GLenum stage)
