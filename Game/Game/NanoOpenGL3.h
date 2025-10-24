@@ -81,6 +81,8 @@ GLuint CreateShaderProgram(std::string_view vertexShader, std::string_view geome
 // Shader Uniforms
 //=============================================================================
 int GetUniformLocation(GLuint program, std::string_view name);
+
+void SetUniform(GLuint id, bool b);
 void SetUniform(GLuint id, float s);
 void SetUniform(GLuint id, int s);
 void SetUniform(GLuint id, unsigned s);
@@ -94,28 +96,6 @@ void SetUniform(GLuint id, const glm::quat& v);
 void SetUniform(GLuint id, const glm::mat3& m);
 void SetUniform(GLuint id, const glm::mat4& m);
 
-template<typename T>
-struct Uniform final
-{
-	void Init(GLuint program, std::string_view name)
-	{
-		m_program = program;
-		m_location = GetUniformLocation(program, name);
-	}
-
-	void Set(const T& value)
-	{
-		if (m_location >= 0)
-		{
-			SetUniform(m_location, value);
-		}
-	}
-
-private:
-	GLuint m_program{ 0 };
-	int m_location{ -1 };
-};
-
 //=============================================================================
 // VertexAttribute
 //=============================================================================
@@ -124,7 +104,7 @@ struct VertexAttribute final
 {
 	GLenum      type;
 	GLint       size;
-	const void* offset; //  (void*)offsetof(Vertex, uv)
+	const void* offset; //  EXAMPLE: (void*)offsetof(Vertex, uv)
 	bool        normalized{ false };
 	bool        perInstance{ false };
 };

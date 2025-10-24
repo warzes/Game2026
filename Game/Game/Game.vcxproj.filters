@@ -91,9 +91,6 @@
     <ClCompile Include="RPPostFrame.cpp">
       <Filter>GameApp\Render\SceneRenderPass</Filter>
     </ClCompile>
-    <ClCompile Include="ExampleApp003.cpp">
-      <Filter>Example</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />

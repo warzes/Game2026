@@ -58,6 +58,37 @@ MeshCreateInfo GeometryGenerator::CreatePlane(float width, float height, float w
 	return meshInfo;
 }
 //=============================================================================
+MeshCreateInfo GeometryGenerator::CreateQuad(const glm::vec2& size)
+{
+	glm::vec2 s2 = size / 2.0f;
+
+	MeshCreateInfo meshInfo;
+
+	meshInfo.vertices.resize(4);
+	meshInfo.vertices[0].position = { -s2.x, -s2.y, 0.0f };
+	meshInfo.vertices[0].texCoord = { 0.0f, 0.0f };
+	meshInfo.vertices[1].position = { s2.x, -s2.y, 0.0f };
+	meshInfo.vertices[1].texCoord = { 1.0f, 0.0f };
+	meshInfo.vertices[2].position = { s2.x, s2.y, 0.0f };
+	meshInfo.vertices[2].texCoord = { 1.0f, 1.0f };
+	meshInfo.vertices[3].position = { -s2.x, s2.y, 0.0f };
+	meshInfo.vertices[3].texCoord = { 0.0f, 1.0f };
+
+	meshInfo.indices = {
+		0, 1, 2,
+		0, 2, 3
+	};
+
+	GeometryGenerator::ComputeNormals(meshInfo);
+	GeometryGenerator::ComputeTangents(meshInfo);
+
+	Material mat;
+	mat.diffuseTextures.push_back(textures::GetDefaultDiffuse2D());
+	meshInfo.material = mat;
+
+	return meshInfo;
+}
+//=============================================================================
 inline void buildBoxPlane(MeshCreateInfo& meshInfo, int& numberOfVertices, int u, int v, int w, float udir, float vdir, float width, float height, float depth, float gridX, float gridY)
 {
 	float segmentWidth = width / gridX;
@@ -228,5 +259,75 @@ MeshCreateInfo GeometryGenerator::CreateSphere(float radius, float widthSeg, flo
 	meshInfo.material = mat;
 
 	return meshInfo;
+}
+//=============================================================================
+void GeometryGenerator::ComputeNormals(MeshCreateInfo& meshInfo)
+{
+	for (auto& vertex : meshInfo.vertices)
+	{
+		vertex.normal = glm::vec3(0.0f);
+	}
+
+	for (unsigned int i = 0; i < meshInfo.indices.size(); i += 3)
+	{
+		uint32_t i0 = meshInfo.indices[i];
+		uint32_t i1 = meshInfo.indices[i + 1];
+		uint32_t i2 = meshInfo.indices[i + 2];
+
+		auto& a = meshInfo.vertices[i0];
+		auto& b = meshInfo.vertices[i1];
+		auto& c = meshInfo.vertices[i2];
+
+		glm::vec3 n = glm::normalize(glm::cross(b.position - c.position, b.position - a.position));
+
+		a.normal += n;
+		b.normal += n;
+		c.normal += n;
+	}
+
+	for (auto& vertex : meshInfo.vertices)
+	{
+		vertex.normal = glm::normalize(vertex.normal);
+	}
+}
+//=============================================================================
+void GeometryGenerator::ComputeTangents(MeshCreateInfo& meshInfo)
+{
+	for (auto& vertex : meshInfo.vertices)
+	{
+		vertex.tangent = glm::vec3(0.0f);
+	}
+
+	for (unsigned int i = 0; i < meshInfo.indices.size(); i += 3)
+	{
+		uint32_t i0 = meshInfo.indices[i];
+		uint32_t i1 = meshInfo.indices[i + 1];
+		uint32_t i2 = meshInfo.indices[i + 2];
+
+		auto& a = meshInfo.vertices[i0];
+		auto& b = meshInfo.vertices[i1];
+		auto& c = meshInfo.vertices[i2];
+
+		glm::vec3 edge1 = b.position - a.position;
+		glm::vec3 edge2 = c.position - a.position;
+		glm::vec2 deltaUV1 = b.texCoord - a.texCoord;
+		glm::vec2 deltaUV2 = c.texCoord - a.texCoord;
+
+		GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+		glm::vec3 tangent(
+			f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
+			f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
+			f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z)
+		);
+		a.tangent = b.tangent = c.tangent = glm::normalize(tangent);
+
+		glm::vec3 bitangent(
+			f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
+			f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
+			f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z)
+		);
+		a.bitangent = b.bitangent = c.bitangent = glm::normalize(bitangent);
+	}
 }
 //=============================================================================

@@ -307,6 +307,11 @@ int GetUniformLocation(GLuint program, std::string_view name)
 	return glGetUniformLocation(program, name.data());
 }
 //=============================================================================
+void SetUniform(GLuint id, bool b)
+{
+	glUniform1i(id, b ? 1 : 0);
+}
+//=============================================================================
 void SetUniform(GLuint id, float s)
 {
 	glUniform1f(id, s);

@@ -96,7 +96,6 @@
   <ItemGroup>
     <ClCompile Include="ExampleApp001.cpp" />
     <ClCompile Include="ExampleApp002.cpp" />
-    <ClCompile Include="ExampleApp003.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GameApp.cpp" />
     <ClCompile Include="GameScene.cpp" />
