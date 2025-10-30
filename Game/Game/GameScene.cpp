@@ -9,11 +9,16 @@ bool GameScene::Init()
 	m_entities.reserve(10000);
 	m_dirLights.resize(MaxDirectionalLight);
 
+	const auto wndWidth = window::GetWidth();
+	const auto wndHeight = window::GetHeight();
+
 	if (!m_rpDirShadowMap.Init())
 		return false;
-	if (!m_rpMainScene.Init(window::GetWidth(), window::GetHeight()))
+	if (!m_rpGeometry.Init(wndWidth, wndHeight))
 		return false;
-	if (!m_rpPostFrame.Init(window::GetWidth(), window::GetHeight()))
+	if (!m_rpMainScene.Init(wndWidth, wndHeight))
+		return false;
+	if (!m_rpPostFrame.Init(wndWidth, wndHeight))
 		return false;
 		
 	return true;
@@ -21,9 +26,10 @@ bool GameScene::Init()
 //=============================================================================
 void GameScene::Close()
 {
-	m_rpDirShadowMap.Close();
 	m_rpMainScene.Close();
 	m_rpPostFrame.Close();
+	m_rpGeometry.Close();
+	m_rpDirShadowMap.Close();
 }
 //=============================================================================
 void GameScene::BindCamera(Camera* camera)
@@ -77,8 +83,12 @@ void GameScene::SetShadowQuality(ShadowQuality quality)
 //=============================================================================
 void GameScene::beginDraw()
 {
-	m_rpMainScene.Resize(window::GetWidth(), window::GetHeight());
-	m_rpPostFrame.Resize(window::GetWidth(), window::GetHeight());
+	const auto wndWidth = window::GetWidth();
+	const auto wndHeight = window::GetHeight();
+
+	m_rpGeometry.Resize(wndWidth, wndHeight);
+	m_rpMainScene.Resize(wndWidth, wndHeight);
+	m_rpPostFrame.Resize(wndWidth, wndHeight);
 }
 //=============================================================================
 void GameScene::draw()
@@ -87,6 +97,8 @@ void GameScene::draw()
 	// 1 Render Pass: draw shadow maps
 	//		Set state: glEnable(GL_DEPTH_TEST);
 	m_rpDirShadowMap.Draw(m_dirLights, m_numDirLights, m_entities, m_numEntities);
+
+
 	
 	//================================================================================
 	// 2 Render Pass: main scenes
@@ -99,14 +111,7 @@ void GameScene::draw()
 
 	//================================================================================
 	// 4 Render Pass: blitting main fbo
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_rpPostFrame.GetFBOId());
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // 0 = default framebuffer (экран)
-	glBlitFramebuffer(
-		0, 0, m_rpPostFrame.GetWidth(), m_rpPostFrame.GetHeight(),
-		0, 0,       window::GetWidth(),       window::GetHeight(),
-		GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	blittingToScreen(m_rpPostFrame.GetFBOId(), m_rpPostFrame.GetWidth(), m_rpPostFrame.GetHeight());
 }
 //=============================================================================
 void GameScene::endDraw()
@@ -114,5 +119,17 @@ void GameScene::endDraw()
 	m_camera = nullptr;
 	m_numEntities = 0;
 	m_numDirLights = 0;
+}
+//=============================================================================
+void GameScene::blittingToScreen(GLuint fbo, uint16_t srcWidth, uint16_t srcHeight)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(
+		0, 0, srcWidth, srcHeight,
+		0, 0, window::GetWidth(), window::GetHeight(),
+		GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 //=============================================================================

@@ -1,11 +1,8 @@
 ﻿#include "stdafx.h"
 #include "RPMainScene.h"
 #include "GameScene.h"
-#include "NanoIO.h"
 #include "NanoLog.h"
 #include "NanoWindow.h"
-//https://github.com/Mikepicker/opengl-sandbox/blob/master/res/shaders/ubershader.vs
-//https://github.com/cforfang/opengl-shadowmapping/blob/master/src/pcf/main.cpp
 //=============================================================================
 bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
@@ -13,7 +10,7 @@ bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_framebufferHeight = framebufferHeight;
 	m_perspective = glm::perspective(glm::radians(60.0f), window::GetAspect(), 0.01f, 1000.0f);
 
-	m_program = CreateShaderProgram(LoadShaderCode("data/shaders/main/vertex.glsl"), LoadShaderCode("data/shaders/main/fragment.glsl"));
+	m_program = LoadShaderProgram("data/shaders/main/vertex.glsl", "data/shaders/main/fragment.glsl");
 	if (!m_program)
 	{
 		Fatal("Scene Main RenderPass Shader failed!");
@@ -27,7 +24,7 @@ bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_modelMatrixId = GetUniformLocation(m_program, "modelMatrix");
 	m_normalMatrixId = GetUniformLocation(m_program, "normalMatrix");
 
-	glUseProgram(0); // TODO: возможно вернуть прошлую
+	glUseProgram(0); // TODO: возможно вернуть прошлую версию шейдера
 
 	m_fbo = { std::make_unique<Framebuffer>(true, false, true) };
 

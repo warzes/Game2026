@@ -35,6 +35,8 @@ private:
 	void draw();
 	void endDraw();
 
+	void blittingToScreen(GLuint fbo, uint16_t srcWidth, uint16_t srcHeight);
+
 	Camera*                        m_camera{ nullptr };
 	std::vector<Entity*>           m_entities;
 	size_t                         m_numEntities{ 0 };

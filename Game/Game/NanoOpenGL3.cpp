@@ -302,6 +302,21 @@ GLuint CreateShaderProgram(std::string_view vertexShader, std::string_view geome
 	return program;
 }
 //=============================================================================
+GLuint LoadShaderProgram(const std::string& vsFile)
+{
+	return CreateShaderProgram(LoadShaderCode(vsFile));
+}
+//=============================================================================
+GLuint LoadShaderProgram(const std::string& vsFile, const std::string& fsFile)
+{
+	return CreateShaderProgram(LoadShaderCode(vsFile), LoadShaderCode(fsFile));
+}
+//=============================================================================
+GLuint LoadShaderProgram(const std::string& vsFile, const std::string& gsFile, const std::string& fsFile)
+{
+	return CreateShaderProgram(LoadShaderCode(vsFile), LoadShaderCode(gsFile), LoadShaderCode(fsFile));
+}
+//=============================================================================
 int GetUniformLocation(GLuint program, std::string_view name)
 {
 	return glGetUniformLocation(program, name.data());

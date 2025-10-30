@@ -11,7 +11,7 @@ bool RPDirShadowMap::Init()
 	m_orthoDimension = 10.0f;
 	m_orthoProjection = glm::ortho(-m_orthoDimension, m_orthoDimension, -m_orthoDimension, m_orthoDimension, 0.1f, 100.0f);
 
-	m_program = CreateShaderProgram(LoadShaderCode("data/shaders/shadowMapping/vertex.glsl"), LoadShaderCode("data/shaders/shadowMapping/fragment.glsl"));
+	m_program = LoadShaderProgram("data/shaders/shadowMapping/vertex.glsl", "data/shaders/shadowMapping/fragment.glsl");
 	if (!m_program)
 	{
 		Fatal("Scene Shadow Mapping Shader failed!");

@@ -3,6 +3,7 @@
     <Platform Name="x64" />
   </Configurations>
   <Folder Name="/Элементы решения/">
+    <File Path="ref.md" />
     <File Path="TODO.md" />
   </Folder>
   <Project Path="3rdparty/3rdparty.vcxproj" Id="09962266-edc2-47d4-9674-7962bbfd0cf1" />
