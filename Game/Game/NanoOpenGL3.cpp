@@ -966,11 +966,17 @@ bool oglSystem::Init()
 	glDisable(GL_DITHER);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+	// TODO: reset opengl state
+
 	return true;
 }
 //=============================================================================
 void oglSystem::Close()
 {
+	for (const auto& [_, sampler] : SamplerCache)
+	{
+		glDeleteSamplers(1, &sampler);
+	}
 	SamplerCache.clear();
 }
 //=============================================================================
