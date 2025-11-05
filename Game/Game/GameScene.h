@@ -6,7 +6,7 @@
 #include "RPGeometry.h"
 #include "RPSSAO.h"
 #include "RPSSAOBlur.h"
-#include "RPMainScene.h"
+#include "RPBlinnPhong.h"
 #include "RPComposite.h"
 
 
@@ -49,6 +49,6 @@ private:
 	RPGeometry                     m_rpGeometry;
 	RPSSAO                         m_rpSSAO;
 	RPSSAOBlur                     m_rpSSAOBlur;
-	RPMainScene                    m_rpMainScene;
-	RPComposite                    m_rpPostFrame;
+	RPBlinnPhong                   m_rpBlinnPhong;
+	RPComposite                    m_rpComposite;
 };

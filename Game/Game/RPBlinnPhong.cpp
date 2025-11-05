@@ -1,10 +1,10 @@
 ﻿#include "stdafx.h"
-#include "RPMainScene.h"
+#include "RPBlinnPhong.h"
 #include "GameScene.h"
 #include "NanoLog.h"
 #include "NanoWindow.h"
 //=============================================================================
-bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
+bool RPBlinnPhong::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
 	m_framebufferWidth = framebufferWidth;
 	m_framebufferHeight = framebufferHeight;
@@ -39,14 +39,14 @@ bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	return true;
 }
 //=============================================================================
-void RPMainScene::Close()
+void RPBlinnPhong::Close()
 {
 	m_fbo.reset();
 	glDeleteProgram(m_program);
 	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
-void RPMainScene::Draw(const RPDirShadowMap& rpShadowMap, const std::vector<DirectionalLight*>& dirLights, size_t numDirLights, const std::vector<Entity*>& entites, size_t numEntities, Camera* camera)
+void RPBlinnPhong::Draw(const RPDirShadowMap& rpShadowMap, const std::vector<DirectionalLight*>& dirLights, size_t numDirLights, const std::vector<Entity*>& entites, size_t numEntities, Camera* camera)
 {
 	m_fbo->Bind();
 	glEnable(GL_DEPTH_TEST);
@@ -96,7 +96,7 @@ void RPMainScene::Draw(const RPDirShadowMap& rpShadowMap, const std::vector<Dire
 	glBindSampler(0, 0);
 }
 //=============================================================================
-void RPMainScene::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
+void RPBlinnPhong::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
 	if (m_framebufferWidth == framebufferWidth && m_framebufferHeight == framebufferHeight)
 		return;
@@ -109,7 +109,7 @@ void RPMainScene::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_fbo->UpdateAttachment(AttachmentType::RenderBuffer, AttachmentTarget::DepthStencil, m_framebufferWidth, m_framebufferHeight);
 }
 //=============================================================================
-void RPMainScene::drawScene(const std::vector<Entity*>& entites, size_t numEntities)
+void RPBlinnPhong::drawScene(const std::vector<Entity*>& entites, size_t numEntities)
 {
 	ModelDrawInfo drawInfo;
 	drawInfo.bindMaterials = true;

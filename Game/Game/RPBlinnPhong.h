@@ -7,7 +7,7 @@ struct Entity;
 class RPDirShadowMap;
 struct DirectionalLight;
 
-class RPMainScene final
+class RPBlinnPhong final
 {
 public:
 	bool Init(uint16_t framebufferWidth, uint16_t framebufferHeight);

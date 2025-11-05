@@ -40,7 +40,7 @@ void main()
 		vec4 offset = vec4(sample, 1.0);
 		offset = projection * offset; // from view to clip-space
 		offset.xyz /= offset.w; // perspective divide
-		offset.xyz = offset.xyz * 0.5 + 0.5; // transform to range 0.0 - 1.0
+		offset.xy = offset.xy * 0.5 + 0.5; // transform to range 0.0 - 1.0
 
 		// get sample depth
 		float sampleDepth = texture(gPosition, offset.xy).z; // get depth value of kernel sample

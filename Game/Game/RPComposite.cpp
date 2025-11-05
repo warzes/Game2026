@@ -22,7 +22,7 @@ bool RPComposite::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	SetUniform(GetUniformLocation(m_program, "brightInput"), 1);
 	SetUniform(GetUniformLocation(m_program, "ssaoSampler"), 2);
 	SetUniform(GetUniformLocation(m_program, "bloom"), false);
-	SetUniform(GetUniformLocation(m_program, "useSSAO"), true);
+	SetUniform(GetUniformLocation(m_program, "useSSAO"), EnableSSAO);
 
 
 	m_fbo = { std::make_unique<Framebuffer>(true, false, true) };
@@ -82,8 +82,11 @@ void RPComposite::Draw(Framebuffer* colorFBO, Framebuffer* SSAOFBO)
 	//glActiveTexture(GL_TEXTURE1);
 	//glBindTexture(GL_TEXTURE_2D, blurFBO->GetAttachments()[0].id);
 
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, SSAOFBO->GetAttachments()[0].id);
+	if (EnableSSAO)
+	{
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, SSAOFBO->GetAttachments()[0].id);
+	}
 
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);

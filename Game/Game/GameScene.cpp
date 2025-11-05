@@ -20,9 +20,9 @@ bool GameScene::Init()
 		return false;
 	if (!m_rpSSAOBlur.Init(wndWidth, wndHeight))
 		return false;
-	if (!m_rpMainScene.Init(wndWidth, wndHeight))
+	if (!m_rpBlinnPhong.Init(wndWidth, wndHeight))
 		return false;
-	if (!m_rpPostFrame.Init(wndWidth, wndHeight))
+	if (!m_rpComposite.Init(wndWidth, wndHeight))
 		return false;
 		
 	return true;
@@ -30,8 +30,8 @@ bool GameScene::Init()
 //=============================================================================
 void GameScene::Close()
 {
-	m_rpMainScene.Close();
-	m_rpPostFrame.Close();
+	m_rpBlinnPhong.Close();
+	m_rpComposite.Close();
 	m_rpSSAOBlur.Close();
 	m_rpSSAO.Close();
 	m_rpGeometry.Close();
@@ -95,8 +95,8 @@ void GameScene::beginDraw()
 	m_rpGeometry.Resize(wndWidth, wndHeight);
 	m_rpSSAO.Resize(wndWidth, wndHeight);
 	m_rpSSAOBlur.Resize(wndWidth, wndHeight);
-	m_rpMainScene.Resize(wndWidth, wndHeight);
-	m_rpPostFrame.Resize(wndWidth, wndHeight);
+	m_rpBlinnPhong.Resize(wndWidth, wndHeight);
+	m_rpComposite.Resize(wndWidth, wndHeight);
 }
 //=============================================================================
 void GameScene::draw()
@@ -106,36 +106,39 @@ void GameScene::draw()
 	//		Set state: glEnable(GL_DEPTH_TEST);
 	m_rpDirShadowMap.Draw(m_dirLights, m_numDirLights, m_entities, m_numEntities);
 
-	//================================================================================
-	// 2 Render Pass: geometry
-	// TODO: m_rpGeometry можно не рендерить если отключено SSAO
-	m_rpGeometry.Draw(m_entities, m_numEntities, m_camera);
+	if (EnableSSAO)
+	{
+		//================================================================================
+		// 2 Render Pass: geometry
+		// TODO: m_rpGeometry можно не рендерить если отключено SSAO
+		m_rpGeometry.Draw(m_entities, m_numEntities, m_camera);
 
-	//================================================================================
-	// 3 Render Pass: SSAO
-	//		Set state: glDisable(GL_DEPTH_TEST);
-	// TODO: m_rpSSAO можно не рендерить если отключено SSAO
-	m_rpSSAO.Draw(m_rpGeometry.GetFBO());
+		//================================================================================
+		// 3 Render Pass: SSAO
+		//		Set state: glDisable(GL_DEPTH_TEST);
+		// TODO: m_rpSSAO можно не рендерить если отключено SSAO
+		m_rpSSAO.Draw(m_rpGeometry.GetFBO());
 
-	//================================================================================
-	// 4 Render Pass: SSAO Blur
-	// TODO: m_rpSSAO можно не рендерить если отключено SSAO
-	m_rpSSAOBlur.Draw(m_rpSSAO.GetFBO());
-		
+		//================================================================================
+		// 4 Render Pass: SSAO Blur
+		// TODO: m_rpSSAO можно не рендерить если отключено SSAO
+		m_rpSSAOBlur.Draw(m_rpSSAO.GetFBO());
+	}
+	
 	//================================================================================
 	// 5 Render Pass: main scenes
 	//		Set state: glEnable(GL_DEPTH_TEST);
-	m_rpMainScene.Draw(m_rpDirShadowMap, m_dirLights, m_numDirLights, m_entities, m_numEntities, m_camera);
+	m_rpBlinnPhong.Draw(m_rpDirShadowMap, m_dirLights, m_numDirLights, m_entities, m_numEntities, m_camera);
 	
 	//================================================================================
 	// 6 Render Pass: post frame
 	//		Set state: glDisable(GL_DEPTH_TEST);
 	// TODO: m_rpSSAO можно не рендерить если отключено SSAO
-	m_rpPostFrame.Draw(m_rpMainScene.GetFBO(), m_rpSSAOBlur.GetFBO());
+	m_rpComposite.Draw(m_rpBlinnPhong.GetFBO(), EnableSSAO ? m_rpSSAOBlur.GetFBO() : nullptr);
 
 	//================================================================================
 	// 7 Render Pass: blitting main fbo
-	blittingToScreen(m_rpPostFrame.GetFBOId(), m_rpPostFrame.GetWidth(), m_rpPostFrame.GetHeight());
+	blittingToScreen(m_rpComposite.GetFBOId(), m_rpComposite.GetWidth(), m_rpComposite.GetHeight());
 }
 //=============================================================================
 void GameScene::endDraw()

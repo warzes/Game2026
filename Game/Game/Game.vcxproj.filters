@@ -85,7 +85,7 @@
     <ClCompile Include="RPDirShadowMap.cpp">
       <Filter>GameApp\Render\SceneRenderPass</Filter>
     </ClCompile>
-    <ClCompile Include="RPMainScene.cpp">
+    <ClCompile Include="RPBlinnPhong.cpp">
       <Filter>GameApp\Render\SceneRenderPass</Filter>
     </ClCompile>
     <ClCompile Include="RPComposite.cpp">
@@ -176,7 +176,7 @@
     <ClInclude Include="RPDirShadowMap.h">
       <Filter>GameApp\Render\SceneRenderPass</Filter>
     </ClInclude>
-    <ClInclude Include="RPMainScene.h">
+    <ClInclude Include="RPBlinnPhong.h">
       <Filter>GameApp\Render\SceneRenderPass</Filter>
     </ClInclude>
     <ClInclude Include="RPComposite.h">

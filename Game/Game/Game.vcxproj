@@ -113,7 +113,7 @@
     <ClCompile Include="Region.cpp" />
     <ClCompile Include="RPDirShadowMap.cpp" />
     <ClCompile Include="RPGeometry.cpp" />
-    <ClCompile Include="RPMainScene.cpp" />
+    <ClCompile Include="RPBlinnPhong.cpp" />
     <ClCompile Include="RPComposite.cpp" />
     <ClCompile Include="RPSSAO.cpp" />
     <ClCompile Include="RPSSAOBlur.cpp" />
@@ -157,7 +157,7 @@
     <ClInclude Include="Region.h" />
     <ClInclude Include="RPDirShadowMap.h" />
     <ClInclude Include="RPGeometry.h" />
-    <ClInclude Include="RPMainScene.h" />
+    <ClInclude Include="RPBlinnPhong.h" />
     <ClInclude Include="RPComposite.h" />
     <ClInclude Include="RPSSAO.h" />
     <ClInclude Include="RPSSAOBlur.h" />
