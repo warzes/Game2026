@@ -10,7 +10,7 @@ bool Scene::Init()
 	m_framebufferHeight = window::GetHeight();
 	m_perspective = glm::perspective(glm::radians(60.0f), window::GetAspect(), 0.01f, 1000.0f);
 
-	SamplerInfo samperCI{};
+	SamplerStateInfo samperCI{};
 	samperCI.minFilter = TextureFilter::Nearest;
 	samperCI.magFilter = TextureFilter::Nearest;
 

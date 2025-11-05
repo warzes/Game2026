@@ -156,23 +156,33 @@ void BindTexture2D(GLenum id, GLuint texture);
 //=============================================================================
 // Sampler
 //=============================================================================
-struct SamplerInfo final
+struct SamplerStateInfo final
 {
+	bool operator==(const SamplerStateInfo&) const noexcept = default;
+
+	float         maxAnisotropy{ 1.0f };
+	float         minLod{ -1000.0f };
+	float         maxLod{ 1000.0f };
+	float         lodBias{ 0.0f };
+	bool          compareEnabled{ false };
+	CompareFunc   compareFunc{ CompareFunc::Less };
+	float         borderColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
 	TextureFilter minFilter{ TextureFilter::Linear };
 	TextureFilter magFilter{ TextureFilter::Linear };
-	TextureWrap wrapS{ TextureWrap::Repeat };
-	TextureWrap wrapT{ TextureWrap::Repeat };
-	TextureWrap wrapR{ TextureWrap::Repeat };
-	float maxAnisotropy{ 1.0f };
-	float minLod{ -1000.0f };
-	float maxLod{ 1000.0f };
-	float lodBias{ 0.0f };
-	bool compareEnabled{ false };
-	CompareFunc compareFunc{ CompareFunc::Less };
-	float borderColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	TextureWrap   wrapS{ TextureWrap::Repeat };
+	TextureWrap   wrapT{ TextureWrap::Repeat };
+	TextureWrap   wrapR{ TextureWrap::Repeat };
 };
 
-GLuint CreateSamplerState(const SamplerInfo& info);
+template<>
+struct std::hash<SamplerStateInfo>
+{
+	std::size_t operator()(const SamplerStateInfo& k) const noexcept;
+};
+
+GLuint CreateSamplerState(const SamplerStateInfo& info);
 
 //=============================================================================
 // Framebuffer
@@ -264,3 +274,12 @@ void EnableSRGB(bool enable);
 //=============================================================================
 void DrawArrays(GLuint vao, GLenum mode, GLint first, GLsizei count);
 void DrawElements(GLuint vao, GLenum mode, GLsizei count, GLenum type, const void* indices = nullptr);
+
+//=============================================================================
+// OpenGL System
+//=============================================================================
+namespace oglSystem
+{
+	bool Init();
+	void Close();
+} // namespace oglSystem

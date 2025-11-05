@@ -1,6 +1,74 @@
 ﻿#include "stdafx.h"
 #include "NanoOpenGL3.h"
 #include "NanoLog.h"
+#include "NanoCore.h"
+//=============================================================================
+std::unordered_map<SamplerStateInfo, GLuint> SamplerCache;
+//=============================================================================
+#if defined(_DEBUG)
+namespace
+{
+	void openGLErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, [[maybe_unused]] GLsizei length, const GLchar* message, [[maybe_unused]] const void* user_param) noexcept
+	{
+		// Ignore certain verbose info messages (particularly ones on Nvidia).
+		if (id == 131169 ||
+			id == 131185 || // NV: Buffer will use video memory
+			id == 131218 ||
+			id == 131204 || // Texture cannot be used for texture mapping
+			id == 131222 ||
+			id == 131154 || // NV: pixel transfer is synchronized with 3D rendering
+			id == 0         // gl{Push, Pop}DebugGroup
+			)
+			return;
+
+		const auto sourceStr = [source]() {
+			switch (source)
+			{
+			case GL_DEBUG_SOURCE_API:             return "Source: API";
+			case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   return "Source: Window Manager";
+			case GL_DEBUG_SOURCE_SHADER_COMPILER: return "Source: Shader Compiler";
+			case GL_DEBUG_SOURCE_THIRD_PARTY:     return "Source: Third Party";
+			case GL_DEBUG_SOURCE_APPLICATION:     return "Source: Application";
+			case GL_DEBUG_SOURCE_OTHER:           return "Source: Other";
+			}
+			return "";
+			}();
+
+		const auto typeStr = [type]() {
+			switch (type)
+			{
+			case GL_DEBUG_TYPE_ERROR:               return "Type: Error";
+			case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "Type: Deprecated Behavior";
+			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  return "Type: Undefined Behavior";
+			case GL_DEBUG_TYPE_PORTABILITY:         return "Type: Portability";
+			case GL_DEBUG_TYPE_PERFORMANCE:         return "Type: Performance";
+			case GL_DEBUG_TYPE_MARKER:              return "Type: Marker";
+			case GL_DEBUG_TYPE_PUSH_GROUP:          return "Type: Push Group";
+			case GL_DEBUG_TYPE_POP_GROUP:           return "Type: Pop Group";
+			case GL_DEBUG_TYPE_OTHER:               return "Type: Other";
+			}
+			return "";
+			}();
+
+		const auto severityStr = [severity]() {
+			switch (severity) {
+			case GL_DEBUG_SEVERITY_NOTIFICATION: return "Severity: notification";
+			case GL_DEBUG_SEVERITY_LOW:          return "Severity: low";
+			case GL_DEBUG_SEVERITY_MEDIUM:       return "Severity: medium";
+			case GL_DEBUG_SEVERITY_HIGH:         return "Severity: high";
+			}
+			return "";
+			}();
+
+		const std::string msg = "OpenGL Debug message(id=" + std::to_string(id) + "):\n"
+			+ sourceStr + '\n'
+			+ typeStr + '\n'
+			+ severityStr + '\n'
+			+ "Message: " + std::string(message) + '\n';
+		Error(msg);
+	}
+}
+#endif
 //=============================================================================
 [[nodiscard]] inline GLenum GetGLEnum(CompareFunc func)
 {
@@ -535,32 +603,54 @@ void BindTexture2D(GLenum id, GLuint texture)
 	glBindTexture(GL_TEXTURE_2D, texture);
 }
 //=============================================================================
-GLuint CreateSamplerState(const SamplerInfo& info)
+std::size_t std::hash<SamplerStateInfo>::operator()(const SamplerStateInfo& k) const noexcept
 {
-	GLuint sampler;
-	glGenSamplers(1, &sampler);
+	auto rtup = std::make_tuple(
+		k.maxAnisotropy,
+		k.minLod,
+		k.maxLod,
+		k.lodBias,
+		k.compareEnabled,
+		k.compareFunc,
+		k.borderColor[0],
+		k.borderColor[1],
+		k.borderColor[2],
+		k.borderColor[3],
+		k.minFilter,
+		k.magFilter,
+		k.wrapS,
+		k.wrapT,
+		k.wrapR);
+	return Hash<decltype(rtup)>{}(rtup);
+}
+//=============================================================================
+GLuint CreateSamplerState(const SamplerStateInfo& info)
+{
+	if (auto it = SamplerCache.find(info); it != SamplerCache.end())
+	{
+		return it->second;
+	}
 
-	// Устанавливаем фильтры
+	GLuint sampler{ 0 };
+	glGenSamplers(1, &sampler);
+	assert(sampler);
+
 	glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GetGLEnum(info.minFilter));
 	glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GetGLEnum(info.magFilter));
 
-	// Устанавливаем режимы оборачивания
 	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GetGLEnum(info.wrapS));
 	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GetGLEnum(info.wrapT));
 	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_R, GetGLEnum(info.wrapR));
 
-	// Устанавливаем максимальное значение анизотропии (если поддерживается)
 	if (info.maxAnisotropy > 1.0f && (GLAD_GL_ARB_texture_filter_anisotropic == 1))
 	{
 		glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY, info.maxAnisotropy);
 	}
 
-	// Устанавливаем уровни LOD
 	glSamplerParameterf(sampler, GL_TEXTURE_MIN_LOD, info.minLod);
 	glSamplerParameterf(sampler, GL_TEXTURE_MAX_LOD, info.maxLod);
 	glSamplerParameterf(sampler, GL_TEXTURE_LOD_BIAS, info.lodBias);
 
-	// Устанавливаем режим сравнения (для теней и т.п.)
 	if (info.compareEnabled)
 	{
 		glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
@@ -571,10 +661,9 @@ GLuint CreateSamplerState(const SamplerInfo& info)
 		glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 	}
 
-	// Устанавливаем цвет границы
 	glSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR, info.borderColor);
 
-	return sampler;
+	return SamplerCache.insert({ info, sampler }).first->second;
 }
 //=============================================================================
 GLuint CreateFramebuffer(GLuint colorTex, GLuint depthTex)
@@ -861,5 +950,27 @@ void DrawElements(GLuint vao, GLenum mode, GLsizei count, GLenum type, const voi
 {
 	glBindVertexArray(vao);
 	glDrawElements(mode, count, type, indices);
+}
+//=============================================================================
+bool oglSystem::Init()
+{
+	Close();
+
+#if defined(_DEBUG)
+	glEnable(GL_DEBUG_OUTPUT);
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	glDebugMessageCallback(openGLErrorCallback, nullptr);
+	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+#endif
+
+	glDisable(GL_DITHER);
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+	return true;
+}
+//=============================================================================
+void oglSystem::Close()
+{
+	SamplerCache.clear();
 }
 //=============================================================================

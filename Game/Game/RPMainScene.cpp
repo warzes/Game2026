@@ -31,7 +31,7 @@ bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_fbo->AddAttachment(AttachmentType::Texture, AttachmentTarget::Color, m_framebufferWidth, m_framebufferHeight);
 	m_fbo->AddAttachment(AttachmentType::RenderBuffer, AttachmentTarget::DepthStencil, m_framebufferWidth, m_framebufferHeight);
 
-	SamplerInfo samperCI{};
+	SamplerStateInfo samperCI{};
 	samperCI.minFilter = TextureFilter::Nearest;
 	samperCI.magFilter = TextureFilter::Nearest;
 	m_sampler = CreateSamplerState(samperCI);

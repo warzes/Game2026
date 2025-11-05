@@ -43,7 +43,7 @@ bool RPPostFrame::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 
 	glUseProgram(0);
 
-	SamplerInfo samperCI{};
+	SamplerStateInfo samperCI{};
 	samperCI.minFilter = TextureFilter::Nearest;
 	samperCI.magFilter = TextureFilter::Nearest;
 	m_sampler = CreateSamplerState(samperCI);

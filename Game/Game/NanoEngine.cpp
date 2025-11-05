@@ -25,91 +25,17 @@ namespace
 	float       framesPerSecond{ 0.0f };
 }
 //=============================================================================
-#if defined(_DEBUG)
-namespace
-{
-	void openGLErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, [[maybe_unused]] GLsizei length, const GLchar* message, [[maybe_unused]] const void* user_param) noexcept
-	{
-		// Ignore certain verbose info messages (particularly ones on Nvidia).
-		if (id == 131169 ||
-			id == 131185 || // NV: Buffer will use video memory
-			id == 131218 ||
-			id == 131204 || // Texture cannot be used for texture mapping
-			id == 131222 ||
-			id == 131154 || // NV: pixel transfer is synchronized with 3D rendering
-			id == 0         // gl{Push, Pop}DebugGroup
-			)
-			return;
-
-		const auto sourceStr = [source]() {
-			switch (source)
-			{
-			case GL_DEBUG_SOURCE_API:             return "Source: API";
-			case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   return "Source: Window Manager";
-			case GL_DEBUG_SOURCE_SHADER_COMPILER: return "Source: Shader Compiler";
-			case GL_DEBUG_SOURCE_THIRD_PARTY:     return "Source: Third Party";
-			case GL_DEBUG_SOURCE_APPLICATION:     return "Source: Application";
-			case GL_DEBUG_SOURCE_OTHER:           return "Source: Other";
-			}
-			return "";
-			}();
-
-		const auto typeStr = [type]() {
-			switch (type)
-			{
-			case GL_DEBUG_TYPE_ERROR:               return "Type: Error";
-			case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "Type: Deprecated Behavior";
-			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  return "Type: Undefined Behavior";
-			case GL_DEBUG_TYPE_PORTABILITY:         return "Type: Portability";
-			case GL_DEBUG_TYPE_PERFORMANCE:         return "Type: Performance";
-			case GL_DEBUG_TYPE_MARKER:              return "Type: Marker";
-			case GL_DEBUG_TYPE_PUSH_GROUP:          return "Type: Push Group";
-			case GL_DEBUG_TYPE_POP_GROUP:           return "Type: Pop Group";
-			case GL_DEBUG_TYPE_OTHER:               return "Type: Other";
-			}
-			return "";
-			}();
-
-		const auto severityStr = [severity]() {
-			switch (severity) {
-			case GL_DEBUG_SEVERITY_NOTIFICATION: return "Severity: notification";
-			case GL_DEBUG_SEVERITY_LOW:          return "Severity: low";
-			case GL_DEBUG_SEVERITY_MEDIUM:       return "Severity: medium";
-			case GL_DEBUG_SEVERITY_HIGH:         return "Severity: high";
-			}
-			return "";
-			}();
-
-		const std::string msg = "OpenGL Debug message(id=" + std::to_string(id) + "):\n"
-			+ sourceStr + '\n'
-			+ typeStr + '\n'
-			+ severityStr + '\n'
-			+ "Message: " + std::string(message) + '\n';
-		Error(msg);
-	}
-}
-#endif
-//=============================================================================
 bool engine::Init(uint16_t width, uint16_t height, std::string_view title)
 {
 	if (!window::Init(width, height, title))
 		return false;
 	input::Init();
 
-	// initOpenGL
-	{
-#if defined(_DEBUG)
-		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glDebugMessageCallback(openGLErrorCallback, nullptr);
-		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-#endif
+	if (!oglSystem::Init())
+		return false;
 
-		EnableSRGB(true);
-		glDisable(GL_DITHER);
-		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-		glViewport(0, 0, window::GetWidth(), window::GetHeight());
-	}
+	EnableSRGB(true);
+	glViewport(0, 0, window::GetWidth(), window::GetHeight());
 
 	// initImGui
 	{
@@ -150,6 +76,7 @@ void engine::Close() noexcept
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+	oglSystem::Close();
 	window::Close();
 }
 //=============================================================================
