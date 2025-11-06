@@ -23,7 +23,7 @@ public:
 	Mesh& operator=(const Mesh&) = delete;
 	Mesh& operator=(Mesh&& other) noexcept;
 
-	void Draw(GLenum mode = GL_TRIANGLES, GLuint program = 0, unsigned instanceCount = 1);
+	void Draw(GLenum mode = GL_TRIANGLES, unsigned instanceCount = 1) const;
 
 	void tDraw(GLenum mode = GL_TRIANGLES, GLuint program = 0, bool bindMaterial = true, bool instancing = false, int amount = 1);
 

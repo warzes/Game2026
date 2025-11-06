@@ -116,6 +116,7 @@
     <ClCompile Include="RPGeometry.cpp" />
     <ClCompile Include="RPBlinnPhong.cpp" />
     <ClCompile Include="RPComposite.cpp" />
+    <ClCompile Include="RPMainScene.cpp" />
     <ClCompile Include="RPSSAO.cpp" />
     <ClCompile Include="RPSSAOBlur.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="RPGeometry.h" />
     <ClInclude Include="RPBlinnPhong.h" />
     <ClInclude Include="RPComposite.h" />
+    <ClInclude Include="RPMainScene.h" />
     <ClInclude Include="RPSSAO.h" />
     <ClInclude Include="RPSSAOBlur.h" />
     <ClInclude Include="Scene.h" />

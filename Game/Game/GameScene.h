@@ -7,6 +7,7 @@
 #include "RPSSAO.h"
 #include "RPSSAOBlur.h"
 #include "RPBlinnPhong.h"
+#include "RPMainScene.h"
 #include "RPComposite.h"
 
 
@@ -50,5 +51,6 @@ private:
 	RPSSAO                         m_rpSSAO;
 	RPSSAOBlur                     m_rpSSAOBlur;
 	RPBlinnPhong                   m_rpBlinnPhong;
+	RPMainScene                    m_rpMainScene;
 	RPComposite                    m_rpComposite;
 };

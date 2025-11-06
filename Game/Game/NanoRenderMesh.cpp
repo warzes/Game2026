@@ -68,7 +68,7 @@ Mesh& Mesh::operator=(Mesh&& old) noexcept
 	return *this;
 }
 //=============================================================================
-void Mesh::Draw(GLenum mode, GLuint program, unsigned instanceCount)
+void Mesh::Draw(GLenum mode, unsigned instanceCount) const
 {
 	assert(m_vao);
 	glBindVertexArray(m_vao);

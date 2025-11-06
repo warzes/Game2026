@@ -103,6 +103,9 @@
     <ClCompile Include="NanoRenderVertex.cpp">
       <Filter>NanoEngine\Render</Filter>
     </ClCompile>
+    <ClCompile Include="RPMainScene.cpp">
+      <Filter>GameApp\Render\SceneRenderPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -197,6 +200,9 @@
     </ClInclude>
     <ClInclude Include="NanoRenderVertex.h">
       <Filter>NanoEngine\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="RPMainScene.h">
+      <Filter>GameApp\Render\SceneRenderPass</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
