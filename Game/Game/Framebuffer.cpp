@@ -11,17 +11,8 @@ bool Framebuffer::Create(const FramebufferInfo& createInfo)
 	m_info = createInfo;
 
 	glGenFramebuffers(1, &m_fbo);
-	initializeAttachments();
-
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	if (status != GL_FRAMEBUFFER_COMPLETE)
-	{
-		Fatal("Framebuffer is not complete after resize: " + std::to_string(status));
-		Destroy();
+	if (!initializeAttachments())
 		return false;
-	}
-
 	return true;
 }
 //=============================================================================
@@ -30,6 +21,9 @@ void Framebuffer::Destroy()
 	if (m_fbo) glDeleteFramebuffers(1, &m_fbo);
 	m_fbo = 0;
 	cleanupAttachments();
+	m_info.colorAttachments.clear();
+	m_info.depthAttachment = {};
+	m_info.width = m_info.height = 0;
 }
 //=============================================================================
 void Framebuffer::Bind()
@@ -91,7 +85,7 @@ void Framebuffer::BindDepthTexture(size_t slot) const
 	}
 }
 //=============================================================================
-void Framebuffer::initializeAttachments()
+bool Framebuffer::initializeAttachments()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -137,6 +131,44 @@ void Framebuffer::initializeAttachments()
 			createDepthRenderbufferAttachment(depthCfg);
 		}
 	}
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		switch (status)
+		{
+		case GL_FRAMEBUFFER_UNDEFINED:
+			Fatal("Framebuffer is not complete after resize: GL_FRAMEBUFFER_UNDEFINED");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+			Fatal("Framebuffer is not complete after resize: GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+			Fatal("Framebuffer is not complete after resize: GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+			Fatal("Framebuffer is not complete after resize: GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+			Fatal("Framebuffer is not complete after resize: GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
+			break;
+		case GL_FRAMEBUFFER_UNSUPPORTED:
+			Fatal("Framebuffer is not complete after resize: GL_FRAMEBUFFER_UNSUPPORTED");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+			Fatal("Framebuffer is not complete after resize: GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE");
+			break;
+		case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+			Fatal("Framebuffer is not complete after resize: GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS");
+			break;
+		}
+
+		Destroy();
+		return false;
+	}
+
+	return true;
 }
 //=============================================================================
 void Framebuffer::cleanupAttachments()
@@ -165,9 +197,6 @@ void Framebuffer::cleanupAttachments()
 	}
 	m_colorAttachmentsId.clear();
 	m_depthAttachmentId = {};
-	m_info.colorAttachments.clear();
-	m_info.depthAttachment = {};
-	m_info.width = m_info.height = 0;
 }
 //=============================================================================
 void Framebuffer::createColorTextureAttachment(size_t index, const ColorAttachment& cfg)

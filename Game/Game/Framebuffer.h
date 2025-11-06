@@ -74,7 +74,7 @@ public:
 	void BindDepthTexture(size_t slot) const;
 
 private:
-	void initializeAttachments();
+	bool initializeAttachments();
 	void cleanupAttachments();
 
 	void createColorTextureAttachment(size_t index, const ColorAttachment& cfg);
