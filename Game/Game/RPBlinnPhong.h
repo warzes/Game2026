@@ -20,8 +20,8 @@ public:
 		const std::vector<GameObject*>& gameObject, size_t numGameObject, 
 		Camera* camera);
 
-	Framebuffer* GetFBO() const { return m_fbo.get(); }
-	GLuint GetFBOId() const { return m_fbo->GetId(); }
+	const Framebuffer& GetFBO() const { return m_fbo; }
+	GLuint GetFBOId() const { return m_fbo.GetId(); }
 	uint16_t GetWidth() const { return m_framebufferWidth; }
 	uint16_t GetHeight() const { return m_framebufferHeight; }
 
@@ -33,11 +33,11 @@ private:
 	int       m_viewMatrixId{ -1 };
 	int       m_modelMatrixId{ -1 };
 	int       m_normalMatrixId{ -1 };
-	uint16_t  m_framebufferWidth{ 0 };
-	uint16_t  m_framebufferHeight{ 0 };
+	uint16_t  m_framebufferWidth{ 0 }; // TODO: можно удалить - есть в m_fbo
+	uint16_t  m_framebufferHeight{ 0 }; // TODO: можно удалить - есть в m_fbo
 	glm::mat4 m_perspective{ 1.0f };
 
-	std::unique_ptr<Framebuffer> m_fbo; // color + depth + stencil
+	Framebuffer m_fbo;
 
 	GLuint    m_sampler{ 0 };
 };

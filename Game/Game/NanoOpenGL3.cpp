@@ -70,6 +70,24 @@ namespace
 }
 //#endif
 //=============================================================================
+GLenum GetColorFormatGL(ColorFormat format)
+{
+	switch (format)
+	{
+	case ColorFormat::Red:  return GL_RED;
+	case ColorFormat::RG:   return GL_RG;
+	case ColorFormat::RGB:  return GL_RGB;
+	case ColorFormat::RGBA: return GL_RGBA;
+	default: std::unreachable();
+	}
+	return 0;
+}
+//=============================================================================
+GLenum GetDataTypeGL(DataType dataType)
+{
+	return (dataType == DataType::Float) ? GL_FLOAT : GL_UNSIGNED_BYTE;
+}
+//=============================================================================
 [[nodiscard]] inline GLenum GetGLEnum(ComparisonFunc func)
 {
 	switch (func) {

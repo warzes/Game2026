@@ -45,9 +45,18 @@ bool RPSSAO::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 
 	glUseProgram(0); // TODO: возможно вернуть прошлую версию шейдера
 
-	m_fbo = { std::make_unique<Framebuffer>(true, false, true) };
+	FramebufferInfo fboInfo;
 
-	m_fbo->AddAttachment(AttachmentType::Texture, AttachmentTarget::ColorRed, m_framebufferWidth, m_framebufferHeight);
+	fboInfo.colorAttachments.resize(1);
+	fboInfo.colorAttachments[0].type = AttachmentType::Texture;
+	fboInfo.colorAttachments[0].format = ColorFormat::Red;
+	fboInfo.colorAttachments[0].dataType = DataType::Float;
+
+	fboInfo.width = m_framebufferWidth;
+	fboInfo.height = m_framebufferHeight;
+
+	if (!m_fbo.Create(fboInfo))
+		return false;
 
 	std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0); // random floats between 0.0 - 1.0
 	std::default_random_engine generator;
@@ -92,7 +101,7 @@ bool RPSSAO::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 //=============================================================================
 void RPSSAO::Close()
 {
-	m_fbo.reset();
+	m_fbo.Destroy();
 	glDeleteProgram(m_program);
 }
 //=============================================================================
@@ -107,12 +116,12 @@ void RPSSAO::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	glm::vec2 size((float)m_framebufferWidth, (float)m_framebufferHeight);
 	m_noiseScale = size / 4.0f;
 
-	m_fbo->UpdateAttachment(AttachmentType::Texture, AttachmentTarget::ColorRed, m_framebufferWidth, m_framebufferHeight);
+	m_fbo.Resize(m_framebufferWidth, m_framebufferHeight);
 }
 //=============================================================================
-void RPSSAO::Draw(Framebuffer* preFBO)
+void RPSSAO::Draw(const Framebuffer* preFBO)
 {
-	m_fbo->Bind();
+	m_fbo.Bind();
 	glDisable(GL_DEPTH_TEST);
 	glViewport(0, 0, static_cast<int>(m_framebufferWidth), static_cast<int>(m_framebufferHeight));
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -123,12 +132,9 @@ void RPSSAO::Draw(Framebuffer* preFBO)
 	SetUniform(GetUniformLocation(m_program, "noiseScale"), m_noiseScale);
 	SetUniform(GetUniformLocation(m_program, "projection"), m_perspective);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, preFBO->GetAttachments()[0].id);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, preFBO->GetAttachments()[1].id);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, m_noiseTexture);
+	preFBO->BindColorTexture(0, 0);
+	preFBO->BindColorTexture(1, 1);
+	BindTexture2D(2, m_noiseTexture);
 
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);

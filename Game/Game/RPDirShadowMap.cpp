@@ -30,15 +30,18 @@ bool RPDirShadowMap::Init()
 
 	for (size_t i = 0; i < m_depthFBO.size(); i++)
 	{
-		m_depthFBO[i] = std::make_unique<Framebuffer>(false);
+		DepthAttachment depth;
+		depth.type = AttachmentType::Texture;
+
+		FramebufferInfo fboInfo;
+		fboInfo.depthAttachment = depth;
+		fboInfo.width = static_cast<int>(m_shadowQuality);
+		fboInfo.height = static_cast<int>(m_shadowQuality);
+
+		if (!m_depthFBO[i].Create(fboInfo))
+			return false;
 	}
-	if (m_shadowQuality != ShadowQuality::Off)
-	{
-		for (int i{ 0 }; i < m_depthFBO.size(); ++i)
-		{
-			m_depthFBO[i]->AddAttachment(AttachmentType::Texture, AttachmentTarget::Depth, static_cast<int>(m_shadowQuality), static_cast<int>(m_shadowQuality));
-		}
-	}
+
 	return true;
 }
 //=============================================================================
@@ -47,7 +50,7 @@ void RPDirShadowMap::Close()
 	glDeleteProgram(m_program);
 	for (size_t i = 0; i < m_depthFBO.size(); i++)
 	{
-		m_depthFBO[i].reset();
+		m_depthFBO[i].Destroy();
 	}
 }
 //=============================================================================
@@ -70,7 +73,7 @@ void RPDirShadowMap::Draw(const std::vector<DirectionalLight*>& dirLights, size_
 
 		const auto& light = dirLights[i];
 
-		m_depthFBO[i]->Bind();
+		m_depthFBO[i].Bind();
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		constexpr glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
@@ -92,7 +95,7 @@ void RPDirShadowMap::SetShadowQuality(ShadowQuality quality)
 	if (m_shadowQuality != ShadowQuality::Off)
 	{
 		for (size_t i = 0; i < m_depthFBO.size(); i++)
-			m_depthFBO[i]->UpdateAttachment(AttachmentType::Texture, AttachmentTarget::Depth, static_cast<int>(m_shadowQuality), static_cast<int>(m_shadowQuality));
+			m_depthFBO[i].Resize(static_cast<int>(m_shadowQuality), static_cast<int>(m_shadowQuality));
 	}
 }
 //=============================================================================

@@ -24,9 +24,18 @@ bool RPComposite::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	SetUniform(GetUniformLocation(m_program, "bloom"), false);
 	SetUniform(GetUniformLocation(m_program, "useSSAO"), EnableSSAO);
 
+	FramebufferInfo fboInfo;
 
-	m_fbo = { std::make_unique<Framebuffer>(true, false, true) };
-	m_fbo->AddAttachment(AttachmentType::Texture, AttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
+	fboInfo.colorAttachments.resize(1);
+	fboInfo.colorAttachments[0].type = AttachmentType::Texture;
+	fboInfo.colorAttachments[0].format = ColorFormat::RGBA;
+	fboInfo.colorAttachments[0].dataType = DataType::Float;
+
+	fboInfo.width = m_framebufferWidth;
+	fboInfo.height = m_framebufferHeight;
+
+	if (!m_fbo.Create(fboInfo))
+		return false;
 
 	std::vector<QuadVertex> vertices = {
 		{glm::vec2(-1.0f,  1.0f), glm::vec2(0.0f, 1.0f)},
@@ -54,7 +63,7 @@ bool RPComposite::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 void RPComposite::Close()
 {
 	glDeleteProgram(m_program);
-	m_fbo.reset();
+	m_fbo.Destroy();
 }
 //=============================================================================
 void RPComposite::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
@@ -64,28 +73,24 @@ void RPComposite::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 
 	m_framebufferWidth = framebufferWidth;
 	m_framebufferHeight = framebufferHeight;
-	m_fbo->UpdateAttachment(AttachmentType::Texture, AttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
+	m_fbo.Resize(m_framebufferWidth, m_framebufferHeight);
 }
 //=============================================================================
-void RPComposite::Draw(Framebuffer* colorFBO, Framebuffer* SSAOFBO)
+void RPComposite::Draw(const Framebuffer* colorFBO, const Framebuffer* SSAOFBO)
 {
-	m_fbo->Bind();
+	m_fbo.Bind();
 	glDisable(GL_DEPTH_TEST);
 	glViewport(0, 0, static_cast<int>(m_framebufferWidth), static_cast<int>(m_framebufferHeight));
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(m_program);
-	
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, colorFBO->GetAttachments()[0].id);
-	
-	//glActiveTexture(GL_TEXTURE1);
-	//glBindTexture(GL_TEXTURE_2D, blurFBO->GetAttachments()[0].id);
+
+	colorFBO->BindColorTexture(0, 0);
+	//blurFBO->BindColorTexture(0, 1);
 
 	if (EnableSSAO)
 	{
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, SSAOFBO->GetAttachments()[0].id);
+		SSAOFBO->BindColorTexture(0, 2);
 	}
 
 	glBindVertexArray(m_vao);

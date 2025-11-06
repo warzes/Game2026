@@ -25,25 +25,33 @@ bool RPGeometry::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 
 	glUseProgram(0); // TODO: возможно вернуть прошлую версию шейдера
 
-	m_fbo = { std::make_unique<Framebuffer>(true, false, true) };
 
-	m_fbo->AddAttachment(AttachmentType::Texture, AttachmentTarget::ColorRGB, m_framebufferWidth, m_framebufferHeight);
-	m_fbo->AddAttachment(AttachmentType::Texture, AttachmentTarget::ColorRGB, m_framebufferWidth, m_framebufferHeight);
-	m_fbo->AddAttachment(AttachmentType::RenderBuffer, AttachmentTarget::DepthStencil, m_framebufferWidth, m_framebufferHeight);
+	FramebufferInfo fboInfo;
 
-	SamplerStateInfo samperCI{};
-	samperCI.minFilter = TextureFilter::Nearest;
-	samperCI.magFilter = TextureFilter::Nearest;
-	m_sampler = CreateSamplerState(samperCI);
+	fboInfo.colorAttachments.resize(2);
+	fboInfo.colorAttachments[0].type = AttachmentType::Texture;
+	fboInfo.colorAttachments[0].format = ColorFormat::RGB;
+	fboInfo.colorAttachments[0].dataType = DataType::Float;
+	fboInfo.colorAttachments[1].type = AttachmentType::Texture;
+	fboInfo.colorAttachments[1].format = ColorFormat::RGB;
+	fboInfo.colorAttachments[1].dataType = DataType::Float;
+
+	fboInfo.depthAttachment = DepthAttachment();
+	fboInfo.depthAttachment->type = AttachmentType::RenderBuffer;
+
+	fboInfo.width = m_framebufferWidth;
+	fboInfo.height = m_framebufferHeight;
+
+	if (!m_fbo.Create(fboInfo))
+		return false;
 
 	return true;
 }
 //=============================================================================
 void RPGeometry::Close()
 {
-	m_fbo.reset();
+	m_fbo.Destroy();
 	glDeleteProgram(m_program);
-	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
 void RPGeometry::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
@@ -55,13 +63,12 @@ void RPGeometry::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_framebufferHeight = framebufferHeight;
 	m_perspective = glm::perspective(glm::radians(60.0f), window::GetAspect(), 0.01f, 1000.0f);
 
-	m_fbo->UpdateAttachment(AttachmentType::Texture, AttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
-	m_fbo->UpdateAttachment(AttachmentType::RenderBuffer, AttachmentTarget::DepthStencil, m_framebufferWidth, m_framebufferHeight);
+	m_fbo.Resize(m_framebufferWidth, m_framebufferHeight);
 }
 //=============================================================================
 void RPGeometry::Draw(const std::vector<GameObject*>& gameObject, size_t numGameObject, Camera* camera)
 {
-	m_fbo->Bind();
+	m_fbo.Bind();
 	glViewport(0, 0, static_cast<int>(m_framebufferWidth), static_cast<int>(m_framebufferHeight));
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT/* | GL_STENCIL_BUFFER_BIT*/);
@@ -70,9 +77,7 @@ void RPGeometry::Draw(const std::vector<GameObject*>& gameObject, size_t numGame
 	SetUniform(m_projectionMatrixId, m_perspective);
 	SetUniform(m_viewMatrixId, camera->GetViewMatrix());
 
-	glBindSampler(0, m_sampler);
 	drawScene(gameObject, numGameObject);
-	glBindSampler(0, 0);
 }
 //=============================================================================
 void RPGeometry::drawScene(const std::vector<GameObject*>& gameObject, size_t numGameObject)

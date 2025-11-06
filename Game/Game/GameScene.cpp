@@ -117,12 +117,12 @@ void GameScene::draw()
 		// 3 Render Pass: SSAO
 		//		Set state: glDisable(GL_DEPTH_TEST);
 		// TODO: m_rpSSAO можно не рендерить если отключено SSAO
-		m_rpSSAO.Draw(m_rpGeometry.GetFBO());
+		m_rpSSAO.Draw(&m_rpGeometry.GetFBO());
 
 		//================================================================================
 		// 4 Render Pass: SSAO Blur
 		// TODO: m_rpSSAO можно не рендерить если отключено SSAO
-		m_rpSSAOBlur.Draw(m_rpSSAO.GetFBO());
+		m_rpSSAOBlur.Draw(&m_rpSSAO.GetFBO());
 	}
 	
 	//================================================================================
@@ -134,7 +134,7 @@ void GameScene::draw()
 	// 6 Render Pass: post frame
 	//		Set state: glDisable(GL_DEPTH_TEST);
 	// TODO: m_rpSSAO можно не рендерить если отключено SSAO
-	m_rpComposite.Draw(m_rpBlinnPhong.GetFBO(), EnableSSAO ? m_rpSSAOBlur.GetFBO() : nullptr);
+	m_rpComposite.Draw(&m_rpBlinnPhong.GetFBO(), EnableSSAO ? &m_rpSSAOBlur.GetFBO() : nullptr);
 
 	//================================================================================
 	// 7 Render Pass: blitting main fbo

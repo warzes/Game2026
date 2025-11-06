@@ -26,10 +26,21 @@ bool RPBlinnPhong::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 
 	glUseProgram(0); // TODO: возможно вернуть прошлую версию шейдера
 
-	m_fbo = { std::make_unique<Framebuffer>(true, false, true) };
+	FramebufferInfo fboInfo;
 
-	m_fbo->AddAttachment(AttachmentType::Texture, AttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
-	m_fbo->AddAttachment(AttachmentType::RenderBuffer, AttachmentTarget::DepthStencil, m_framebufferWidth, m_framebufferHeight);
+	fboInfo.colorAttachments.resize(1);
+	fboInfo.colorAttachments[0].type = AttachmentType::Texture;
+	fboInfo.colorAttachments[0].format = ColorFormat::RGBA;
+	fboInfo.colorAttachments[0].dataType = DataType::UnsignedByte;
+
+	fboInfo.depthAttachment = DepthAttachment();
+	fboInfo.depthAttachment->type = AttachmentType::RenderBuffer;
+
+	fboInfo.width = m_framebufferWidth;
+	fboInfo.height = m_framebufferHeight;
+
+	if (!m_fbo.Create(fboInfo))
+		return false;
 
 	SamplerStateInfo samperCI{};
 	samperCI.minFilter = TextureFilter::Nearest;
@@ -41,14 +52,14 @@ bool RPBlinnPhong::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 //=============================================================================
 void RPBlinnPhong::Close()
 {
-	m_fbo.reset();
+	m_fbo.Destroy();
 	glDeleteProgram(m_program);
 	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
 void RPBlinnPhong::Draw(const RPDirShadowMap& rpShadowMap, const std::vector<DirectionalLight*>& dirLights, size_t numDirLights, const std::vector<GameObject*>& gameObject, size_t numGameObject, Camera* camera)
 {
-	m_fbo->Bind();
+	m_fbo.Bind();
 	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, static_cast<int>(m_framebufferWidth), static_cast<int>(m_framebufferHeight));
 	glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
@@ -79,8 +90,7 @@ void RPBlinnPhong::Draw(const RPDirShadowMap& rpShadowMap, const std::vector<Dir
 		glm::vec3 lightPosition = l->position;
 		glm::vec3 lightTarget = lightPosition + l->direction;
 		glm::mat4 lightView = glm::lookAt(lightPosition, lightTarget, glm::vec3(0.0f, 1.0f, 0.0f));
-		glActiveTexture(GL_TEXTURE0 + textureOffset);
-		glBindTexture(GL_TEXTURE_2D, rpShadowMap.GetDepthFBO()[depthMapIndex]->GetAttachments().at(0).id);
+		rpShadowMap.GetDepthFBO()[depthMapIndex].BindDepthTexture(textureOffset);
 		SetUniform(GetUniformLocation(m_program, "depthMap[" + std::to_string(depthMapIndex) + "]"), textureOffset);
 		SetUniform(GetUniformLocation(m_program, "light[" + std::to_string(i) + "].lightSpaceMatrix"), rpShadowMap.GetProjection() * lightView);
 		depthMapIndex++;
@@ -105,8 +115,7 @@ void RPBlinnPhong::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_framebufferHeight = framebufferHeight;
 	m_perspective = glm::perspective(glm::radians(60.0f), window::GetAspect(), 0.01f, 1000.0f);
 
-	m_fbo->UpdateAttachment(AttachmentType::Texture, AttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
-	m_fbo->UpdateAttachment(AttachmentType::RenderBuffer, AttachmentTarget::DepthStencil, m_framebufferWidth, m_framebufferHeight);
+	m_fbo.Resize(m_framebufferWidth, m_framebufferHeight);
 }
 //=============================================================================
 void RPBlinnPhong::drawScene(const std::vector<GameObject*>& gameObject, size_t numGameObject)

@@ -1,11 +1,342 @@
 ﻿#include "stdafx.h"
 #include "Framebuffer.h"
 #include "NanoLog.h"
+
+#pragma region [ NEW Framebuffer ]
+//=============================================================================
+bool Framebuffer::Create(const FramebufferInfo& createInfo)
+{
+	Destroy();
+
+	m_info = createInfo;
+
+	glGenFramebuffers(1, &m_fbo);
+	initializeAttachments();
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		Fatal("Framebuffer is not complete after resize: " + std::to_string(status));
+		Destroy();
+		return false;
+	}
+
+	return true;
+}
+//=============================================================================
+void Framebuffer::Destroy()
+{
+	if (m_fbo) glDeleteFramebuffers(1, &m_fbo);
+	m_fbo = 0;
+	cleanupAttachments();
+}
+//=============================================================================
+void Framebuffer::Bind()
+{
+	assert(m_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+}
+//=============================================================================
+void Framebuffer::Unbind()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+//=============================================================================
+void Framebuffer::Resize(uint16_t width, uint16_t height)
+{
+	if (m_info.width == width && m_info.height == height) return;
+
+	m_info.width = width;
+	m_info.height = height;
+	cleanupAttachments();
+	initializeAttachments();
+}
+//=============================================================================
+void Framebuffer::BindColorTexture(size_t colorAttachment, size_t slot) const
+{
+	if (colorAttachment < m_colorAttachmentsId.size())
+	{
+		if (m_colorAttachmentsId[colorAttachment].type == AttachmentType::Texture)
+		{
+			BindTexture2D(slot, m_colorAttachmentsId[colorAttachment].id);
+		}
+		else
+		{
+			// TODO:
+		}
+	}
+	else
+	{
+		Error("colorAttachment not find");
+	}
+}
+//=============================================================================
+void Framebuffer::BindDepthTexture(size_t slot) const
+{
+	if (m_depthAttachmentId && m_depthAttachmentId->id)
+	{
+		if (m_depthAttachmentId->type == AttachmentType::Texture)
+		{
+			BindTexture2D(slot, m_depthAttachmentId->id);
+		}
+		else
+		{
+			// TODO:
+		}
+	}
+	else
+	{
+		Error("depthAttachment not find");
+	}
+}
+//=============================================================================
+void Framebuffer::initializeAttachments()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+	// color attachments
+	std::vector<GLenum> drawBuffers;
+	for (size_t i = 0; i < m_info.colorAttachments.size(); ++i)
+	{
+		const auto& cfg = m_info.colorAttachments[i];
+		if (cfg.type == AttachmentType::Texture)
+		{
+			createColorTextureAttachment(i, cfg);
+		}
+		else if (cfg.type == AttachmentType::TextureCubeMap)
+		{
+			createColorCubeMapTextureAttachment(i, cfg);
+		}
+		else if (cfg.type == AttachmentType::RenderBuffer)
+		{
+			createColorRenderbufferAttachment(i, cfg);
+		}
+		else
+		{
+			continue;
+		}
+		drawBuffers.push_back(GL_COLOR_ATTACHMENT0 + static_cast<GLenum>(i));
+	}
+	glDrawBuffers(drawBuffers.size(), drawBuffers.data());
+
+	// depth buffer attachment
+	if (m_info.depthAttachment)
+	{
+		const auto& depthCfg = m_info.depthAttachment.value();
+		if (depthCfg.type == AttachmentType::Texture)
+		{
+			createDepthTextureAttachment(depthCfg);
+		}
+		else if (depthCfg.type == AttachmentType::TextureCubeMap)
+		{
+			createDepthCubeMapTextureAttachment(depthCfg);
+		}
+		else if (depthCfg.type == AttachmentType::RenderBuffer)
+		{
+			createDepthRenderbufferAttachment(depthCfg);
+		}
+	}
+}
+//=============================================================================
+void Framebuffer::cleanupAttachments()
+{
+	for (auto cls : m_colorAttachmentsId)
+	{
+		if (cls.id)
+		{
+			if (cls.type == AttachmentType::Texture || cls.type == AttachmentType::TextureCubeMap)
+				glDeleteTextures(1, &cls.id);
+			else if(cls.type == AttachmentType::RenderBuffer)
+				glDeleteRenderbuffers(1, &cls.id);
+		}
+		cls.id = 0;
+	}
+	if (m_depthAttachmentId)
+	{
+		if (m_depthAttachmentId->id)
+		{
+			if (m_depthAttachmentId->type == AttachmentType::Texture || m_depthAttachmentId->type == AttachmentType::TextureCubeMap)
+				glDeleteTextures(1, &m_depthAttachmentId->id);
+			else if (m_depthAttachmentId->type == AttachmentType::RenderBuffer)			
+				glDeleteRenderbuffers(1, &m_depthAttachmentId->id);
+		}
+		m_depthAttachmentId->id = 0;
+	}
+	m_colorAttachmentsId.clear();
+	m_depthAttachmentId = {};
+	m_info.colorAttachments.clear();
+	m_info.depthAttachment = {};
+	m_info.width = m_info.height = 0;
+}
+//=============================================================================
+void Framebuffer::createColorTextureAttachment(size_t index, const ColorAttachment& cfg)
+{
+	GLuint tex{ 0 };
+	glGenTextures(1, &tex);
+	assert(tex);
+	if (cfg.multisample)
+	{
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, cfg.samples, getInternalFormat(cfg.format, cfg.dataType, cfg.colorSpace), m_info.width, m_info.height, GL_TRUE);
+	}
+	else
+	{
+		glBindTexture(GL_TEXTURE_2D, tex);
+		glTexImage2D(GL_TEXTURE_2D, 0, getInternalFormat(cfg.format, cfg.dataType, cfg.colorSpace), m_info.width, m_info.height, 0, GetColorFormatGL(cfg.format), GetDataTypeGL(cfg.dataType), nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, (cfg.multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D), tex, 0);
+
+	m_colorAttachmentsId.emplace_back(ColorAttachmentId{.id = tex, .type = cfg.type });
+}
+//=============================================================================
+void Framebuffer::createColorCubeMapTextureAttachment(size_t index, const ColorAttachment& cfg)
+{
+	if (cfg.multisample)
+	{
+		Fatal("Multisample cube map textures are not supported in OpenGL 3.3");
+		return;
+	}
+	GLuint tex{ 0 };
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+	for (int i = 0; i < 6; ++i)
+	{
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, getInternalFormat(cfg.format, cfg.dataType, cfg.colorSpace), m_info.width, m_info.height, 0, GetColorFormatGL(cfg.format), GetDataTypeGL(cfg.dataType), nullptr);
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_CUBE_MAP_POSITIVE_X, tex, 0);
+	m_colorAttachmentsId.emplace_back(ColorAttachmentId{ .id = tex, .type = cfg.type });
+}
+//=============================================================================
+void Framebuffer::createColorRenderbufferAttachment(size_t index, const ColorAttachment& cfg)
+{
+	GLuint rb{ 0 };
+	glGenRenderbuffers(1, &rb);
+	glBindRenderbuffer(GL_RENDERBUFFER, rb);
+	if (cfg.multisample)
+	{
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, cfg.samples, getInternalFormat(cfg.format, cfg.dataType, cfg.colorSpace), m_info.width, m_info.height);
+	}
+	else
+	{
+		glRenderbufferStorage(GL_RENDERBUFFER, getInternalFormat(cfg.format, cfg.dataType, cfg.colorSpace), m_info.width, m_info.height);
+	}
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_RENDERBUFFER, rb);
+	m_colorAttachmentsId.emplace_back(ColorAttachmentId{ .id = rb, .type = cfg.type });
+}
+//=============================================================================
+void Framebuffer::createDepthTextureAttachment(const DepthAttachment& cfg)
+{
+	GLuint tex = 0;
+	if (cfg.multisample)
+	{
+		glGenTextures(1, &tex);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, cfg.samples, GL_DEPTH_COMPONENT32, m_info.width, m_info.height, GL_TRUE);
+	}
+	else
+	{
+		glGenTextures(1, &tex);
+		glBindTexture(GL_TEXTURE_2D, tex);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, m_info.width, m_info.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	}
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, (cfg.multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D), tex, 0);
+	m_depthAttachmentId = DepthAttachmentId{ .id = tex, .type = cfg.type };
+}
+//=============================================================================
+void Framebuffer::createDepthCubeMapTextureAttachment(const DepthAttachment& cfg)
+{
+	if (cfg.multisample)
+	{
+		Fatal("Multisample cube map depth textures are not supported in OpenGL 3.3");
+		return;
+	}
+	GLuint tex{ 0 };
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+	for (int i = 0; i < 6; ++i) {
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT32, m_info.width, m_info.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X, tex, 0);
+	m_depthAttachmentId = DepthAttachmentId{ .id = tex, .type = cfg.type };
+}
+//=============================================================================
+void Framebuffer::createDepthRenderbufferAttachment(const DepthAttachment& cfg)
+{
+	GLuint rb = 0;
+	glGenRenderbuffers(1, &rb);
+	glBindRenderbuffer(GL_RENDERBUFFER, rb);
+	if (cfg.multisample)
+	{
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, cfg.samples, GL_DEPTH_COMPONENT32, m_info.width, m_info.height);
+	}
+	else
+	{
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, m_info.width, m_info.height);
+	}
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rb);
+	m_depthAttachmentId = DepthAttachmentId{ .id = rb, .type = cfg.type };
+}
+//=============================================================================
+GLenum Framebuffer::getInternalFormat(ColorFormat format, DataType dataType, ColorSpace colorSpace)
+{
+	if (colorSpace == ColorSpace::sRGB && dataType == DataType::Float)
+	{
+		Fatal("sRGB is not supported with float data type in OpenGL 3.3");
+		return 0;
+	}
+
+	switch (format)
+	{
+	case ColorFormat::Red:  return (dataType == DataType::Float) ? GL_R32F : GL_R8;
+	case ColorFormat::RG:   return (dataType == DataType::Float) ? GL_RG32F : GL_RG8;
+
+	case ColorFormat::RGB:  return (dataType == DataType::Float) 
+		? GL_RGB32F 
+		: (colorSpace == ColorSpace::sRGB ? GL_SRGB8 : GL_RGB8);
+
+	case ColorFormat::RGBA: return (dataType == DataType::Float) 
+		? GL_RGBA32F 
+		: (colorSpace == ColorSpace::sRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8);
+
+	default:
+		Fatal("Format not supported for this color format");
+	}
+
+	return 0;
+}
+//=============================================================================
+#pragma endregion
+
+
+#pragma region [ OLD Framebuffer ]
+
+
 // TODO: отрефакторить
 // после создания текстуры вернуть бинд старой
 // TODO: в updateColorTextureAttachment и деструкторе отцепляется только GL_COLOR_ATTACHMENT0, если несколько текстур то проблема
 //=============================================================================
-Framebuffer::Framebuffer(bool color, bool ms, bool hdr)
+tFramebuffer::tFramebuffer(bool color, bool ms, bool hdr)
 	: m_renderColor(color)
 	, m_multiSample(ms)
 	, m_hdr(hdr)
@@ -13,7 +344,7 @@ Framebuffer::Framebuffer(bool color, bool ms, bool hdr)
 	glGenFramebuffers(1, &m_fbo);
 }
 //=============================================================================
-Framebuffer::~Framebuffer()
+tFramebuffer::~tFramebuffer()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	for (int i{ 0 }; i < m_attachment.size(); ++i)
@@ -22,22 +353,22 @@ Framebuffer::~Framebuffer()
 		{
 			switch (m_attachment.at(i).target)
 			{
-			case AttachmentTarget::ColorRed:
-			case AttachmentTarget::ColorRG:
-			case AttachmentTarget::ColorRGB:
-			case AttachmentTarget::ColorRGBA:
+			case tAttachmentTarget::ColorRed:
+			case tAttachmentTarget::ColorRG:
+			case tAttachmentTarget::ColorRGB:
+			case tAttachmentTarget::ColorRGBA:
 				if (m_multiSample)
 					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, 0, 0);
 				else
 					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
 				break;
-			case AttachmentTarget::Depth:
+			case tAttachmentTarget::Depth:
 				if (m_multiSample)
 					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, 0, 0);
 				else
 					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
 				break;
-			case AttachmentTarget::Stencil:
+			case tAttachmentTarget::Stencil:
 				if (m_multiSample)
 					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, 0, 0);
 				else
@@ -52,13 +383,13 @@ Framebuffer::~Framebuffer()
 		{
 			switch (m_attachment.at(i).target)
 			{
-			case AttachmentTarget::ColorRed:
-			case AttachmentTarget::ColorRG:
-			case AttachmentTarget::ColorRGB:
-			case AttachmentTarget::ColorRGBA:
+			case tAttachmentTarget::ColorRed:
+			case tAttachmentTarget::ColorRG:
+			case tAttachmentTarget::ColorRGB:
+			case tAttachmentTarget::ColorRGBA:
 				glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 0, 0);
 				break;
-			case AttachmentTarget::Depth:
+			case tAttachmentTarget::Depth:
 				glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 0, 0);
 				break;
 			default:
@@ -70,19 +401,19 @@ Framebuffer::~Framebuffer()
 		{
 			switch (m_attachment.at(i).target)
 			{
-			case AttachmentTarget::ColorRed:
-			case AttachmentTarget::ColorRG:
-			case AttachmentTarget::ColorRGB:
-			case AttachmentTarget::ColorRGBA:
+			case tAttachmentTarget::ColorRed:
+			case tAttachmentTarget::ColorRG:
+			case tAttachmentTarget::ColorRGB:
+			case tAttachmentTarget::ColorRGBA:
 				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, 0);
 				break;
-			case AttachmentTarget::Depth:
+			case tAttachmentTarget::Depth:
 				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
 				break;
-			case AttachmentTarget::Stencil:
+			case tAttachmentTarget::Stencil:
 				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
 				break;
-			case AttachmentTarget::DepthStencil:
+			case tAttachmentTarget::DepthStencil:
 				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
 				break;
 			default:
@@ -95,7 +426,7 @@ Framebuffer::~Framebuffer()
 	glDeleteFramebuffers(1, &m_fbo);
 }
 //=============================================================================
-void Framebuffer::AddAttachment(AttachmentType type, AttachmentTarget target, int width, int height, int insertPos)
+void tFramebuffer::AddAttachment(AttachmentType type, tAttachmentTarget target, int width, int height, int insertPos)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -103,13 +434,13 @@ void Framebuffer::AddAttachment(AttachmentType type, AttachmentTarget target, in
 	{
 		switch (target)
 		{
-		case AttachmentTarget::ColorRed:
-		case AttachmentTarget::ColorRG:
-		case AttachmentTarget::ColorRGB:
-		case AttachmentTarget::ColorRGBA:
+		case tAttachmentTarget::ColorRed:
+		case tAttachmentTarget::ColorRG:
+		case tAttachmentTarget::ColorRGB:
+		case tAttachmentTarget::ColorRGBA:
 			addColorTextureAttachment(width, height, target, insertPos);
 			break;
-		case AttachmentTarget::Depth:
+		case tAttachmentTarget::Depth:
 			addDepthTextureAttachment(width, height, insertPos);
 			break;
 		default: break;
@@ -119,13 +450,13 @@ void Framebuffer::AddAttachment(AttachmentType type, AttachmentTarget target, in
 	{
 		switch (target)
 		{
-		case AttachmentTarget::ColorRed:
-		case AttachmentTarget::ColorRG:
-		case AttachmentTarget::ColorRGB:
-		case AttachmentTarget::ColorRGBA:
+		case tAttachmentTarget::ColorRed:
+		case tAttachmentTarget::ColorRG:
+		case tAttachmentTarget::ColorRGB:
+		case tAttachmentTarget::ColorRGBA:
 			addColorTextureCubemapAttachment(width, height, insertPos);
 			break;
-		case AttachmentTarget::Depth: 
+		case tAttachmentTarget::Depth:
 			addDepthTextureCubemapAttachment(width, height, insertPos);
 			break;
 		default: break;
@@ -135,16 +466,16 @@ void Framebuffer::AddAttachment(AttachmentType type, AttachmentTarget target, in
 	{
 		switch (target)
 		{
-		case AttachmentTarget::ColorRed:
-		case AttachmentTarget::ColorRG:
-		case AttachmentTarget::ColorRGB:
-		case AttachmentTarget::ColorRGBA:
+		case tAttachmentTarget::ColorRed:
+		case tAttachmentTarget::ColorRG:
+		case tAttachmentTarget::ColorRGB:
+		case tAttachmentTarget::ColorRGBA:
 			addColorRenderbufferAttachment(width, height, target, insertPos);
 			break;
-		case AttachmentTarget::Depth:
+		case tAttachmentTarget::Depth:
 			addDepthRenderbufferAttachment(width, height, insertPos);
 			break;
-		case AttachmentTarget::DepthStencil:
+		case tAttachmentTarget::DepthStencil:
 			addDepthStencilRenderbufferAttachment(width, height, insertPos);
 			break;
 		default: break;
@@ -154,7 +485,7 @@ void Framebuffer::AddAttachment(AttachmentType type, AttachmentTarget target, in
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 //=============================================================================
-void Framebuffer::UpdateAttachment(AttachmentType type, AttachmentTarget target, int width, int height)
+void tFramebuffer::UpdateAttachment(AttachmentType type, tAttachmentTarget target, int width, int height)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	for (int i{ 0 }; i < m_attachment.size(); ++i)
@@ -165,13 +496,13 @@ void Framebuffer::UpdateAttachment(AttachmentType type, AttachmentTarget target,
 			{
 				switch (target)
 				{
-				case AttachmentTarget::ColorRed:
-				case AttachmentTarget::ColorRG:
-				case AttachmentTarget::ColorRGB:
-				case AttachmentTarget::ColorRGBA:
+				case tAttachmentTarget::ColorRed:
+				case tAttachmentTarget::ColorRG:
+				case tAttachmentTarget::ColorRGB:
+				case tAttachmentTarget::ColorRGBA:
 					updateColorTextureAttachment(width, height, target, i);
 					break;
-				case AttachmentTarget::Depth:
+				case tAttachmentTarget::Depth:
 					updateDepthTextureAttachment(width, height, i);
 					break;
 				default: break;
@@ -181,13 +512,13 @@ void Framebuffer::UpdateAttachment(AttachmentType type, AttachmentTarget target,
 			{
 				switch (target)
 				{
-				case AttachmentTarget::ColorRed:
-				case AttachmentTarget::ColorRG:
-				case AttachmentTarget::ColorRGB:
-				case AttachmentTarget::ColorRGBA:
+				case tAttachmentTarget::ColorRed:
+				case tAttachmentTarget::ColorRG:
+				case tAttachmentTarget::ColorRGB:
+				case tAttachmentTarget::ColorRGBA:
 					updateColorTextureCubemapAttachment(width, height, i);
 					break;
-				case AttachmentTarget::Depth:
+				case tAttachmentTarget::Depth:
 					updateDepthTextureCubemapAttachment(width, height, i);
 					break;
 				default: break;
@@ -197,16 +528,16 @@ void Framebuffer::UpdateAttachment(AttachmentType type, AttachmentTarget target,
 			{
 				switch (target)
 				{
-				case AttachmentTarget::ColorRed:
-				case AttachmentTarget::ColorRG:
-				case AttachmentTarget::ColorRGB:
-				case AttachmentTarget::ColorRGBA:
+				case tAttachmentTarget::ColorRed:
+				case tAttachmentTarget::ColorRG:
+				case tAttachmentTarget::ColorRGB:
+				case tAttachmentTarget::ColorRGBA:
 					updateColorRenderbufferAttachment(width, height, target, i);
 					break;
-				case AttachmentTarget::Depth:
+				case tAttachmentTarget::Depth:
 					updateDepthRenderbufferAttachment(width, height, i);
 					break;
-				case AttachmentTarget::DepthStencil:
+				case tAttachmentTarget::DepthStencil:
 					updateDepthStencilRenderbufferAttachment(width, height, i);
 					break;
 				default: break;
@@ -217,15 +548,15 @@ void Framebuffer::UpdateAttachment(AttachmentType type, AttachmentTarget target,
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 //=============================================================================
-void Framebuffer::CreateDirectionalDepthFBO(int width, int height)
+void tFramebuffer::CreateDirectionalDepthFBO(int width, int height)
 {
 	m_multiSample = false;
 	m_renderColor = false;
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	Attachment buffer;
+	tAttachment buffer;
 	buffer.type = AttachmentType::Texture;
-	buffer.target = AttachmentTarget::Depth;
+	buffer.target = tAttachmentTarget::Depth;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -249,15 +580,15 @@ void Framebuffer::CreateDirectionalDepthFBO(int width, int height)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 //=============================================================================
-void Framebuffer::CreateOmnidirectionalDepthFBO(int width, int height)
+void tFramebuffer::CreateOmnidirectionalDepthFBO(int width, int height)
 {
 	m_multiSample = false;
 	m_renderColor = false;
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	Attachment buffer;
+	tAttachment buffer;
 	buffer.type = AttachmentType::TextureCubeMap;
-	buffer.target = AttachmentTarget::Depth;
+	buffer.target = tAttachmentTarget::Depth;
 
 	glGenTextures(1, &buffer.id);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, buffer.id);
@@ -281,17 +612,17 @@ void Framebuffer::CreateOmnidirectionalDepthFBO(int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 //=============================================================================
-void Framebuffer::CreateMultisampledFBO(int width, int height)
+void tFramebuffer::CreateMultisampledFBO(int width, int height)
 {
 	m_multiSample = true;
 	m_renderColor = true;
-	struct Attachment bufferColor;
+	struct tAttachment bufferColor;
 	bufferColor.type = AttachmentType::Texture;
-	bufferColor.target = AttachmentTarget::ColorRGBA;
+	bufferColor.target = tAttachmentTarget::ColorRGBA;
 
-	Attachment bufferDS;
+	tAttachment bufferDS;
 	bufferDS.type = AttachmentType::RenderBuffer;
-	bufferDS.target = AttachmentTarget::DepthStencil;
+	bufferDS.target = tAttachmentTarget::DepthStencil;
 
 	glGenTextures(1, &bufferColor.id);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, bufferColor.id);
@@ -318,14 +649,14 @@ void Framebuffer::CreateMultisampledFBO(int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 //=============================================================================
-void Framebuffer::CreateResolveFBO(int width, int height)
+void tFramebuffer::CreateResolveFBO(int width, int height)
 {
 	m_multiSample = false;
 	m_renderColor = true;
-	
-	Attachment buffer;
+
+	tAttachment buffer;
 	buffer.type = AttachmentType::Texture;
-	buffer.target = AttachmentTarget::ColorRGBA;
+	buffer.target = tAttachmentTarget::ColorRGBA;
 
 	glGenTextures(1, &buffer.id);
 	glBindTexture(GL_TEXTURE_2D, buffer.id);
@@ -343,7 +674,7 @@ void Framebuffer::CreateResolveFBO(int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 }
 //=============================================================================
-void Framebuffer::UpdateDirectionalDepthFBO(int width, int height)
+void tFramebuffer::UpdateDirectionalDepthFBO(int width, int height)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
@@ -353,7 +684,7 @@ void Framebuffer::UpdateDirectionalDepthFBO(int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 //=============================================================================
-void Framebuffer::UpdateOmnidirectionalDepthFBO(int width, int height)
+void tFramebuffer::UpdateOmnidirectionalDepthFBO(int width, int height)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 0, 0);
@@ -363,7 +694,7 @@ void Framebuffer::UpdateOmnidirectionalDepthFBO(int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 //=============================================================================
-void Framebuffer::UpdateMultisampledFBO(int width, int height)
+void tFramebuffer::UpdateMultisampledFBO(int width, int height)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, 0, 0);
@@ -375,7 +706,7 @@ void Framebuffer::UpdateMultisampledFBO(int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 //=============================================================================
-void Framebuffer::UpdateResolveFBO(int width, int height)
+void tFramebuffer::UpdateResolveFBO(int width, int height)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
@@ -385,12 +716,12 @@ void Framebuffer::UpdateResolveFBO(int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 //=============================================================================
-std::vector<Attachment>& Framebuffer::GetAttachments()
+std::vector<tAttachment>& tFramebuffer::GetAttachments()
 {
 	return m_attachment;
 }
 //=============================================================================
-void Framebuffer::Bind()
+void tFramebuffer::Bind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -399,7 +730,7 @@ void Framebuffer::Bind()
 		size_t colorsNum = 0;
 		for (size_t i = 0; i < m_attachment.size(); i++)
 		{
-			if (m_attachment[i].type == AttachmentType::Texture && (m_attachment[i].target == AttachmentTarget::ColorRed || m_attachment[i].target == AttachmentTarget::ColorRG || m_attachment[i].target == AttachmentTarget::ColorRGB || m_attachment[i].target == AttachmentTarget::ColorRGBA))
+			if (m_attachment[i].type == AttachmentType::Texture && (m_attachment[i].target == tAttachmentTarget::ColorRed || m_attachment[i].target == tAttachmentTarget::ColorRG || m_attachment[i].target == tAttachmentTarget::ColorRGB || m_attachment[i].target == tAttachmentTarget::ColorRGBA))
 			{
 				colorsNum++;
 			}
@@ -413,7 +744,7 @@ void Framebuffer::Bind()
 			}
 			glDrawBuffers(colorsNum, attachments.data());
 		}
-		
+
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			Error("framebuffer is not complete !");
 
@@ -421,45 +752,45 @@ void Framebuffer::Bind()
 	}
 }
 //=============================================================================
-void Framebuffer::Unbind()
+void tFramebuffer::Unbind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 //=============================================================================
-void Framebuffer::BlitFramebuffer(Framebuffer& writeFBO, int width, int height)
+void tFramebuffer::BlitFramebuffer(tFramebuffer& writeFBO, int width, int height)
 {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, writeFBO.GetId());
 	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 //=============================================================================
-void Framebuffer::BlitFramebuffer(std::unique_ptr<Framebuffer>& writeFBO, int width, int height)
+void tFramebuffer::BlitFramebuffer(std::unique_ptr<tFramebuffer>& writeFBO, int width, int height)
 {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, writeFBO->GetId());
 	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 //=============================================================================
-void Framebuffer::addColorTextureAttachment(int width, int height, AttachmentTarget target, int insertPos)
+void tFramebuffer::addColorTextureAttachment(int width, int height, tAttachmentTarget target, int insertPos)
 {
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	Attachment buffer;
+	tAttachment buffer;
 	buffer.type = AttachmentType::Texture;
 	buffer.target = target;
 	GLint internalFormat = (m_hdr) ? GL_RGBA16F : GL_RGBA;
 	GLenum format = GL_RGBA;
-	if (target == AttachmentTarget::ColorRed)
+	if (target == tAttachmentTarget::ColorRed)
 	{
 		internalFormat = GL_RED; // TODO: hdr?
 		format = GL_RED;
 	}
-	else if (target == AttachmentTarget::ColorRG)
+	else if (target == tAttachmentTarget::ColorRG)
 	{
 		internalFormat = (m_hdr) ? GL_RG16F : GL_RG;
 		format = GL_RG;
 	}
-	else if (target == AttachmentTarget::ColorRGB)
+	else if (target == tAttachmentTarget::ColorRGB)
 	{
 		internalFormat = (m_hdr) ? GL_RGB16F : GL_RGB;
 		format = GL_RGB;
@@ -506,13 +837,13 @@ void Framebuffer::addColorTextureAttachment(int width, int height, AttachmentTar
 	m_rawColor = true;
 }
 //=============================================================================
-void Framebuffer::addDepthTextureAttachment(int width, int height, int insertPos)
+void tFramebuffer::addDepthTextureAttachment(int width, int height, int insertPos)
 {
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	Attachment buffer;
+	tAttachment buffer;
 	buffer.type = AttachmentType::Texture;
-	buffer.target = AttachmentTarget::Depth;
+	buffer.target = tAttachmentTarget::Depth;
 
 	glGenTextures(1, &buffer.id);
 	glBindTexture(GL_TEXTURE_2D, buffer.id);
@@ -539,13 +870,13 @@ void Framebuffer::addDepthTextureAttachment(int width, int height, int insertPos
 	}
 }
 //=============================================================================
-void Framebuffer::addColorTextureCubemapAttachment(int width, int height, int insertPos)
+void tFramebuffer::addColorTextureCubemapAttachment(int width, int height, int insertPos)
 {
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	Attachment buffer;
+	tAttachment buffer;
 	buffer.type = AttachmentType::TextureCubeMap;
-	buffer.target = AttachmentTarget::ColorRGBA;
+	buffer.target = tAttachmentTarget::ColorRGBA;
 	GLint internalFormat = (m_hdr) ? GL_RGBA16F : GL_RGBA;
 	GLenum type = (m_hdr) ? GL_FLOAT : GL_UNSIGNED_BYTE;
 
@@ -572,13 +903,13 @@ void Framebuffer::addColorTextureCubemapAttachment(int width, int height, int in
 	}
 }
 //=============================================================================
-void Framebuffer::addDepthTextureCubemapAttachment(int width, int height, int insertPos)
+void tFramebuffer::addDepthTextureCubemapAttachment(int width, int height, int insertPos)
 {
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	Attachment buffer;
+	tAttachment buffer;
 	buffer.type = AttachmentType::TextureCubeMap;
-	buffer.target = AttachmentTarget::Depth;
+	buffer.target = tAttachmentTarget::Depth;
 
 	glGenTextures(1, &buffer.id);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, buffer.id);
@@ -606,21 +937,21 @@ void Framebuffer::addDepthTextureCubemapAttachment(int width, int height, int in
 	}
 }
 //=============================================================================
-void Framebuffer::addColorRenderbufferAttachment(int width, int height, AttachmentTarget target, int insertPos)
+void tFramebuffer::addColorRenderbufferAttachment(int width, int height, tAttachmentTarget target, int insertPos)
 {
-	Attachment buffer;
+	tAttachment buffer;
 	buffer.type = AttachmentType::RenderBuffer;
 	buffer.target = target;
 	GLint internalFormat = (m_hdr) ? GL_RGBA16F : GL_RGBA8;
-	if (target == AttachmentTarget::ColorRed)
+	if (target == tAttachmentTarget::ColorRed)
 	{
 		internalFormat = GL_RED; // TODO: hdr?
 	}
-	else if (target == AttachmentTarget::ColorRG)
+	else if (target == tAttachmentTarget::ColorRG)
 	{
 		internalFormat = (m_hdr) ? GL_RG16F : GL_RG8;
 	}
-	else if (target == AttachmentTarget::ColorRGB)
+	else if (target == tAttachmentTarget::ColorRGB)
 	{
 		internalFormat = (m_hdr) ? GL_RGB16F : GL_RGB8;
 	}
@@ -645,11 +976,11 @@ void Framebuffer::addColorRenderbufferAttachment(int width, int height, Attachme
 	}
 }
 //=============================================================================
-void Framebuffer::addDepthRenderbufferAttachment(int width, int height, int insertPos)
+void tFramebuffer::addDepthRenderbufferAttachment(int width, int height, int insertPos)
 {
-	Attachment buffer;
+	tAttachment buffer;
 	buffer.type = AttachmentType::RenderBuffer;
-	buffer.target = AttachmentTarget::Depth;
+	buffer.target = tAttachmentTarget::Depth;
 
 	glGenRenderbuffers(1, &buffer.id);
 	glBindRenderbuffer(GL_RENDERBUFFER, buffer.id);
@@ -671,11 +1002,11 @@ void Framebuffer::addDepthRenderbufferAttachment(int width, int height, int inse
 	}
 }
 //=============================================================================
-void Framebuffer::addDepthStencilRenderbufferAttachment(int width, int height, int insertPos)
+void tFramebuffer::addDepthStencilRenderbufferAttachment(int width, int height, int insertPos)
 {
-	Attachment buffer;
+	tAttachment buffer;
 	buffer.type = AttachmentType::RenderBuffer;
-	buffer.target = AttachmentTarget::DepthStencil;
+	buffer.target = tAttachmentTarget::DepthStencil;
 
 	glGenRenderbuffers(1, &buffer.id);
 	glBindRenderbuffer(GL_RENDERBUFFER, buffer.id);
@@ -697,7 +1028,7 @@ void Framebuffer::addDepthStencilRenderbufferAttachment(int width, int height, i
 	}
 }
 //=============================================================================
-void Framebuffer::updateColorTextureAttachment(int width, int height, AttachmentTarget target, int insertPos)
+void tFramebuffer::updateColorTextureAttachment(int width, int height, tAttachmentTarget target, int insertPos)
 {
 	if (m_multiSample)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, 0, 0);
@@ -710,7 +1041,7 @@ void Framebuffer::updateColorTextureAttachment(int width, int height, Attachment
 	addColorTextureAttachment(width, height, target, (insertPos == m_attachment.size() ? -1 : insertPos));
 }
 //=============================================================================
-void Framebuffer::updateDepthTextureAttachment(int width, int height, int insertPos)
+void tFramebuffer::updateDepthTextureAttachment(int width, int height, int insertPos)
 {
 	if (m_multiSample)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, 0, 0);
@@ -726,7 +1057,7 @@ void Framebuffer::updateDepthTextureAttachment(int width, int height, int insert
 		addDepthTextureAttachment(width, height, insertPos);
 }
 //=============================================================================
-void Framebuffer::updateColorTextureCubemapAttachment(int width, int height, int insertPos)
+void tFramebuffer::updateColorTextureCubemapAttachment(int width, int height, int insertPos)
 {
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 0, 0);
 	glDeleteTextures(1, &m_attachment.at(insertPos).id);
@@ -739,7 +1070,7 @@ void Framebuffer::updateColorTextureCubemapAttachment(int width, int height, int
 		addColorTextureCubemapAttachment(width, height, insertPos);
 }
 //=============================================================================
-void Framebuffer::updateDepthTextureCubemapAttachment(int width, int height, int insertPos)
+void tFramebuffer::updateDepthTextureCubemapAttachment(int width, int height, int insertPos)
 {
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 0, 0);
 	glDeleteTextures(1, &m_attachment.at(insertPos).id);
@@ -752,7 +1083,7 @@ void Framebuffer::updateDepthTextureCubemapAttachment(int width, int height, int
 		addDepthTextureCubemapAttachment(width, height, insertPos);
 }
 //=============================================================================
-void Framebuffer::updateColorRenderbufferAttachment(int width, int height, AttachmentTarget target, int insertPos)
+void tFramebuffer::updateColorRenderbufferAttachment(int width, int height, tAttachmentTarget target, int insertPos)
 {
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, 0);
 	glDeleteRenderbuffers(1, &m_attachment.at(insertPos).id);
@@ -762,7 +1093,7 @@ void Framebuffer::updateColorRenderbufferAttachment(int width, int height, Attac
 	addColorRenderbufferAttachment(width, height, target, (insertPos == m_attachment.size() ? -1 : insertPos));
 }
 //=============================================================================
-void Framebuffer::updateDepthRenderbufferAttachment(int width, int height, int insertPos)
+void tFramebuffer::updateDepthRenderbufferAttachment(int width, int height, int insertPos)
 {
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
 	glDeleteRenderbuffers(1, &m_attachment.at(insertPos).id);
@@ -775,7 +1106,7 @@ void Framebuffer::updateDepthRenderbufferAttachment(int width, int height, int i
 		addDepthRenderbufferAttachment(width, height, insertPos);
 }
 //=============================================================================
-void Framebuffer::updateDepthStencilRenderbufferAttachment(int width, int height, int insertPos)
+void tFramebuffer::updateDepthStencilRenderbufferAttachment(int width, int height, int insertPos)
 {
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
 	glDeleteRenderbuffers(1, &m_attachment.at(insertPos).id);
@@ -788,3 +1119,5 @@ void Framebuffer::updateDepthStencilRenderbufferAttachment(int width, int height
 		addDepthStencilRenderbufferAttachment(width, height, insertPos);
 }
 //=============================================================================
+
+#pragma endregion

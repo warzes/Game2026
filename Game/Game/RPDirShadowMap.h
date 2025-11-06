@@ -47,5 +47,5 @@ private:
 	float         m_orthoDimension;
 	glm::mat4     m_orthoProjection; // for directional lights
 
-	std::array<std::unique_ptr<Framebuffer>, MaxDirectionalLight> m_depthFBO;
+	std::array<Framebuffer, MaxDirectionalLight> m_depthFBO;
 };

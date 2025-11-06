@@ -86,9 +86,9 @@ private:
 
 	std::unique_ptr<GridAxis>     m_gridAxis;
 
-	std::unique_ptr<Framebuffer>                 m_multisample; // color + depth + stencil
-	std::unique_ptr<Framebuffer>                 m_normal; // only color, no multisampling
-	std::array<std::unique_ptr<Framebuffer>, 10> m_stdDepth; // for directional and spotlight shadow mapping
+	std::unique_ptr<tFramebuffer>                 m_multisample; // color + depth + stencil
+	std::unique_ptr<tFramebuffer>                 m_normal; // only color, no multisampling
+	std::array<std::unique_ptr<tFramebuffer>, 10> m_stdDepth; // for directional and spotlight shadow mapping
 
 	float m_orthoDimension;
 	SHADOW_QUALITY m_shadowQuality;

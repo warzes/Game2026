@@ -40,16 +40,25 @@ bool RPSSAOBlur::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 
 	glUseProgram(0); // TODO: возможно вернуть прошлую версию шейдера
 
-	m_fbo = { std::make_unique<Framebuffer>(true, false, true) };
+	FramebufferInfo fboInfo;
 
-	m_fbo->AddAttachment(AttachmentType::Texture, AttachmentTarget::ColorRed, m_framebufferWidth, m_framebufferHeight);
+	fboInfo.colorAttachments.resize(1);
+	fboInfo.colorAttachments[0].type = AttachmentType::Texture;
+	fboInfo.colorAttachments[0].format = ColorFormat::Red;
+	fboInfo.colorAttachments[0].dataType = DataType::Float;
+
+	fboInfo.width = m_framebufferWidth;
+	fboInfo.height = m_framebufferHeight;
+
+	if (!m_fbo.Create(fboInfo))
+		return false;
 
 	return true;
 }
 //=============================================================================
 void RPSSAOBlur::Close()
 {
-	m_fbo.reset();
+	m_fbo.Destroy();
 	glDeleteProgram(m_program);
 }
 //=============================================================================
@@ -61,20 +70,19 @@ void RPSSAOBlur::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_framebufferWidth = framebufferWidth;
 	m_framebufferHeight = framebufferHeight;
 
-	m_fbo->UpdateAttachment(AttachmentType::Texture, AttachmentTarget::ColorRed, m_framebufferWidth, m_framebufferHeight);
+	m_fbo.Resize(m_framebufferWidth, m_framebufferHeight);
 }
 //=============================================================================
-void RPSSAOBlur::Draw(Framebuffer* preFBO)
+void RPSSAOBlur::Draw(const Framebuffer* preFBO)
 {
-	m_fbo->Bind();
+	m_fbo.Bind();
 	glViewport(0, 0, static_cast<int>(m_framebufferWidth), static_cast<int>(m_framebufferHeight));
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(m_program);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, preFBO->GetAttachments()[0].id);
+	preFBO->BindColorTexture(0, 0);
 
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);

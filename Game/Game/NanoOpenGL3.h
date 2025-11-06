@@ -68,6 +68,22 @@ enum class ColorSpace : uint8_t
 	sRGB
 };
 
+enum class ColorFormat : uint8_t
+{
+	Red,
+	RG,
+	RGB,
+	RGBA
+};
+GLenum GetColorFormatGL(ColorFormat format);
+
+enum class DataType : uint8_t
+{
+	UnsignedByte,
+	Float
+};
+GLenum GetDataTypeGL(DataType dataType);
+
 //=============================================================================
 // Shader Program
 //=============================================================================

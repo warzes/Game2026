@@ -36,31 +36,31 @@ bool Scene::Init()
 	if (!initBlinnPhongShader())
 		return false;
 
-	m_multisample = { std::make_unique<Framebuffer>(true, true, true) };
+	m_multisample = { std::make_unique<tFramebuffer>(true, true, true) };
 
-	m_normal = { std::make_unique<Framebuffer>(true, false, true) };
+	m_normal = { std::make_unique<tFramebuffer>(true, false, true) };
 	m_stdDepth = {
-			std::make_unique<Framebuffer>(false),
-			std::make_unique<Framebuffer>(false),
-			std::make_unique<Framebuffer>(false),
-			std::make_unique<Framebuffer>(false),
-			std::make_unique<Framebuffer>(false),
-			std::make_unique<Framebuffer>(false),
-			std::make_unique<Framebuffer>(false),
-			std::make_unique<Framebuffer>(false),
-			std::make_unique<Framebuffer>(false),
-			std::make_unique<Framebuffer>(false)
+			std::make_unique<tFramebuffer>(false),
+			std::make_unique<tFramebuffer>(false),
+			std::make_unique<tFramebuffer>(false),
+			std::make_unique<tFramebuffer>(false),
+			std::make_unique<tFramebuffer>(false),
+			std::make_unique<tFramebuffer>(false),
+			std::make_unique<tFramebuffer>(false),
+			std::make_unique<tFramebuffer>(false),
+			std::make_unique<tFramebuffer>(false),
+			std::make_unique<tFramebuffer>(false)
 	};
 
-	m_multisample->AddAttachment(AttachmentType::Texture, AttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
-	m_multisample->AddAttachment(AttachmentType::RenderBuffer, AttachmentTarget::DepthStencil, m_framebufferWidth, m_framebufferHeight);
-	m_normal->AddAttachment(AttachmentType::Texture, AttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
+	m_multisample->AddAttachment(AttachmentType::Texture, tAttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
+	m_multisample->AddAttachment(AttachmentType::RenderBuffer, tAttachmentTarget::DepthStencil, m_framebufferWidth, m_framebufferHeight);
+	m_normal->AddAttachment(AttachmentType::Texture, tAttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
 
 	if (m_shadowQuality != SHADOW_QUALITY::OFF)
 	{
 		for (int i{ 0 }; i < 10; ++i)
 		{
-			m_stdDepth.at(i)->AddAttachment(AttachmentType::Texture, AttachmentTarget::Depth, static_cast<int>(m_shadowQuality), static_cast<int>(m_shadowQuality));
+			m_stdDepth.at(i)->AddAttachment(AttachmentType::Texture, tAttachmentTarget::Depth, static_cast<int>(m_shadowQuality), static_cast<int>(m_shadowQuality));
 		}
 	}
 	return true;
@@ -136,7 +136,7 @@ void Scene::SetShadowQuality(SHADOW_QUALITY quality)
 	if (m_shadowQuality != SHADOW_QUALITY::OFF)
 	{
 		for (int i{ 0 }; i < 10; ++i)
-			m_stdDepth.at(i)->UpdateAttachment(AttachmentType::Texture, AttachmentTarget::Depth, static_cast<int>(m_shadowQuality), static_cast<int>(m_shadowQuality));
+			m_stdDepth.at(i)->UpdateAttachment(AttachmentType::Texture, tAttachmentTarget::Depth, static_cast<int>(m_shadowQuality), static_cast<int>(m_shadowQuality));
 	}
 }
 //=============================================================================
@@ -196,9 +196,9 @@ void Scene::updateSize()
 		m_framebufferHeight = window::GetHeight();
 		m_perspective = glm::perspective(glm::radians(60.0f), window::GetAspect(), 0.01f, 1000.0f);
 
-		m_multisample->UpdateAttachment(AttachmentType::Texture, AttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
-		m_multisample->UpdateAttachment(AttachmentType::RenderBuffer, AttachmentTarget::DepthStencil, m_framebufferWidth, m_framebufferHeight);
-		m_normal->UpdateAttachment(AttachmentType::Texture, AttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
+		m_multisample->UpdateAttachment(AttachmentType::Texture, tAttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
+		m_multisample->UpdateAttachment(AttachmentType::RenderBuffer, tAttachmentTarget::DepthStencil, m_framebufferWidth, m_framebufferHeight);
+		m_normal->UpdateAttachment(AttachmentType::Texture, tAttachmentTarget::ColorRGBA, m_framebufferWidth, m_framebufferHeight);
 	}
 }
 //=============================================================================
