@@ -3,7 +3,7 @@
 #include "NanoLog.h"
 #include "NanoIO.h"
 //=============================================================================
-bool Model::Load(const std::string& fileName)
+bool Model::Load(const std::string& fileName, ModelMaterialType materialType)
 {
 #define ASSIMP_LOAD_FLAGS (aiProcess_JoinIdenticalVertices |    \
                            aiProcess_Triangulate |              \
@@ -21,6 +21,8 @@ bool Model::Load(const std::string& fileName)
                            aiProcess_OptimizeMeshes)
 
 	Free();
+
+	m_materialType = materialType;
 
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(fileName.c_str(), ASSIMP_LOAD_FLAGS);
@@ -45,7 +47,7 @@ bool Model::Load(const std::string& fileName)
 void Model::Create(const MeshInfo& ci)
 {
 	Free();
-	m_meshes.emplace_back(Mesh{ ci.vertices, ci.indices, ci.material });
+	m_meshes.emplace_back(Mesh{ ci.vertices, ci.indices, ci.material, ci.pbrMaterial });
 	computeAABB();
 
 	// TODO: центрировать модель, так как бывают не от центра
@@ -56,7 +58,7 @@ void Model::Create(const std::vector<MeshInfo>& meshes)
 	Free();
 	for (size_t i = 0; i < meshes.size(); i++)
 	{
-		m_meshes.emplace_back(Mesh(meshes[i].vertices, meshes[i].indices, meshes[i].material));
+		m_meshes.emplace_back(Mesh(meshes[i].vertices, meshes[i].indices, meshes[i].material, meshes[i].pbrMaterial));
 	}
 	computeAABB();
 
@@ -162,7 +164,10 @@ Mesh Model::processMesh(const aiScene* scene, struct aiMesh* mesh, std::string_v
 	}
 
 	// Process material
-	Material material;
+	std::optional<Material> material{};
+	std::optional<PBRMaterial> pbrMaterial{};
+
+	if (m_materialType == ModelMaterialType::BlinnPhong)
 	{
 		// TODO: по одной текстуре грузится, а тут есть возможность нескольих текстур
 		aiMaterial* mesh_material = scene->mMaterials[mesh->mMaterialIndex];
@@ -193,22 +198,61 @@ Mesh Model::processMesh(const aiScene* scene, struct aiMesh* mesh, std::string_v
 		if (normal.size() > 1) Warning("More than one normal texture loaded. Engine does not support multiple normal textures");
 		if (metallicRoughMaps.size() > 1) Warning("More than one normal texture loaded. Engine does not support multiple metallicRoughMaps textures");
 
-		material.diffuseTextures = diffuse;
-		material.specularTextures = specular;
-		material.normalTextures = normal;
-		material.metallicRoughTextures = metallicRoughMaps;
+		material = Material();
+		material->diffuseTextures = diffuse;
+		material->specularTextures = specular;
+		material->normalTextures = normal;
+		material->metallicRoughTextures = metallicRoughMaps;
 
-		material.diffuseColor = glm::vec3(colorDiffuse.r, colorDiffuse.g, colorDiffuse.b);
-		material.specularColor = glm::vec3(colorSpecular.r, colorSpecular.g, colorSpecular.b);
-		material.ambientColor = glm::vec3(colorAmbient.r, colorAmbient.g, colorAmbient.b);
+		material->diffuseColor = glm::vec3(colorDiffuse.r, colorDiffuse.g, colorDiffuse.b);
+		material->specularColor = glm::vec3(colorSpecular.r, colorSpecular.g, colorSpecular.b);
+		material->ambientColor = glm::vec3(colorAmbient.r, colorAmbient.g, colorAmbient.b);
 
-		material.opacity = opacity;
+		material->opacity = opacity;
 		//material.shininess = shininess; // TODO: не работает
-		material.roughness = roughness;
-		material.metallic = metallic;
+		material->roughness = roughness;
+		material->metallic = metallic;
+	}
+	else if (m_materialType == ModelMaterialType::PBR)
+	{
+		pbrMaterial = PBRMaterial();
+
+		aiMaterial* mesh_material = scene->mMaterials[mesh->mMaterialIndex];
+
+		std::vector<Texture2D> albedoMap = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_BASE_COLOR, ColorSpace::sRGB);
+		if (albedoMap.empty())
+		{
+			albedoMap = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_DIFFUSE, ColorSpace::sRGB);
+		}
+
+		std::vector<Texture2D> normalMap = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_NORMALS, ColorSpace::Linear);
+		if (normalMap.empty())
+		{
+			normalMap = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_HEIGHT, ColorSpace::Linear);
+		}
+
+		std::vector<Texture2D> metallicRoughnessMap = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_METALNESS, ColorSpace::Linear);
+
+		std::vector<Texture2D> aoMap = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_AMBIENT_OCCLUSION, ColorSpace::Linear);
+		if (aoMap.empty())
+		{
+			aoMap = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_AMBIENT, ColorSpace::Linear);
+		}
+		if (aoMap.empty())
+		{
+			aoMap = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_LIGHTMAP, ColorSpace::Linear);
+		}
+
+		std::vector<Texture2D> emissiveMap = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_EMISSIVE, ColorSpace::sRGB);
+
+		if (!albedoMap.empty())            pbrMaterial->albedoTexture = albedoMap[0];
+		if (!normalMap.empty())            pbrMaterial->normalTexture = normalMap[0];
+		if (!metallicRoughnessMap.empty()) pbrMaterial->metallicRoughnessTexture = metallicRoughnessMap[0];
+		if (!aoMap.empty())                pbrMaterial->AOTexture = aoMap[0];
+		if (!emissiveMap.empty())          pbrMaterial->emissiveTexture = emissiveMap[0];
 	}
 
-	return Mesh(vertices, indices, material);
+	return Mesh(vertices, indices, material, pbrMaterial);
 }
 //=============================================================================
 std::vector<Texture2D> Model::loadMaterialTextures(std::string_view directory, const aiScene* scene, aiMaterial* mat, aiTextureType type, ColorSpace colorSpace)
@@ -260,3 +304,4 @@ void Model::computeAABB()
 		m_aabb.CombineAABB(m_meshes[i].GetAABB());
 	}
 }
+//=============================================================================

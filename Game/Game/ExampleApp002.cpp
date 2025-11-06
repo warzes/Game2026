@@ -37,12 +37,12 @@ void ExampleApp002()
 		modelPlane.model.Create(GeometryGenerator::CreatePlane(100, 100, 100, 100));
 		modelBox.model.Create(GeometryGenerator::CreateBox());
 		modelSphere.model.Create(GeometryGenerator::CreateSphere());
-		modelTest.model.Load("data/models/tree.glb");
+		modelTest.model.Load("data/models/tree.glb", ModelMaterialType::BlinnPhong);
 		//modelTest.model.Load("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj");
 
 		gRegion.Init();
 		
-		modelTest2.model.Load("data/models/cottage/cottage_obj.obj");
+		modelTest2.model.Load("data/models/cottage/cottage_obj.obj", ModelMaterialType::BlinnPhong);
 		// TRS matrix
 		modelTest2.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 0.0f, -3.0f));
 		// rotate mat

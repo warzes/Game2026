@@ -6,15 +6,16 @@
 
 struct MeshInfo final
 {
-	std::vector<MeshVertex> vertices;
-	std::vector<uint32_t>   indices;
-	std::optional<Material> material{};
+	std::vector<MeshVertex>    vertices;
+	std::vector<uint32_t>      indices;
+	std::optional<Material>    material{};
+	std::optional<PBRMaterial> pbrMaterial{};
 };
 
 class Mesh final
 {
 public:
-	Mesh(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices, std::optional<Material> material);
+	Mesh(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices, std::optional<Material> material, std::optional<PBRMaterial> pbrMaterial);
 	Mesh(const Mesh&) = delete;
 	Mesh(Mesh&& other) noexcept;
 	~Mesh();
@@ -34,11 +35,12 @@ public:
 private:
 	void initAABB(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices);
 
-	uint32_t                m_vertexCount{ 0 };
-	uint32_t                m_indicesCount{ 0 };
-	GLuint                  m_vao{ 0 };
-	GLuint                  m_vbo{ 0 };
-	GLuint                  m_ebo{ 0 };
-	std::optional<Material> m_material{};
-	AABB                    m_aabb{};
+	uint32_t                   m_vertexCount{ 0 };
+	uint32_t                   m_indicesCount{ 0 };
+	GLuint                     m_vao{ 0 };
+	GLuint                     m_vbo{ 0 };
+	GLuint                     m_ebo{ 0 };
+	std::optional<Material>    m_material{};
+	std::optional<PBRMaterial> m_pbrMaterial{};
+	AABB                       m_aabb{};
 };

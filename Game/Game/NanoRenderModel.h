@@ -9,10 +9,17 @@ struct ModelDrawInfo final
 	GLuint shaderProgram{ 0 };
 };
 
+enum class ModelMaterialType : uint8_t
+{
+	None,
+	BlinnPhong,
+	PBR
+};
+
 class Model final
 {
 public:
-	bool Load(const std::string& fileName);
+	bool Load(const std::string& fileName, ModelMaterialType materialType);
 	void Create(const MeshInfo& meshCreateInfo);
 	void Create(const std::vector<MeshInfo>& meshes);
 
@@ -36,6 +43,7 @@ private:
 	void computeAABB();
 
 	std::vector<Mesh> m_meshes;
+	ModelMaterialType m_materialType;
 	AABB              m_aabb;
 	std::string       m_name;
 };

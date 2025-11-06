@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "NanoRenderMesh.h"
 //=============================================================================
-Mesh::Mesh(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices, std::optional<Material> material)
+Mesh::Mesh(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices, std::optional<Material> material, std::optional<PBRMaterial> pbrMaterial)
 {
 	assert(!vertices.empty());
 
@@ -9,6 +9,7 @@ Mesh::Mesh(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>&
 	m_indicesCount = indices.size();
 
 	m_material = material;
+	m_pbrMaterial = pbrMaterial;
 
 	GLuint currentVBO = GetCurrentBuffer(GL_ARRAY_BUFFER);
 	GLuint currentEBO = GetCurrentBuffer(GL_ELEMENT_ARRAY_BUFFER);
@@ -38,6 +39,7 @@ Mesh::Mesh(Mesh&& old) noexcept
 	, m_vbo(std::exchange(old.m_vbo, 0))
 	, m_ebo(std::exchange(old.m_ebo, 0))
 	, m_material(std::exchange(old.m_material, std::nullopt))
+	, m_pbrMaterial(std::exchange(old.m_pbrMaterial, std::nullopt))
 	, m_aabb(old.m_aabb)
 {
 }
@@ -60,6 +62,7 @@ Mesh& Mesh::operator=(Mesh&& old) noexcept
 		m_vbo = std::exchange(old.m_vbo, 0);
 		m_ebo = std::exchange(old.m_ebo, 0);
 		m_material = std::exchange(old.m_material, std::nullopt);
+		m_pbrMaterial = std::exchange(old.m_pbrMaterial, std::nullopt);
 		m_aabb = old.m_aabb;
 	}
 	return *this;
