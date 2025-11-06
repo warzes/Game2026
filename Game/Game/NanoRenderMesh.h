@@ -30,6 +30,7 @@ public:
 	auto GetVertexCount() const noexcept { return m_vertexCount; }
 	auto GetIndexCount() const noexcept { return m_indicesCount; }
 	auto GetMaterial() const noexcept { return m_material; }
+	auto GetPbrMaterial() const noexcept { return m_pbrMaterial; }
 	const AABB& GetAABB() const noexcept { return m_aabb; }
 
 private:

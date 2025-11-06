@@ -23,6 +23,8 @@ namespace
 	GameObject box2Entity;
 	GameObject box3Entity;
 	GameObject box4Entity;
+
+	GameLight lights[3];
 }
 //=============================================================================
 void GameApp()
@@ -36,7 +38,7 @@ void GameApp()
 
 		camera.SetPosition(glm::vec3(0.0f, 0.5f, 4.5f));
 
-		modelTest.model.Load("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj", ModelMaterialType::BlinnPhong);
+		modelTest.model.Load("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj", ModelMaterialType::PBR);
 		modelTest.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(-30.0f, 0.0f, 15.0f));
 
 		sphereEntity.model.Create(GeometryGenerator::CreateSphere(0.5f, 16, 16));
@@ -51,8 +53,6 @@ void GameApp()
 		box4Entity.model.Create(GeometryGenerator::CreateBox());
 		box4Entity.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-
-
 		dirLight.position = glm::vec3(-6.0f, 10.0f, 2.0f);
 		//dirLight.direction = glm::vec3(0.5f, -1.5f, -0.25f);
 		dirLight.direction = glm::normalize(-dirLight.position);
@@ -66,6 +66,14 @@ void GameApp()
 		dirLight2.ambientStrength = glm::vec3(0.25f);
 		dirLight2.diffuseStrength = glm::vec3(1.0f);
 		dirLight2.specularStrength = glm::vec3(1.0f);
+
+		lights[0].position = glm::vec3(0.0f, 1.0f, -2.0f);
+		lights[0].color = glm::vec3(0.2f);
+		lights[1].position = glm::vec3(-2.0f, 1.0f, 0.0f);
+		lights[1].color = glm::vec3(0.0f, 0.2f, 0.0f);
+		lights[2].position = glm::vec3(2.0f, 1.0f, 0.0f);
+		lights[2].color = glm::vec3(0.2f, 0.0f, 0.0f);
+
 
 		while (!engine::ShouldClose())
 		{
@@ -96,6 +104,10 @@ void GameApp()
 			scene.BindGameObject(&box2Entity);
 			scene.BindGameObject(&box3Entity);
 			scene.BindGameObject(&box4Entity);
+
+			scene.BindLight(&lights[0]);
+			scene.BindLight(&lights[1]);
+			scene.BindLight(&lights[2]);
 
 			scene.BindLight(&dirLight);
 			scene.BindLight(&dirLight2);

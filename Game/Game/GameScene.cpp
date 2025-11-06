@@ -8,6 +8,7 @@ bool GameScene::Init()
 {
 	m_gameObjects.reserve(10000);
 	m_dirLights.resize(MaxDirectionalLight);
+	m_lights.resize(MaxLight);
 
 	const auto wndWidth = window::GetWidth();
 	const auto wndHeight = window::GetHeight();
@@ -54,6 +55,17 @@ void GameScene::BindGameObject(GameObject* go)
 		m_gameObjects[m_numGO] = go;
 
 	m_numGO++;
+}
+//=============================================================================
+void GameScene::BindLight(GameLight* ent)
+{
+	if (m_numLights >= MaxLight)
+	{
+		Error("Max light");
+		return;
+	}
+	m_lights[m_numLights] = ent;
+	m_numLights++;
 }
 //=============================================================================
 void GameScene::BindLight(DirectionalLight* ent)
@@ -130,7 +142,7 @@ void GameScene::draw()
 	// 5 Render Pass: main scenes
 	//		Set state: glEnable(GL_DEPTH_TEST);
 	//m_rpBlinnPhong.Draw(m_rpDirShadowMap, m_dirLights, m_numDirLights, m_gameObjects, m_numGO, m_camera);
-	m_rpMainScene.Draw(m_rpDirShadowMap, m_dirLights, m_numDirLights, m_gameObjects, m_numGO, m_camera);
+	m_rpMainScene.Draw(m_rpDirShadowMap, m_lights, m_numLights, m_gameObjects, m_numGO, m_camera);
 	
 	//================================================================================
 	// 6 Render Pass: post frame
@@ -148,6 +160,7 @@ void GameScene::endDraw()
 	m_camera = nullptr;
 	m_numGO = 0;
 	m_numDirLights = 0;
+	m_numLights = 0;
 }
 //=============================================================================
 void GameScene::blittingToScreen(GLuint fbo, uint16_t srcWidth, uint16_t srcHeight)

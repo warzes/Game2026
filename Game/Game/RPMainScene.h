@@ -6,6 +6,7 @@ class Camera;
 struct GameObject;
 class RPDirShadowMap;
 struct DirectionalLight;
+struct GameLight;
 
 class RPMainScene final
 {
@@ -16,7 +17,7 @@ public:
 	void Resize(uint16_t framebufferWidth, uint16_t framebufferHeight);
 
 	void Draw(const RPDirShadowMap& rpShadowMap,
-		const std::vector<DirectionalLight*>& dirLights, size_t numDirLights,
+		const std::vector<GameLight*>& lights, size_t numLights,
 		const std::vector<GameObject*>& gameObject, size_t numGameObject,
 		Camera* camera);
 
@@ -32,6 +33,7 @@ private:
 	int       m_projectionMatrixId{ -1 };
 	int       m_viewMatrixId{ -1 };
 	int       m_modelMatrixId{ -1 };
+	int       m_lightCountId{ -1 };
 
 	uint16_t  m_framebufferWidth{ 0 }; // TODO: можно удалить - есть в m_fbo
 	uint16_t  m_framebufferHeight{ 0 }; // TODO: можно удалить - есть в m_fbo

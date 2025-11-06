@@ -10,7 +10,6 @@
 #include "RPMainScene.h"
 #include "RPComposite.h"
 
-
 struct GameObject final
 {
 	const AABB& GetAABB() const noexcept { return model.GetAABB(); }
@@ -18,6 +17,13 @@ struct GameObject final
 	Model     model;
 	glm::mat4 modelMat{ glm::mat4(1.0f) };
 	bool      visible{ true };
+};
+
+struct GameLight final
+{
+	glm::vec3 position;
+	glm::vec3 color;
+	bool active{ false };
 };
 
 class GameScene final
@@ -29,6 +35,7 @@ public:
 
 	void BindCamera(Camera* camera);
 	void BindGameObject(GameObject* go);
+	void BindLight(GameLight* ent);
 	void BindLight(DirectionalLight* ent);
 
 	void SetShadowQuality(ShadowQuality quality);
@@ -45,6 +52,9 @@ private:
 	size_t                         m_numGO{ 0 };
 	std::vector<DirectionalLight*> m_dirLights;
 	size_t                         m_numDirLights{ 0 };
+
+	std::vector<GameLight*>        m_lights;
+	size_t                         m_numLights{ 0 };
 
 	RPDirShadowMap                 m_rpDirShadowMap;
 	RPGeometry                     m_rpGeometry;

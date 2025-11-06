@@ -10,7 +10,9 @@ bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_framebufferHeight = framebufferHeight;
 	m_perspective = glm::perspective(glm::radians(60.0f), window::GetAspect(), 0.01f, 1000.0f);
 
-	m_program = LoadShaderProgram("data/shaders/pbr/vertex.glsl", "data/shaders/pbr/fragment.glsl");
+	const std::vector<std::string> defines = { std::string("MAX_LIGHTS ") + std::to_string(MaxLight) };
+
+	m_program = LoadShaderProgram("data/shaders/pbr/vertex.glsl", "data/shaders/pbr/fragment.glsl", defines);
 	if (!m_program)
 	{
 		Fatal("Scene Main RenderPass Shader failed!");
@@ -19,8 +21,16 @@ bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	glUseProgram(m_program);
 
 	m_projectionMatrixId = GetUniformLocation(m_program, "projectionMatrix");
+	assert(m_projectionMatrixId > -1);
 	m_viewMatrixId = GetUniformLocation(m_program, "viewMatrix");
+	assert(m_viewMatrixId > -1);
 	m_modelMatrixId = GetUniformLocation(m_program, "modelMatrix");
+	assert(m_modelMatrixId > -1);
+	m_lightCountId = GetUniformLocation(m_program, "lightCount");
+	assert(m_lightCountId > -1);
+
+	SetUniform(GetUniformLocation(m_program, "albedoSampler"), 0);
+	SetUniform(GetUniformLocation(m_program, "normalSampler"), 5);
 
 	glUseProgram(0); // TODO: возможно вернуть прошлую версию шейдера
 
@@ -55,7 +65,7 @@ void RPMainScene::Close()
 	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
-void RPMainScene::Draw(const RPDirShadowMap& rpShadowMap, const std::vector<DirectionalLight*>& dirLights, size_t numDirLights, const std::vector<GameObject*>& gameObject, size_t numGameObject, Camera* camera)
+void RPMainScene::Draw(const RPDirShadowMap& rpShadowMap, const std::vector<GameLight*>& lights, size_t numLights, const std::vector<GameObject*>& gameObject, size_t numGameObject, Camera* camera)
 {
 	m_fbo.Bind();
 	glEnable(GL_DEPTH_TEST);
@@ -67,37 +77,32 @@ void RPMainScene::Draw(const RPDirShadowMap& rpShadowMap, const std::vector<Dire
 	SetUniform(m_projectionMatrixId, m_perspective);
 	SetUniform(m_viewMatrixId, camera->GetViewMatrix());
 
-	//SetUniform(GetUniformLocation(m_program, "cam.viewPos"), camera->Position);
-	//SetUniform(GetUniformLocation(m_program, "shadowOn"), 1);
-	//SetUniform(GetUniformLocation(m_program, "bias"), rpShadowMap.GetBias());
+	SetUniform(m_lightCountId, (int)numLights);
 
-	//int textureOffset{ 4 };
-	//int depthMapIndex{ 0 };
-	//int lightCount = 0;
-	//for (int i = lightCount; i < numDirLights; ++i)
-	//{
-	//	auto& l = dirLights[i];
+	int textureOffset{ 10 };
+	for (size_t i = 0; i < numLights; i++)
+	{
+		const auto* light = lights[i];
 
-	//	SetUniform(GetUniformLocation(m_program, std::string("light[" + std::to_string(i) + "].type")), 0);
-	//	SetUniform(GetUniformLocation(m_program, std::string("light[" + std::to_string(i) + "].position")), l->position);
-	//	SetUniform(GetUniformLocation(m_program, std::string("light[" + std::to_string(i) + "].direction")), l->direction);
-	//	SetUniform(GetUniformLocation(m_program, std::string("light[" + std::to_string(i) + "].ambientStrength")), l->ambientStrength);
-	//	SetUniform(GetUniformLocation(m_program, std::string("light[" + std::to_string(i) + "].diffuseStrength")), l->diffuseStrength);
-	//	SetUniform(GetUniformLocation(m_program, std::string("light[" + std::to_string(i) + "].specularStrength")), l->specularStrength);
+		glm::vec3 direction = glm::normalize(-light->position);
+		glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
-	//	glm::vec3 lightPosition = l->position;
-	//	glm::vec3 lightTarget = lightPosition + l->direction;
-	//	glm::mat4 lightView = glm::lookAt(lightPosition, lightTarget, glm::vec3(0.0f, 1.0f, 0.0f));
-	//	rpShadowMap.GetDepthFBO()[depthMapIndex].BindDepthTexture(textureOffset);
-	//	SetUniform(GetUniformLocation(m_program, "depthMap[" + std::to_string(depthMapIndex) + "]"), textureOffset);
-	//	SetUniform(GetUniformLocation(m_program, "light[" + std::to_string(i) + "].lightSpaceMatrix"), rpShadowMap.GetProjection() * lightView);
-	//	depthMapIndex++;
-	//	textureOffset++;
+		glm::vec3 right = glm::normalize(glm::cross(direction, worldUp));
+		glm::vec3 up = glm::normalize(glm::cross(right, direction));
 
-	//	lightCount++;
-	//}
+		glm::mat4 lightProjection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 10.0f);
 
-	//SetUniform(GetUniformLocation(m_program, "lightCount"), lightCount);
+		glm::mat4 lightView = glm::lookAt(light->position, light->position + direction, up);
+
+		std::string prefix = "lights[" + std::to_string(i) + "].";
+		SetUniform(GetUniformLocation(m_program, prefix + "position"), light->position);
+		SetUniform(GetUniformLocation(m_program, prefix + "direction"), direction);
+		SetUniform(GetUniformLocation(m_program, prefix + "color"), light->color);
+		SetUniform(GetUniformLocation(m_program, prefix + "matrix"), lightProjection * lightView);
+		SetUniform(GetUniformLocation(m_program, prefix + "shadowMapSampler"), (int)(textureOffset + i));
+		//rpShadowMap.GetDepthFBO()[depthMapIndex].BindDepthTexture(textureOffset + i);
+		// TODO: shadow map texture - GL_CLAMP_TO_BORDER и borderColor[] = 1.0, 1.0, 1.0, 1.0 через GL_TEXTURE_BORDER_COLOR
+	}
 
 	glBindSampler(0, m_sampler);
 	drawScene(gameObject, numGameObject);
@@ -128,7 +133,25 @@ void RPMainScene::drawScene(const std::vector<GameObject*>& gameObject, size_t n
 		const auto& meshes = gameObject[i]->model.GetMeshes();
 		for (const auto& mesh : meshes)
 		{
-			const auto& material = mesh.GetMaterial();
+			const auto& material = mesh.GetPbrMaterial();
+			bool hasAlbedo = false;
+			GLuint albedoTex = 0;
+			bool hasNormal = false;
+			GLuint normalTex = 0;
+			if (material)
+			{
+				hasAlbedo = material->albedoTexture.id > 0;
+				albedoTex = material->albedoTexture.id;
+
+				hasNormal = material->normalTexture.id > 0;
+				normalTex = material->normalTexture.id;
+			}
+
+			SetUniform(GetUniformLocation(m_program, "hasAlbedo"), hasAlbedo);
+			SetUniform(GetUniformLocation(m_program, "hasNormal"), hasNormal);
+
+			BindTexture2D(0, albedoTex);
+			BindTexture2D(5, normalTex);
 
 			mesh.Draw(GL_TRIANGLES);
 		}
