@@ -1,4 +1,4 @@
-﻿uniform int tonemap;
+uniform int tonemap;
 
 vec3 linearToneMapping(vec3 color)
 {

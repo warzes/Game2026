@@ -2,12 +2,12 @@
 
 #include "NanoRender.h"
 #include "NanoScene.h"
-#include "RPDirectionalLightsShadowMap.h"
+#include "RP_1_DirectionalLightsShadowMap.h"
+#include "RP_2_MainScene.h"
 #include "RPGeometry.h"
 #include "RPSSAO.h"
 #include "RPSSAOBlur.h"
 #include "RPBlinnPhong.h"
-#include "RPMainScene.h"
 #include "RPComposite.h"
 #include "GameWorldData.h"
 
@@ -30,6 +30,8 @@ public:
 	void BindCamera(Camera* camera);
 	void BindGameObject(GameObject* go);
 	void BindLight(DirectionalLight* ent);
+	void BindLight(SpotLight* ent);
+	void BindLight(PointLight* ent);
 
 private:
 	void beginDraw();
@@ -41,10 +43,12 @@ private:
 	GameWorldData                m_data;
 
 	RPDirectionalLightsShadowMap m_rpDirShadowMap;
+	RPMainScene                  m_rpMainScene;
+
 	RPGeometry                   m_rpGeometry;
 	RPSSAO                       m_rpSSAO;
 	RPSSAOBlur                   m_rpSSAOBlur;
 	RPBlinnPhong                 m_rpBlinnPhong;
-	RPMainScene                  m_rpMainScene;
+
 	RPComposite                  m_rpComposite;
 };

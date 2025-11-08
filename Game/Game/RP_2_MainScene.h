@@ -2,10 +2,8 @@
 
 #include "Framebuffer.h"
 
-class Camera;
-struct GameObject;
 class RPDirectionalLightsShadowMap;
-struct DirectionalLight;
+struct GameWorldData;
 
 class RPMainScene final
 {
@@ -15,9 +13,7 @@ public:
 
 	void Resize(uint16_t framebufferWidth, uint16_t framebufferHeight);
 
-	void Draw(const RPDirectionalLightsShadowMap& rpShadowMap,
-		const std::vector<GameObject*>& gameObject, size_t numGameObject,
-		Camera* camera);
+	void Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const GameWorldData& gameData);
 
 	const Framebuffer& GetFBO() const { return m_fbo; }
 	GLuint GetFBOId() const { return m_fbo.GetId(); }
@@ -25,17 +21,28 @@ public:
 	uint16_t GetHeight() const { return m_framebufferHeight; }
 
 private:
-	void drawScene(const std::vector<GameObject*>& gameObject, size_t numGameObject);
+	bool initProgram();
+	bool initFBO();
+	void setSize(uint16_t framebufferWidth, uint16_t framebufferHeight);
+	void drawScene(const GameWorldData& gameData);
+
+	uint16_t  m_framebufferWidth{ 0 };
+	uint16_t  m_framebufferHeight{ 0 };
+	glm::mat4 m_perspective{ 1.0f };
 
 	GLuint    m_program{ 0 };
 	int       m_projectionMatrixId{ -1 };
 	int       m_viewMatrixId{ -1 };
 	int       m_modelMatrixId{ -1 };
-	int       m_lightCountId{ -1 };
+	int       m_camPosId{ -1 };
 
-	uint16_t  m_framebufferWidth{ 0 }; // TODO: можно удалить - есть в m_fbo
-	uint16_t  m_framebufferHeight{ 0 }; // TODO: можно удалить - есть в m_fbo
-	glm::mat4 m_perspective{ 1.0f };
+
+	int       m_hasAlbedoMapId{ -1 };
+	int       m_hasNormalMapId{ -1 };
+	int       m_hasMetallicRoughnessMapId{ -1 };
+	int       m_hasAOMapId{ -1 };
+	int       m_hasEmissiveMapId{ -1 };
+	int       m_opacityId{ -1 };
 
 	Framebuffer m_fbo;
 

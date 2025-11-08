@@ -112,11 +112,11 @@
     <ClCompile Include="NanoRenderVertex.cpp" />
     <ClCompile Include="NanoScene.cpp" />
     <ClCompile Include="Region.cpp" />
-    <ClCompile Include="RPDirectionalLightsShadowMap.cpp" />
+    <ClCompile Include="RP_1_DirectionalLightsShadowMap.cpp" />
     <ClCompile Include="RPGeometry.cpp" />
     <ClCompile Include="RPBlinnPhong.cpp" />
     <ClCompile Include="RPComposite.cpp" />
-    <ClCompile Include="RPMainScene.cpp" />
+    <ClCompile Include="RP_2_MainScene.cpp" />
     <ClCompile Include="RPSSAO.cpp" />
     <ClCompile Include="RPSSAOBlur.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -159,11 +159,11 @@
     <ClInclude Include="NanoScene.h" />
     <ClInclude Include="NanoWindow.h" />
     <ClInclude Include="Region.h" />
-    <ClInclude Include="RPDirectionalLightsShadowMap.h" />
+    <ClInclude Include="RP_1_DirectionalLightsShadowMap.h" />
     <ClInclude Include="RPGeometry.h" />
     <ClInclude Include="RPBlinnPhong.h" />
     <ClInclude Include="RPComposite.h" />
-    <ClInclude Include="RPMainScene.h" />
+    <ClInclude Include="RP_2_MainScene.h" />
     <ClInclude Include="RPSSAO.h" />
     <ClInclude Include="RPSSAOBlur.h" />
     <ClInclude Include="Scene.h" />

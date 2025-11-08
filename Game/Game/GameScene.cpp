@@ -66,6 +66,28 @@ void GameScene::BindLight(DirectionalLight* ent)
 	m_data.numDirLights++;
 }
 //=============================================================================
+void GameScene::BindLight(SpotLight* ent)
+{
+	if (m_data.numSpotLights >= MaxSpotLight)
+	{
+		Error("Max Spot light");
+		return;
+	}
+	m_data.spotLights[m_data.numSpotLights] = ent;
+	m_data.numSpotLights++;
+}
+//=============================================================================
+void GameScene::BindLight(PointLight* ent)
+{
+	if (m_data.numPointLights >= MaxPointLight)
+	{
+		Error("Max point light");
+		return;
+	}
+	m_data.pointLights[m_data.numPointLights] = ent;
+	m_data.numPointLights++;
+}
+//=============================================================================
 void GameScene::Draw()
 {
 	if (!m_data.camera)
@@ -101,31 +123,33 @@ void GameScene::draw()
 {
 	//================================================================================
 	// 1.) Render Pass: render depth of scene to texture (from light's perspective)
-	//		Set state: glEnable(GL_DEPTH_TEST);
 	m_rpDirShadowMap.Draw(m_data);
+	//m_rpSpotShadowMap.Draw(m_data);
+	//m_rpPointShadowMap.Draw(m_data);
+	//m_rpAreaShadowMap.Draw(m_data);
 
+	//================================================================================
+	// 2.) Render Pass: render Scene as normal using the generated depth / shadow map
+	m_rpMainScene.Draw(m_rpDirShadowMap, m_data);
+
+	//================================================================================
+	// 3.) Render Pass: SSAO
 	if (EnableSSAO)
 	{
 		//================================================================================
-		// 2.1 Render Pass: geometry
+		// 3.1 Render Pass: geometry
 		m_rpGeometry.Draw(m_data.gameObjects, m_data.numGameObject, m_data.camera);
 
 		//================================================================================
-		// 2.2 Render Pass: SSAO
+		// 3.2 Render Pass: SSAO
 		//		Set state: glDisable(GL_DEPTH_TEST);
 		m_rpSSAO.Draw(&m_rpGeometry.GetFBO());
 
 		//================================================================================
-		// 2.3 Render Pass: SSAO Blur
+		// 3.3 Render Pass: SSAO Blur
 		m_rpSSAOBlur.Draw(&m_rpSSAO.GetFBO());
 	}
-	
-	//================================================================================
-	// 3 Render Pass: main scenes
-	//		Set state: glEnable(GL_DEPTH_TEST);
-	//m_rpBlinnPhong.Draw(m_rpDirShadowMap, m_dirLights, m_numDirLights, m_gameObjects, m_numGO, m_camera);
-	m_rpMainScene.Draw(m_rpDirShadowMap, m_data.gameObjects, m_data.numGameObject, m_data.camera);
-	
+
 	//================================================================================
 	// 4 Render Pass: post frame
 	//		Set state: glDisable(GL_DEPTH_TEST);

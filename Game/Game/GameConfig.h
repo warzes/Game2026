@@ -2,7 +2,9 @@
 
 #define DISABLE_SRGB 0
 
-inline bool EnableSSAO = true;
+inline bool EnableSSAO = false;
 
-constexpr size_t MaxDirectionalLight = 16u;
-constexpr size_t MaxLight = 16u;
+constexpr size_t MaxDirectionalLight = 8u;
+constexpr size_t MaxSpotLight = 8u;
+constexpr size_t MaxPointLight = 16u;
+

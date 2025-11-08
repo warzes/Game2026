@@ -71,12 +71,12 @@ void RPBlinnPhong::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const s
 
 	SetUniform(GetUniformLocation(m_program, "cam.viewPos"), camera->Position);
 	SetUniform(GetUniformLocation(m_program, "shadowOn"), 1);
-	SetUniform(GetUniformLocation(m_program, "bias"), rpShadowMap.GetBias());
+	//SetUniform(GetUniformLocation(m_program, "bias"), rpShadowMap.GetBias());
 
 	int textureOffset{ 4 };
 	int depthMapIndex{ 0 };
 	int lightCount = 0;
-	for (int i = lightCount; i < numDirLights; ++i)
+	/*for (int i = lightCount; i < numDirLights; ++i)
 	{
 		auto& l = dirLights[i];
 
@@ -97,7 +97,7 @@ void RPBlinnPhong::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const s
 		textureOffset++;
 
 		lightCount++;
-	}
+	}*/
 
 	SetUniform(GetUniformLocation(m_program, "lightCount"), lightCount);
 

@@ -112,7 +112,15 @@ bool Framebuffer::initializeAttachments()
 		}
 		drawBuffers.push_back(GL_COLOR_ATTACHMENT0 + static_cast<GLenum>(i));
 	}
-	glDrawBuffers(drawBuffers.size(), drawBuffers.data());
+	if (drawBuffers.empty())
+	{
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+	}
+	else
+	{
+		glDrawBuffers(drawBuffers.size(), drawBuffers.data());
+	}
 
 	// depth buffer attachment
 	if (m_info.depthAttachment)

@@ -23,7 +23,9 @@ namespace
 	Camera camera;
 	GameObject modelTest;
 	DirectionalLight dirLight;
-	DirectionalLight dirLight2;
+
+	PointLight pointLights[10];
+
 
 	GameObject sphereEntity;
 	GameObject box1Entity;
@@ -58,19 +60,17 @@ void GameApp()
 		box4Entity.model.Create(GeometryGenerator::CreateBox());
 		box4Entity.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-		dirLight.position = glm::vec3(-6.0f, 10.0f, 2.0f);
-		//dirLight.direction = glm::vec3(0.5f, -1.5f, -0.25f);
-		dirLight.direction = glm::normalize(-dirLight.position);
-		dirLight.ambientStrength = glm::vec3(0.25f);
-		dirLight.diffuseStrength = glm::vec3(1.0f);
-		dirLight.specularStrength = glm::vec3(1.0f);
+		dirLight.direction = glm::vec3(0.3f, -0.7f, -0.4f);
+		dirLight.color = glm::vec3(5.0f, 4.5f, 4.0f);
 
-		dirLight2.position = glm::vec3(-0.0f, 10.0f, 2.0f);
-		//dirLight2.direction = glm::vec3(-6.5f, -1.5f, -0.25f);
-		dirLight2.direction = glm::normalize(-dirLight2.position);
-		dirLight2.ambientStrength = glm::vec3(0.25f);
-		dirLight2.diffuseStrength = glm::vec3(1.0f);
-		dirLight2.specularStrength = glm::vec3(1.0f);
+		for (int i = 0; i < 10; ++i)
+		{
+			float x = rand() % 20 - 10;
+			float y = rand() % 20 - 10;
+
+			pointLights[i].position = glm::vec3(x, 1.0f, y);
+			pointLights[i].color = glm::vec3(5.0f, 0.8f, 4.5f);
+		}
 
 		while (!engine::ShouldClose())
 		{
@@ -103,7 +103,11 @@ void GameApp()
 			scene.BindGameObject(&box4Entity);
 
 			scene.BindLight(&dirLight);
-			scene.BindLight(&dirLight2);
+			for (size_t i = 0; i < 10; i++)
+			{
+				scene.BindLight(&pointLights[i]);
+			}
+
 			scene.Draw();
 
 			engine::DrawFPS();

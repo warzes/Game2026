@@ -15,6 +15,7 @@ Render
 - объемный свет (https://github.com/Mikepicker/opengl-sandbox)
 - туман
 - god rays
+- возможно источникам света добавить ambientStrength/diffuseStrength/specularStrength
 
 
 //=============================================================================

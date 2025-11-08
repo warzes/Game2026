@@ -79,7 +79,7 @@
     <ClCompile Include="NanoRenderGeometryGen.cpp">
       <Filter>NanoEngine\Render</Filter>
     </ClCompile>
-    <ClCompile Include="RPDirectionalLightsShadowMap.cpp">
+    <ClCompile Include="RP_1_DirectionalLightsShadowMap.cpp">
       <Filter>GameApp\SceneRenderPass</Filter>
     </ClCompile>
     <ClCompile Include="RPBlinnPhong.cpp">
@@ -100,7 +100,7 @@
     <ClCompile Include="NanoRenderVertex.cpp">
       <Filter>NanoEngine\Render</Filter>
     </ClCompile>
-    <ClCompile Include="RPMainScene.cpp">
+    <ClCompile Include="RP_2_MainScene.cpp">
       <Filter>GameApp\SceneRenderPass</Filter>
     </ClCompile>
     <ClCompile Include="GameScene.cpp">
@@ -176,7 +176,7 @@
     <ClInclude Include="NanoRenderGeometryGen.h">
       <Filter>NanoEngine\Render</Filter>
     </ClInclude>
-    <ClInclude Include="RPDirectionalLightsShadowMap.h">
+    <ClInclude Include="RP_1_DirectionalLightsShadowMap.h">
       <Filter>GameApp\SceneRenderPass</Filter>
     </ClInclude>
     <ClInclude Include="RPBlinnPhong.h">
@@ -198,7 +198,7 @@
     <ClInclude Include="NanoRenderVertex.h">
       <Filter>NanoEngine\Render</Filter>
     </ClInclude>
-    <ClInclude Include="RPMainScene.h">
+    <ClInclude Include="RP_2_MainScene.h">
       <Filter>GameApp\SceneRenderPass</Filter>
     </ClInclude>
     <ClInclude Include="GameScene.h">

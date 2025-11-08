@@ -59,9 +59,23 @@ private:
 
 struct DirectionalLight final
 {
+	glm::vec3 direction{ 0.1f };
+	glm::vec3 color{ 1.0f };
+};
+
+
+struct PointLight final
+{
 	glm::vec3 position{ 0.0f };
-	glm::vec3 direction{ 0.0f };
-	glm::vec3 ambientStrength{ 0.5f };
-	glm::vec3 diffuseStrength{ 1.0f };
-	glm::vec3 specularStrength{ 0.0f };
+	glm::vec3 color{ 1.0f };
+};
+
+struct SpotLight final
+{
+	glm::vec3 position{ 0.0f };
+	glm::vec3 direction{ 0.1f };
+	glm::vec3 color{ 1.0f };
+
+	float cutOff{ 0.0f };
+	float outerCutOff{ 0.0f };
 };
