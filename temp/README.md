@@ -4,19 +4,39 @@ A minimal, header-rich rendering library for forward rendering using OpenGL 3.3 
 
 ## Features
 
+### Core Rendering
 - **Forward Rendering**: Single-pass lighting with Blinn-Phong model
 - **Lighting**: Up to 4 directional, 4 point, and 4 spot lights (separate classes per light type)
-- **Texturing**: Diffuse, specular, and normal maps with bump mapping support
-- **Shadow Mapping**:
-  - Directional & Spot lights: 2D depth maps with PCF filtering
-  - Point lights: Cubemap depth with soft shadows
-  - All calculations in fragment shader (no vertex attributes needed)
+- **Texturing**: Diffuse, specular, and normal maps with full bump mapping support
+
+### Advanced Surface Shading
+- **Parallax Mapping**: Depth-aware UV offset for surface detail without extra geometry (basic & layered)
+- **Normal Mapping**: Full TBN-space normal mapping with tangent calculation
+- **Bump Mapping**: Height-to-normal conversion via parallax
+
+### Shadows
+- **Standard Shadow Maps**:
+  - Directional & Spot lights: 2D depth maps with PCF (3x3 filtering)
+  - Point lights: Cubemap depth with soft-shadow approximation
+- **Cascade Shadow Maps**: 3-tier cascading for directional lights (better far-view quality)
+- **All calculations in fragment shader** (no vertex attribute passing)
+
+### Postprocessing
+- **HDR Rendering**: RGBA16F framebuffer with Reinhard tone mapping
+- **Bloom**: Bright-pass extraction + separable Gaussian blur (5-sample)
+- **FXAA**: Fast approximate anti-aliasing for smooth edges
+- **SSAO**: Screen-space ambient occlusion (16-sample kernel)
+- **Screen-Space Reflections**: Cheap ray-marched reflections
+
+### Environment
+- **Skybox**: Cubemap-based with proper depth handling
 - **Volumetric Fog**: Distance-based with configurable height zone
-- **Postprocessing**:
-  - HDR rendering with Reinhard tone mapping
-  - Bloom (bright-pass extraction + separable Gaussian blur)
-  - Screen-Space Reflections (SSR approximation)
-- **Efficient**: Uses `std140` layout UBOs, sampler objects, and minimal CPU-GPU sync
+
+### Performance
+- **Efficient UBOs**: `std140` layout, 16KB for all lights
+- **Sampler Objects**: Independent texture/filtering state
+- **Instancing-ready**: Structure supports batch rendering
+- **HDR Pipeline**: Single 16-bit float target for full dynamic range
 
 ## Project Structure
 
@@ -24,33 +44,27 @@ A minimal, header-rich rendering library for forward rendering using OpenGL 3.3 
 RenderLib/
 ├── CMakeLists.txt
 ├── include/RenderLib/
-│   ├── Shader.hpp
-│   ├── Texture.hpp
-│   ├── Sampler.hpp
-│   ├── UBO.hpp
-│   ├── Mesh.hpp
-│   ├── Renderer.hpp
-│   ├── LightDirectional.hpp
-│   ├── LightPoint.hpp
-│   └── LightSpot.hpp
+│   ├── Shader.hpp, Texture.hpp, Sampler.hpp, UBO.hpp
+│   ├── Mesh.hpp, Renderer.hpp
+│   ├── LightDirectional.hpp, LightPoint.hpp, LightSpot.hpp
+│   ├── Skybox.hpp                    (cubemap + IBL)
+│   ├── CascadeShadow.hpp             (tiered shadow maps)
+│   └── Advanced.hpp                  (parallax settings)
 ├── src/
-│   ├── Shader.cpp
-│   ├── Texture.cpp
-│   ├── Sampler.cpp
-│   ├── UBO.cpp
-│   ├── Mesh.cpp
+│   ├── Shader.cpp, Texture.cpp, Sampler.cpp, UBO.cpp, Mesh.cpp
 │   ├── Renderer.cpp
-│   ├── LightDirectional.cpp
-│   ├── LightPoint.cpp
-│   └── LightSpot.cpp
+│   ├── LightDirectional.cpp, LightPoint.cpp, LightSpot.cpp
+│   ├── Skybox.cpp, CascadeShadow.cpp
+│   └── [utilities]
 └── shaders/
-    ├── basic.vert / basic.frag        (main forward pass)
-    ├── shadow_dir.vert / shadow_depth.frag
-    ├── shadow_point.vert / shadow_depth.frag
-    ├── blur.frag                       (separable Gaussian)
-    ├── extract_bright.frag             (bright-pass for bloom)
-    ├── post_bloom.frag                 (tone map + blend)
-    └── ssr.frag                        (screen-space reflections)
+    ├── basic.vert / basic.frag                (simple Blinn-Phong)
+    ├── basic_advanced.vert / basic_advanced.frag  (parallax + cascades)
+    ├── shadow_*.vert / shadow_depth.frag      (depth-only passes)
+    ├── skybox.vert / skybox.frag              (cubemap rendering)
+    ├── fxaa.frag, blur.frag, extract_bright.frag  (postprocessing)
+    ├── post_bloom.frag                        (HDR tone map + bloom)
+    ├── ssao.frag                              (ambient occlusion)
+    └── ssr.frag                               (screen-space reflections)
 ```
 
 ## Building
@@ -165,13 +179,44 @@ lights.create("Lights", 1, 16 * 1024);
 lights.update(offset, size, data);
 ```
 
+## Advanced Usage Tips
+
+### Parallax Mapping
+1. Store heightmap in normal texture's alpha channel (0=raised, 1=sunken)
+2. Set `heightScale` uniform (0.05-0.15 typical)
+3. Use `basic_advanced` shaders instead of `basic`
+
+### Cascade Shadows
+1. Create `CascadeShadowMap` instead of individual directional lights
+2. Update splits based on view distance: `{0.01, 0.1, 0.5, 1000}`
+3. Bind cascaded depth maps to `cascadeShadowMaps[lightIdx][cascade]`
+
+### Skybox + IBL
+```cpp
+RenderLib::CubemapTexture cubemap;
+cubemap.loadFromMemory(512, 512, {right, left, top, bottom, front, back}, GL_RGB);
+RenderLib::Skybox skybox;
+skybox.init(&cubemap);
+// In render loop: skybox.render(skyboxShader, proj, view);
+```
+
+### SSAO Setup
+1. Render G-buffer with positions, normals (needs depth prepass)
+2. Run SSAO pass with kernel sampling
+3. Blur result and apply multiplicatively to final color
+
+### FXAA
+- Apply as final post-process over HDR result
+- Set `texelSize = 1.0 / vec2(width, height)`
+
 ## Notes
 
 - **No window creation**: Consumers must provide OpenGL context
 - **Image loading**: Use `stb_image` (not bundled) to load textures
 - **Shadowing**: All shadow-map generation and sampling is CPU-managed and shader-executed
-- **Postprocessing**: Bloom and SSR are post-passes over the HDR color buffer
-- **Extensibility**: Shader sources are in `shaders/` directory for easy customization
+- **Postprocessing**: Bloom, SSAO, FXAA, SSR are post-passes over HDR color buffer
+- **Extensibility**: Shader sources in `shaders/` directory for easy customization
+- **Parallax Performance**: Use basic parallax (8 layers) for most cases; increase layers only when needed
 
 ## License
 
