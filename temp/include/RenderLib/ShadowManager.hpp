@@ -60,10 +60,29 @@ public:
     // Shadow atlas management
     void allocateAtlasSpace(uint32_t lightCount, uint32_t resolution);
     glm::vec4 getAtlasRect(uint32_t lightIndex) const;
+    
+    // RSM quality parameters
+    void setRSMQuality(float smoothness, float bias, float radius, float intensity) {
+        rsmSmoothness_ = smoothness;
+        rsmBias_ = bias;
+        rsmRadius_ = radius;
+        rsmIntensity_ = intensity;
+    }
+    
+    float getRSMSmoothness() const { return rsmSmoothness_; }
+    float getRSMBias() const { return rsmBias_; }
+    float getRSMRadius() const { return rsmRadius_; }
+    float getRSMIntensity() const { return rsmIntensity_; }
 
 private:
     ShadowMode shadowMode_ = ShadowMode::Standard;
     AtlasMode atlasMode_ = AtlasMode::Individual;
+    
+    // RSM quality parameters
+    float rsmSmoothness_ = 1.0f;
+    float rsmBias_ = 0.001f;
+    float rsmRadius_ = 0.02f;
+    float rsmIntensity_ = 1.0f;
 
     // Shadow atlas
     GLuint shadowAtlasFBO_ = 0;

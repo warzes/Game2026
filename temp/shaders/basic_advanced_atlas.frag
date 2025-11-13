@@ -27,17 +27,22 @@ uniform float uLightIntensity;
 // Atlas rect: (x, y, width, height) in normalized coordinates
 uniform vec4 uAtlasRect;
 
+// Atlas quality parameters
+uniform float uAtlasBias = 0.005;
+uniform float uAtlasSmoothing = 1.0;
+uniform bool uAtlasRSMEnabled = false;
+
 out vec4 FragColor;
 
 const float PI = 3.14159265359;
 
-// PCF sampling with atlas coordinates
-float sampleShadowAtlas(vec3 lightSpacePos) {
-    // Convert light space position to atlas coordinates
-    vec2 atlasCoord = lightSpacePos.xy * 0.5 + 0.5;
+// PCF sampling with atlas coordinates and smoothing
+float sampleShadowAtlasPCF(vec3 lightSpacePos, float smoothing) {
+    // Convert light space position to texture coordinates [0,1]
+    vec2 texCoord = lightSpacePos.xy * 0.5 + 0.5;
     
-    // Map to atlas tile
-    atlasCoord = uAtlasRect.xy + atlasCoord * uAtlasRect.zw;
+    // Map to atlas tile (denormalize by atlas rect)
+    vec2 atlasCoord = uAtlasRect.xy + texCoord * uAtlasRect.zw;
     
     // Check bounds
     if (atlasCoord.x < uAtlasRect.x || atlasCoord.x > (uAtlasRect.x + uAtlasRect.z) ||
@@ -45,14 +50,39 @@ float sampleShadowAtlas(vec3 lightSpacePos) {
         return 1.0;
     }
     
+    float currentDepth = (lightSpacePos.z * 0.5 + 0.5);  // Normalize to [0,1]
+    float pixelSize = 1.0 / 4096.0;  // Atlas texture size
+    
+    // Simple 3x3 PCF
+    float shadow = 0.0;
     float closestDepth = texture(uShadowAtlas, atlasCoord).r;
-    float currentDepth = lightSpacePos.z;
-    float bias = 0.005;
+    if (currentDepth - uAtlasBias <= closestDepth) { shadow = shadow + 1.0; }
     
-    // Simple shadow comparison
-    float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
+    closestDepth = texture(uShadowAtlas, atlasCoord + vec2(pixelSize, 0.0) * smoothing).r;
+    if (currentDepth - uAtlasBias <= closestDepth) { shadow = shadow + 1.0; }
     
-    return shadow;
+    closestDepth = texture(uShadowAtlas, atlasCoord + vec2(-pixelSize, 0.0) * smoothing).r;
+    if (currentDepth - uAtlasBias <= closestDepth) { shadow = shadow + 1.0; }
+    
+    closestDepth = texture(uShadowAtlas, atlasCoord + vec2(0.0, pixelSize) * smoothing).r;
+    if (currentDepth - uAtlasBias <= closestDepth) { shadow = shadow + 1.0; }
+    
+    closestDepth = texture(uShadowAtlas, atlasCoord + vec2(0.0, -pixelSize) * smoothing).r;
+    if (currentDepth - uAtlasBias <= closestDepth) { shadow = shadow + 1.0; }
+    
+    closestDepth = texture(uShadowAtlas, atlasCoord + vec2(pixelSize, pixelSize) * smoothing).r;
+    if (currentDepth - uAtlasBias <= closestDepth) { shadow = shadow + 1.0; }
+    
+    closestDepth = texture(uShadowAtlas, atlasCoord + vec2(-pixelSize, pixelSize) * smoothing).r;
+    if (currentDepth - uAtlasBias <= closestDepth) { shadow = shadow + 1.0; }
+    
+    closestDepth = texture(uShadowAtlas, atlasCoord + vec2(pixelSize, -pixelSize) * smoothing).r;
+    if (currentDepth - uAtlasBias <= closestDepth) { shadow = shadow + 1.0; }
+    
+    closestDepth = texture(uShadowAtlas, atlasCoord + vec2(-pixelSize, -pixelSize) * smoothing).r;
+    if (currentDepth - uAtlasBias <= closestDepth) { shadow = shadow + 1.0; }
+    
+    return shadow / 9.0;
 }
 
 // PBR functions
@@ -104,9 +134,9 @@ void main() {
     vec3 L = normalize(uLightPos - fs_in.FragPos);
     vec3 H = normalize(V + L);
     
-    // Sample shadow from atlas
+    // Sample shadow from atlas with PCF
     vec3 lightSpacePos = fs_in.FragPosLightSpace.xyz / fs_in.FragPosLightSpace.w;
-    float shadow = sampleShadowAtlas(lightSpacePos);
+    float shadow = sampleShadowAtlasPCF(lightSpacePos, uAtlasSmoothing);
     
     // Cook-Torrance PBR
     float NdotV = max(dot(N, V), 0.0);

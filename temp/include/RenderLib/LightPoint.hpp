@@ -25,6 +25,12 @@ struct PointLight {
     GLuint rsmColorCube{0};       // Color cubemap
     bool useRSM{false};
     
+    // RSM parameters for quality control
+    float rsmSmoothness{1.0f};    // Smoothing radius for RSM
+    float rsmBias{0.001f};        // Depth bias to reduce shadow acne
+    float rsmRadius{0.02f};       // Sample radius for indirect lighting
+    float rsmIntensity{1.0f};     // Indirect lighting contribution intensity
+    
     // Atlas support
     bool useAtlas{false};
     glm::vec4 atlasRect{0.0f};

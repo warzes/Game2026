@@ -26,6 +26,12 @@ uniform vec3 uViewPos;
 uniform vec3 uLightColor;
 uniform float uLightIntensity;
 
+// RSM quality parameters
+uniform float uRSMSmoothness;        // Smoothing radius (1-3)
+uniform float uRSMBias;              // Depth bias
+uniform float uRSMRadius;            // Sample radius for indirect
+uniform float uRSMIntensity;         // Contribution intensity
+
 out vec4 FragColor;
 
 const float PI = 3.14159265359;
@@ -70,8 +76,28 @@ vec3 decodeRSMNormal(vec2 rsmTexCoord) {
     return normalize(encoded * 2.0 - 1.0);
 }
 
-// Sample RSM information at light space position
-vec4 sampleRSM(vec3 lightSpacePos) {
+// PCF filtering for RSM with smoothness parameter
+float rsmPCF(vec3 lightSpacePos, vec2 baseCoord, float smoothness) {
+    float depth = texture(uRSMDepthMap, baseCoord).r;
+    float shadow = 0.0;
+    float pixelSize = 1.0 / 2048.0;  // Assuming 2048x2048 RSM
+    
+    // Simple PCF with 3x3 kernel
+    shadow = shadow + (lightSpacePos.z <= depth + uRSMBias ? 1.0 : 0.0);
+    shadow = shadow + (lightSpacePos.z <= texture(uRSMDepthMap, baseCoord + vec2(pixelSize, 0.0) * smoothness).r + uRSMBias ? 1.0 : 0.0);
+    shadow = shadow + (lightSpacePos.z <= texture(uRSMDepthMap, baseCoord + vec2(-pixelSize, 0.0) * smoothness).r + uRSMBias ? 1.0 : 0.0);
+    shadow = shadow + (lightSpacePos.z <= texture(uRSMDepthMap, baseCoord + vec2(0.0, pixelSize) * smoothness).r + uRSMBias ? 1.0 : 0.0);
+    shadow = shadow + (lightSpacePos.z <= texture(uRSMDepthMap, baseCoord + vec2(0.0, -pixelSize) * smoothness).r + uRSMBias ? 1.0 : 0.0);
+    shadow = shadow + (lightSpacePos.z <= texture(uRSMDepthMap, baseCoord + vec2(pixelSize, pixelSize) * smoothness).r + uRSMBias ? 1.0 : 0.0);
+    shadow = shadow + (lightSpacePos.z <= texture(uRSMDepthMap, baseCoord + vec2(-pixelSize, pixelSize) * smoothness).r + uRSMBias ? 1.0 : 0.0);
+    shadow = shadow + (lightSpacePos.z <= texture(uRSMDepthMap, baseCoord + vec2(pixelSize, -pixelSize) * smoothness).r + uRSMBias ? 1.0 : 0.0);
+    shadow = shadow + (lightSpacePos.z <= texture(uRSMDepthMap, baseCoord + vec2(-pixelSize, -pixelSize) * smoothness).r + uRSMBias ? 1.0 : 0.0);
+    
+    return shadow / 9.0;
+}
+
+// Sample RSM information at light space position with multiple samples
+vec4 sampleRSMIndirect(vec3 lightSpacePos, vec3 worldNormal) {
     // Convert from light space [-1,1] to texture coordinates [0,1]
     vec2 rsmTexCoord = lightSpacePos.xy * 0.5 + 0.5;
     
@@ -81,17 +107,24 @@ vec4 sampleRSM(vec3 lightSpacePos) {
         return vec4(0.0);
     }
     
-    // Sample RSM textures
+    // Depth check with bias
     float depth = texture(uRSMDepthMap, rsmTexCoord).r;
-    vec4 color = texture(uRSMColorMap, rsmTexCoord);
-    vec3 rsmNormal = decodeRSMNormal(rsmTexCoord);
-    
-    // Shadow comparison
-    if (lightSpacePos.z > depth + 0.0001) {
+    if (lightSpacePos.z > depth + uRSMBias) {
         return vec4(0.0);
     }
     
-    return vec4(color.rgb * 0.8, 1.0);
+    // Sample RSM color with PCF
+    vec4 rsmColor = texture(uRSMColorMap, rsmTexCoord);
+    vec3 rsmNormal = decodeRSMNormal(rsmTexCoord);
+    
+    // Apply PCF smoothness filtering
+    float shadowFactor = rsmPCF(lightSpacePos, rsmTexCoord, uRSMSmoothness);
+    
+    // Modulate by normal correspondence
+    float normalFactor = max(dot(worldNormal, rsmNormal), 0.0);
+    
+    // Return filtered RSM data
+    return vec4(rsmColor.rgb * shadowFactor * normalFactor, shadowFactor);
 }
 
 void main() {
@@ -112,7 +145,7 @@ void main() {
     vec3 H = normalize(V + L);
     
     // Sample RSM for indirect lighting influence
-    vec3 rsmColor = sampleRSM(fs_in.FragPosLightSpace.xyz / fs_in.FragPosLightSpace.w).rgb;
+    vec4 rsmData = sampleRSMIndirect(fs_in.FragPosLightSpace.xyz / fs_in.FragPosLightSpace.w, N);
     
     // Cook-Torrance PBR
     float NdotV = max(dot(N, V), 0.0);
@@ -132,11 +165,11 @@ void main() {
     
     vec3 specular = (NDF * G * F) / max(0.001, 4.0 * NdotV * NdotL + 0.0001);
     
-    // Direct light + RSM indirect
-    vec3 Lo = (kD * albedo / PI + specular) * uLightColor * uLightIntensity * NdotL;
+    // Direct light with shadow
+    vec3 Lo = (kD * albedo / PI + specular) * uLightColor * uLightIntensity * NdotL * rsmData.w;
     
-    // Add RSM contribution
-    Lo += rsmColor * 0.3 * albedo;
+    // Add RSM indirect lighting contribution (modulated by intensity)
+    Lo = Lo + (rsmData.rgb * uRSMIntensity * 0.5);
     
     // Ambient
     vec3 ambient = albedo * 0.03;

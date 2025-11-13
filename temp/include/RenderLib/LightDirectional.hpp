@@ -32,6 +32,12 @@ struct DirectionalLight {
     GLuint rsmDepthMap{0};        // Depth for indirect light
     bool useRSM{false};           // Enable RSM
     
+    // RSM parameters for quality control
+    float rsmSmoothness{1.0f};    // Smoothing radius for RSM (1-3 recommended)
+    float rsmBias{0.001f};        // Depth bias to reduce shadow acne
+    float rsmRadius{0.02f};       // Sample radius for indirect lighting
+    float rsmIntensity{1.0f};     // Indirect lighting contribution intensity
+    
     // Atlas support
     bool useAtlas{false};         // Enable shadow atlas
     glm::vec4 atlasRect{0.0f};    // Atlas UV rect (x, y, width, height)
