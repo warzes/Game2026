@@ -40,4 +40,68 @@ void PointLight::resizeShadow(int resolution) {
     initShadowCube();
 }
 
+void PointLight::initRSM() {
+    if(rsmCubeFBO) return;
+    
+    glGenFramebuffers(1, &rsmCubeFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, rsmCubeFBO);
+    
+    // Create color cubemap (for lighting)
+    glGenTextures(1, &rsmColorCube);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, rsmColorCube);
+    for (int i = 0; i < 6; ++i) {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F,
+                     shadowResolution, shadowResolution, 0,
+                     GL_RGBA, GL_FLOAT, nullptr);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    
+    // Create normal cubemap (for RSM normal data)
+    glGenTextures(1, &rsmCubeMap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, rsmCubeMap);
+    for (int i = 0; i < 6; ++i) {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F,
+                     shadowResolution, shadowResolution, 0,
+                     GL_RGBA, GL_FLOAT, nullptr);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        glDeleteFramebuffers(1, &rsmCubeFBO);
+        rsmCubeFBO = 0;
+    }
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void PointLight::resizeRSM(int resolution) {
+    if(resolution == shadowResolution) return;
+    shadowResolution = resolution;
+    destroyRSM();
+    initRSM();
+}
+
+void PointLight::destroyRSM() {
+    if (rsmCubeFBO != 0) {
+        glDeleteFramebuffers(1, &rsmCubeFBO);
+        rsmCubeFBO = 0;
+    }
+    if (rsmColorCube != 0) {
+        glDeleteTextures(1, &rsmColorCube);
+        rsmColorCube = 0;
+    }
+    if (rsmCubeMap != 0) {
+        glDeleteTextures(1, &rsmCubeMap);
+        rsmCubeMap = 0;
+    }
+}
+
 } // namespace RenderLib

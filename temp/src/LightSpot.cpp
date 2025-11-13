@@ -36,4 +36,79 @@ void SpotLight::resizeShadow(int resolution) {
     initShadowMap();
 }
 
+void SpotLight::initRSM() {
+    if(rsmFBO) return;
+    
+    glGenFramebuffers(1, &rsmFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, rsmFBO);
+    
+    // Create color texture
+    glGenTextures(1, &rsmColorMap);
+    glBindTexture(GL_TEXTURE_2D, rsmColorMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, shadowResolution, shadowResolution, 0,
+                 GL_RGBA, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                          rsmColorMap, 0);
+    
+    // Create normal texture
+    glGenTextures(1, &rsmNormalMap);
+    glBindTexture(GL_TEXTURE_2D, rsmNormalMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, shadowResolution, shadowResolution, 0,
+                 GL_RGBA, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D,
+                          rsmNormalMap, 0);
+    
+    // Create depth texture
+    glGenTextures(1, &depthMapRSM);
+    glBindTexture(GL_TEXTURE_2D, depthMapRSM);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, shadowResolution, shadowResolution, 0,
+                 GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+                          depthMapRSM, 0);
+    
+    GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(2, attachments);
+    
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        glDeleteFramebuffers(1, &rsmFBO);
+        rsmFBO = 0;
+    }
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void SpotLight::resizeRSM(int resolution) {
+    if(resolution == shadowResolution) return;
+    shadowResolution = resolution;
+    destroyRSM();
+    initRSM();
+}
+
+void SpotLight::destroyRSM() {
+    if (rsmFBO != 0) {
+        glDeleteFramebuffers(1, &rsmFBO);
+        rsmFBO = 0;
+    }
+    if (rsmColorMap != 0) {
+        glDeleteTextures(1, &rsmColorMap);
+        rsmColorMap = 0;
+    }
+    if (rsmNormalMap != 0) {
+        glDeleteTextures(1, &rsmNormalMap);
+        rsmNormalMap = 0;
+    }
+    if (depthMapRSM != 0) {
+        glDeleteTextures(1, &depthMapRSM);
+        depthMapRSM = 0;
+    }
+}
+
 } // namespace RenderLib

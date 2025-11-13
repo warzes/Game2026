@@ -4,6 +4,17 @@
 
 namespace RenderLib {
 
+// Shadow rendering modes
+enum class ShadowMode {
+    Standard,       // Traditional depth comparison PCF
+    RSM,           // Reflective Shadow Maps (color + normal)
+};
+
+enum class AtlasMode {
+    Individual,    // Separate shadow maps (current method)
+    Atlas,         // Single atlas texture with all lights
+};
+
 struct DirectionalLight {
     glm::vec3 direction{0.0f, -1.0f, 0.0f};
     glm::vec3 color{1.0f};
@@ -13,9 +24,25 @@ struct DirectionalLight {
     GLuint depthMapFBO{0};
     GLuint depthMap{0};
     int shadowResolution{2048};
+    
+    // RSM support (Reflective Shadow Maps)
+    GLuint rsmFBO{0};
+    GLuint rsmNormalMap{0};       // Normal map from light space
+    GLuint rsmColorMap{0};        // Color information
+    GLuint rsmDepthMap{0};        // Depth for indirect light
+    bool useRSM{false};           // Enable RSM
+    
+    // Atlas support
+    bool useAtlas{false};         // Enable shadow atlas
+    glm::vec4 atlasRect{0.0f};    // Atlas UV rect (x, y, width, height)
 
     void initShadowMap();
+    void initRSM();              // Initialize RSM textures
     void resizeShadow(int resolution);
+    void resizeRSM(int resolution);
+    
+    // Cleanup
+    void destroyRSM();
 };
 
 } // namespace RenderLib
