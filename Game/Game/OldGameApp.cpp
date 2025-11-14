@@ -71,17 +71,17 @@ void OldGameApp()
 
 			// input
 			{
-				if (input::IsKeyDown(GLFW_KEY_W)) camera.ProcessKeyboard(CameraForward, engine::GetDeltaTime());
-				if (input::IsKeyDown(GLFW_KEY_S)) camera.ProcessKeyboard(CameraBackward, engine::GetDeltaTime());
-				if (input::IsKeyDown(GLFW_KEY_A)) camera.ProcessKeyboard(CameraLeft, engine::GetDeltaTime());
-				if (input::IsKeyDown(GLFW_KEY_D)) camera.ProcessKeyboard(CameraRight, engine::GetDeltaTime());
+				if (input::IsKeyDown(RGFW_w)) camera.ProcessKeyboard(CameraForward, engine::GetDeltaTime());
+				if (input::IsKeyDown(RGFW_s)) camera.ProcessKeyboard(CameraBackward, engine::GetDeltaTime());
+				if (input::IsKeyDown(RGFW_a)) camera.ProcessKeyboard(CameraLeft, engine::GetDeltaTime());
+				if (input::IsKeyDown(RGFW_d)) camera.ProcessKeyboard(CameraRight, engine::GetDeltaTime());
 
-				if (input::IsMouseDown(GLFW_MOUSE_BUTTON_RIGHT))
+				if (input::IsMouseDown(RGFW_mouseRight))
 				{
 					input::SetCursorVisible(false);
 					camera.ProcessMouseMovement(input::GetCursorOffset().x, input::GetCursorOffset().y);
 				}
-				else if (input::IsMouseReleased(GLFW_MOUSE_BUTTON_RIGHT))
+				else if (input::IsMouseReleased(RGFW_mouseRight))
 				{
 					input::SetCursorVisible(true);
 				}

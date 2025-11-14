@@ -16,8 +16,10 @@ namespace
 {
 	// timing
 	float       deltaTime{ 0.0f };
-	double      currentTime{ 0.0 };
-	double      lastFrameTime{ 0.0 };
+	std::chrono::high_resolution_clock::time_point previousTime;
+	std::chrono::high_resolution_clock::time_point currentTime;
+
+
 	// fps
 	const float avgInterval{ 0.5f };
 	unsigned    frameCounter{ 0 };
@@ -42,22 +44,12 @@ bool engine::Init(uint16_t width, uint16_t height, std::string_view title)
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
-		ImGui_ImplGlfw_InitForOpenGL(window::handle, false);
+		ImGui_ImplRgfw_InitForOpenGL(window::handle, false);
 		ImGui_ImplOpenGL3_Init("#version 330");
 		ImGui::StyleColorsDark();
 
-		GLFWmonitor* primary = glfwGetPrimaryMonitor();
-
-		float xscale, yscale;
-		glfwGetMonitorContentScale(primary, &xscale, &yscale);
-
-		ImGuiStyle* style = &ImGui::GetStyle();
-		style->ScaleAllSizes(xscale > yscale ? xscale : yscale);
-
 		ImGuiIO& io = ImGui::GetIO();
-		io.FontGlobalScale = xscale > yscale ? xscale : yscale;
 		io.IniFilename = nullptr;
-
 		io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;// TODO: возможно есть другой способ как имгуи не давать показывать скрытый курсор
 	}
 
@@ -65,7 +57,7 @@ bool engine::Init(uint16_t width, uint16_t height, std::string_view title)
 		return false;
 
 	deltaTime = 0.0f;
-	lastFrameTime = glfwGetTime();
+	previousTime = std::chrono::high_resolution_clock::now();
 
 	return true;
 }
@@ -74,7 +66,7 @@ void engine::Close() noexcept
 {
 	textures::Close();
 	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
+	ImGui_ImplRgfw_Shutdown();
 	ImGui::DestroyContext();
 	oglSystem::Close();
 	window::Close();
@@ -89,9 +81,9 @@ void engine::BeginFrame()
 {
 	// calc deltaTime
 	{
-		currentTime = glfwGetTime();
-		deltaTime = static_cast<float>(currentTime - lastFrameTime);
-		lastFrameTime = currentTime;
+		currentTime = std::chrono::high_resolution_clock::now();
+		deltaTime = std::chrono::duration<float>(currentTime - previousTime).count();
+		previousTime = currentTime;
 	}
 
 	// calc fps
@@ -108,7 +100,7 @@ void engine::BeginFrame()
 
 	// Start a new ImGUi frame
 	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
+	ImGui_ImplRgfw_NewFrame();
 	ImGui::NewFrame();
 }
 //=============================================================================

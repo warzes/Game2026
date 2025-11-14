@@ -4,60 +4,23 @@
 //=============================================================================
 namespace
 {
+	bool windowQuit{ true };
+	RGFW_event windowEvent;
 	uint16_t windowWidth, windowHeight;
 	float windowAspect{ 1.0f };
 
 	glm::vec2 cursorPos{};
 	glm::vec2 cursorOffset{};
-	glm::vec2 cursorPosLastFrame{};
 	glm::vec2 scrollOffset{};
-
-	KeyState keysStatus[MaxKeys] = { KeyState(0) };
-	KeyState mouseButtonStatus[MaxMouseButtons] = { KeyState(0) };
 }
 //=============================================================================
-void keyPress(int key, int action) noexcept
+void errorFunc(RGFW_debugType type, RGFW_errorCode err, const char* msg) noexcept
 {
-	if (key != GLFW_KEY_UNKNOWN)
-	{
-		switch (action)
-		{
-		case GLFW_RELEASE: keysStatus[key] = KeyState::Released; break;
-		case GLFW_PRESS:   keysStatus[key] = KeyState::Pressed; break;
-		case GLFW_REPEAT:  keysStatus[key] = KeyState::Repeat; break;
-		default:           std::unreachable(); break;
-		}
-	}
+	if (type != RGFW_typeError || err == RGFW_noError) return; /* disregard non-errors */
+	Error("RGFW ERROR: " + std::string(msg));
 }
 //=============================================================================
-void mouseButton(int button, int action) noexcept
-{
-	switch (action)
-	{
-	case GLFW_RELEASE: mouseButtonStatus[button] = KeyState::Released; break;
-	case GLFW_PRESS:   mouseButtonStatus[button] = KeyState::Pressed; break;
-	case GLFW_REPEAT:  mouseButtonStatus[button] = KeyState::Repeat; break;
-	default:           std::unreachable(); break;
-	}
-}
-//=============================================================================
-void mousePos(double xPos, double yPos) noexcept
-{
-	cursorPos.x = static_cast<float>(xPos);
-	cursorPos.y = static_cast<float>(yPos);
-
-	cursorOffset.x += cursorPos.x - cursorPosLastFrame.x;
-	cursorOffset.y += cursorPosLastFrame.y - cursorPos.y; // Reversed Y since y-coordinates go from bottom to left
-	cursorPosLastFrame = cursorPos;
-}
-//=============================================================================
-void mouseScroll(double xOffset, double yOffset) noexcept
-{
-	scrollOffset.x = static_cast<float>(xOffset);
-	scrollOffset.y = static_cast<float>(yOffset);
-}
-//=============================================================================
-void framebufferSizeCallback([[maybe_unused]] GLFWwindow* window, int width, int height) noexcept
+void windowResizeFunc(RGFW_window* win, i32 width, i32 height) noexcept
 {
 	if (width < 0 || height < 0) return;
 	windowWidth = static_cast<uint16_t>(std::max(width, 1));
@@ -65,165 +28,163 @@ void framebufferSizeCallback([[maybe_unused]] GLFWwindow* window, int width, int
 	windowAspect = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
 }
 //=============================================================================
-void windowFocusCallback(GLFWwindow* window, int focused) noexcept
+void windowMinimizeFunc(RGFW_window*) noexcept
 {
-	ImGui_ImplGlfw_WindowFocusCallback(window, focused);
+	Debug("window minimize");
 }
 //=============================================================================
-void monitorCallback(GLFWmonitor* monitor, int event) noexcept
+void windowMaximizeFunc(RGFW_window*, i32 x, i32 y, i32 w, i32 h) noexcept
 {
-	ImGui_ImplGlfw_MonitorCallback(monitor, event);
+	RGFW_UNUSED(x); RGFW_UNUSED(y);
+	Debug("window maximize: " + std::to_string(w) + ":" + std::to_string(h));
 }
 //=============================================================================
-void handleKeysCallback(GLFWwindow* window, int key, int scanCode, int action, int mods) noexcept
+void windowRestoreFunc(RGFW_window*, i32 x, i32 y, i32 w, i32 h) noexcept
 {
-	ImGui_ImplGlfw_KeyCallback(window, key, scanCode, action, mods);
-	keyPress(key, action);
+	RGFW_UNUSED(x); RGFW_UNUSED(y);
+	Debug("window restore: " + std::to_string(w) + ":" + std::to_string(h));
 }
 //=============================================================================
-void handleCharCallback(GLFWwindow* window, unsigned int c) noexcept
+void windowQuitFunc(RGFW_window*) noexcept
 {
-	ImGui_ImplGlfw_CharCallback(window, c);
 }
 //=============================================================================
-void handleCursorEnterCallback(GLFWwindow* window, int entered) noexcept
+void focusFunc(RGFW_window* win, u8 inFocus) noexcept
 {
-	ImGui_ImplGlfw_CursorEnterCallback(window, entered);
+	ImGui_ImplRgfw_WindowFocusCallback(win, inFocus);
+	if (inFocus) Debug("window in focus");
+	else Debug("window out of focus");
 }
 //=============================================================================
-void handleMouseButtonCallback(GLFWwindow* window, int button, int action, int mods) noexcept
+void mouseNotifyFunc(RGFW_window* win, i32 x, i32 y, u8 status) noexcept
 {
-	ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-	mouseButton(button, action);
+	ImGui_ImplRgfw_CursorEnterCallback(win, x, y, status);
+
+	if (status) Debug("mouse enter " + std::to_string(x) + ":" + std::to_string(y));
+	else Debug("mouse leave");
 }
 //=============================================================================
-void handleMouseCursorPosCallback(GLFWwindow* window, double xPos, double yPos) noexcept
+void mousePosFunc(RGFW_window* window, i32 xPos, i32 yPos, float vecX, float vecY) noexcept
 {
-	ImGui_ImplGlfw_CursorPosCallback(window, xPos, yPos);
-	mousePos(xPos, yPos);
+	ImGui_ImplRgfw_CursorPosCallback(window, xPos, yPos, vecX, vecY);
+	cursorPos.x = static_cast<float>(xPos);
+	cursorPos.y = static_cast<float>(yPos);
+	cursorOffset.x = vecX;
+	cursorOffset.y = -vecY; // Reversed Y since y-coordinates go from bottom to left
 }
 //=============================================================================
-void handleMouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset) noexcept
+void mouseButtonFunc(RGFW_window* win, u8 button, u8 pressed) noexcept
 {
-	ImGui_ImplGlfw_ScrollCallback(window, xOffset, yOffset);
-	mouseScroll(xOffset, yOffset);
+	ImGui_ImplRgfw_MouseButtonCallback(win, button, pressed);
 }
 //=============================================================================
-bool window::Init(uint16_t width, uint16_t height, std::string_view title, bool vsync, bool resizable, bool maximized, bool decorate)
+void scrollFunc(RGFW_window* win, float xOffset, float yOffset) noexcept
 {
-	if (!glfwInit())
+	ImGui_ImplRgfw_MouseScrollCallback(win, xOffset, yOffset);
+	scrollOffset.x = xOffset;
+	scrollOffset.y = yOffset;
+}
+//=============================================================================
+void keyFunc(RGFW_window* win, RGFW_key key, u8 keyChar, RGFW_keymod keyMod, RGFW_bool repeat, RGFW_bool pressed) noexcept
+{
+	ImGui_ImplRgfw_KeyCallback(win, key, keyChar, keyMod, repeat, pressed);
+}
+//=============================================================================
+bool window::Init(uint16_t width, uint16_t height, std::string_view title, bool vsync, bool resizable, bool maximized)
+{
+	if (!RGFW_init())
 	{
-		Fatal("Error Initialising GLFW");
+		Fatal("Error Initialising RGFW");
 		return false;
 	}
-	// Setup GLFW Windows Properties
-	glfwDefaultWindowHints();
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-	// OpenGL version
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	// Core Profile
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	// Allow forward compatiblity
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
+	RGFW_glHints* hints = RGFW_getGlobalHints_OpenGL();
+	hints->depth = 32;
+	hints->sRGB = true;
 #if defined(_DEBUG)
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+	hints->debug = true;
 #else
-	glfwWindowHint(GLFW_CONTEXT_NO_ERROR, GLFW_TRUE);
+	hints->noError = true;
 #endif
-	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-	glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE);
+	hints->major = 3;
+	hints->minor = 3;
 
-	glfwWindowHint(GLFW_RESIZABLE, resizable ? GLFW_TRUE : GLFW_FALSE);
-	glfwWindowHint(GLFW_MAXIMIZED, maximized ? GL_TRUE : GL_FALSE);
-	glfwWindowHint(GLFW_DECORATED, decorate ? GL_TRUE : GL_FALSE);
+	RGFW_setGlobalHints_OpenGL(hints);
 
-	// Disable GlFW auto iconify behaviour
-	// Auto Iconify automatically minimizes (iconifies) the window if the window loses focus additionally auto iconify restores the hardware resolution of the monitor if the window that loses focus is a fullscreen window
-	glfwWindowHint(GLFW_AUTO_ICONIFY, GL_FALSE);
+	RGFW_windowFlags windowFlags = RGFW_windowCenter | RGFW_windowOpenGL;
+	if (!resizable) windowFlags |= RGFW_windowNoResize;
+	if (maximized) windowFlags |= RGFW_windowMaximize;
 
-	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-	if (!monitor)
-	{
-		Fatal("No Monitor detected");
-		return false;
-	}
-	const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
-
-	// Create the window
-	handle = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
+	handle = RGFW_createWindow(title.data(), 0, 0, width,height, windowFlags);
 	if (!handle)
 	{
-		Fatal("Failed to create GLFW window");
+		Fatal("Failed to create RGFW window");
 		return false;
 	}
 
 	// Window callbacks
-	//glfwSetWindowPosCallback(handle, windowPosCallback);
-	glfwSetWindowFocusCallback(handle, windowFocusCallback);
-	//glfwSetWindowIconifyCallback(handle, windowIconifyCallback);
-	//glfwSetWindowMaximizeCallback(handle, windowMaximizeCallback);
-	glfwSetFramebufferSizeCallback(handle, framebufferSizeCallback);
-	//glfwSetWindowCloseCallback(handle, windowCloseCallback);
-	glfwSetMonitorCallback(monitorCallback);
+	RGFW_setDebugCallback(errorFunc);
+	RGFW_setWindowResizedCallback(windowResizeFunc);
+	RGFW_setWindowMinimizedCallback(windowMinimizeFunc);
+	RGFW_setWindowRestoredCallback(windowRestoreFunc);
+	RGFW_setWindowMaximizedCallback(windowMaximizeFunc);
+	RGFW_setWindowQuitCallback(windowQuitFunc);
+	RGFW_setFocusCallback(focusFunc);
+	//// Mouse callbacks
+	RGFW_setMouseNotifyCallback(mouseNotifyFunc);
+	RGFW_setMousePosCallback(mousePosFunc);
+	RGFW_setMouseButtonCallback(mouseButtonFunc);
+	RGFW_setMouseScrollCallback(scrollFunc);
+	//// Key callbacks
+	RGFW_setKeyCallback(keyFunc);
 
-	// Key callbacks 
-	glfwSetKeyCallback(handle, handleKeysCallback);
-	glfwSetCharCallback(handle, handleCharCallback);
-
-	// Mouse callbacks 
-	glfwSetCursorEnterCallback(handle, handleCursorEnterCallback);
-	glfwSetMouseButtonCallback(handle, handleMouseButtonCallback);
-	glfwSetCursorPosCallback(handle, handleMouseCursorPosCallback);
-	glfwSetScrollCallback(handle, handleMouseScrollCallback);
 
 	// Get buffer size information
 	int displayW, displayH;
-	glfwGetFramebufferSize(handle, &displayW, &displayH);
+	RGFW_window_getSize(handle, &displayW, &displayH);
 	windowWidth = static_cast<uint16_t>(displayW);
 	windowHeight = static_cast<uint16_t>(displayH);
 	windowAspect = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
 
-	int monitorLeft, monitorTop;
-	glfwGetMonitorPos(monitor, &monitorLeft, &monitorTop);
-
-	glfwSetWindowPos(handle,
-		videoMode->width / 2 - windowWidth / 2 + monitorLeft,
-		videoMode->height / 2 - windowHeight / 2 + monitorTop);
-
 	// Set the current context
-	glfwMakeContextCurrent(handle);
+	RGFW_window_makeCurrentContext_OpenGL(handle);
 		
 	// glad: load all OpenGL function pointers
-	const int openGLVersion = gladLoadGL(glfwGetProcAddress);
+	const int openGLVersion = gladLoadGL(RGFW_getProcAddress_OpenGL);
 	if (openGLVersion < GLAD_MAKE_VERSION(3, 3))
 	{
 		Fatal("Failed to initialize OpenGL context!");
 		return false;
 	}
 
-	glfwSwapInterval(vsync ? 1 : 0);
+	RGFW_window_swapInterval_OpenGL(handle, vsync ? 1 : 0);
+
+	windowQuit = false;
 
 	return true;
 }
 //=============================================================================
 void window::Close() noexcept
 {
-	if (handle) glfwDestroyWindow(handle);
+	windowQuit = true;
+	if (handle) RGFW_window_close(handle);
 	handle = nullptr;
-	glfwTerminate();
+	RGFW_deinit();
 }
 //=============================================================================
 bool window::WindowShouldClose() noexcept
 {
-	return glfwWindowShouldClose(handle);
+	bool eee = RGFW_window_shouldClose(handle) == RGFW_TRUE || windowQuit;
+	if (eee)
+	{
+		windowQuit = eee;
+	}
+
+	return RGFW_window_shouldClose(handle) == RGFW_TRUE || windowQuit;
 }
 //=============================================================================
 void window::Swap()
 {
-	glfwSwapBuffers(handle);
+	RGFW_window_swapBuffers_OpenGL(handle);
 }
 //=============================================================================
 uint16_t window::GetWidth() noexcept { return windowWidth; }
@@ -232,47 +193,57 @@ float window::GetAspect() noexcept { return windowAspect; }
 //=============================================================================
 void input::Init()
 {
-	double xpos, ypos;
-	glfwGetCursorPos(window::handle, &xpos, &ypos);
+	i32 xpos, ypos;
+	RGFW_window_getMouse(window::handle, &xpos, &ypos);
 	cursorOffset.x = static_cast<float>(xpos);
 	cursorOffset.y = static_cast<float>(ypos);
-	cursorPosLastFrame = cursorOffset;
 }
 //=============================================================================
 void input::Update()
 {
-	for (unsigned i = 0; i < MaxKeys; ++i)
-	{
-		// keystates decay to either up or down after one frame
-		if (keysStatus[i] & KeyState::Up)   keysStatus[i] = KeyState::Up;
-		if (keysStatus[i] & KeyState::Down) keysStatus[i] = KeyState::Down;
-	}
-	for (unsigned i = 0; i < MaxMouseButtons; i++)
-	{
-		if (mouseButtonStatus[i] & KeyState::Up)   mouseButtonStatus[i] = KeyState::Up;
-		if (mouseButtonStatus[i] & KeyState::Down) mouseButtonStatus[i] = KeyState::Down;
-	}
 	scrollOffset = glm::vec2(0);
 	cursorOffset = glm::vec2(0);
-	glfwPollEvents();
+
+	while (RGFW_window_checkEvent(window::handle, &windowEvent))
+	{
+		if (windowEvent.type == RGFW_quit)
+		{
+			windowQuit = true;
+		}
+		// TODO: ???
+	}
 }
 //=============================================================================
 void input::SetCursorVisible(bool state)
 {
-	glfwSetInputMode(window::handle, GLFW_CURSOR, state ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+	if (state)
+	{
+		if (RGFW_window_isHoldingMouse(window::handle))
+		{
+			RGFW_window_showMouse(window::handle, 1);
+			RGFW_window_unholdMouse(window::handle);
+		}
+	}
+	else
+	{
+		if (!RGFW_window_isHoldingMouse(window::handle))
+		{
+			RGFW_window_showMouse(window::handle, 0);
+			RGFW_window_holdMouse(window::handle);
+		}
+	}
 }
 //=============================================================================
 const glm::vec2& input::GetCursorPos() noexcept { return cursorPos; }
 const glm::vec2& input::GetCursorOffset() noexcept { return cursorOffset; }
-const glm::vec2& input::GetPrevCursorPos() noexcept { return cursorPosLastFrame; }
 const glm::vec2& input::GetScrollOffset() noexcept { return scrollOffset; }
 //=============================================================================
-bool input::IsKeyDown(Key key) noexcept { return keysStatus[key] & KeyState::Down; }
-bool input::IsKeyUp(Key key) noexcept { return keysStatus[key] & KeyState::Up; }
-bool input::IsKeyPressed(Key key) noexcept { return keysStatus[key] == KeyState::Pressed; }
-bool input::IsKeyReleased(Key key) noexcept { return keysStatus[key] == KeyState::Released; }
-bool input::IsMouseDown(MouseButton key) noexcept { return mouseButtonStatus[key] & KeyState::Down; }
-bool input::IsMouseUp(MouseButton key) noexcept { return mouseButtonStatus[key] & KeyState::Up; }
-bool input::IsMousePressed(MouseButton key) noexcept { return mouseButtonStatus[key] == KeyState::Pressed; }
-bool input::IsMouseReleased(MouseButton key) noexcept { return mouseButtonStatus[key] == KeyState::Released; }
+bool input::IsKeyDown(RGFW_key key) noexcept { return RGFW_isKeyDown(key); }
+bool input::IsKeyUp(RGFW_key key) noexcept { return !RGFW_isKeyDown(key); }
+bool input::IsKeyPressed(RGFW_key key) noexcept { return RGFW_isKeyPressed(key); }
+bool input::IsKeyReleased(RGFW_key key) noexcept { return RGFW_isKeyReleased(key); }
+bool input::IsMouseDown(RGFW_mouseButton key) noexcept { return RGFW_isMouseDown(key); }
+bool input::IsMouseUp(RGFW_mouseButton key) noexcept { return !RGFW_isMouseDown(key); }
+bool input::IsMousePressed(RGFW_mouseButton key) noexcept { return RGFW_isMousePressed(key); }
+bool input::IsMouseReleased(RGFW_mouseButton key) noexcept { return RGFW_isMouseReleased(key); }
 //=============================================================================

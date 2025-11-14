@@ -29,6 +29,7 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
+#include <chrono>
 #include <random>
 #include <optional>
 #include <regex>
@@ -42,7 +43,10 @@
 #include <unordered_map>
 
 #include <glad/gl.h>
-#include <glfw/glfw3.h>
+
+#define RGFWDEF
+#define RGFW_OPENGL
+#include <RGFW/RGFW.h>
 
 #if defined(__EMSCRIPTEN__)
 #	define GLFW_INCLUDE_ES3
@@ -51,8 +55,8 @@
 #endif
 
 #include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+#include <imgui/imgui_impl_rgfw.h>
 
 #define GLM_FORCE_XYZW_ONLY 1
 #define GLM_ENABLE_EXPERIMENTAL 1

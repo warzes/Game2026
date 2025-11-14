@@ -5,16 +5,10 @@
     <ClCompile Include="stb\stb.cpp">
       <Filter>stb</Filter>
     </ClCompile>
-    <ClCompile Include="glfw\glfw3.c">
-      <Filter>glfw</Filter>
-    </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_draw.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_impl_glfw.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_impl_opengl3.cpp">
@@ -28,6 +22,12 @@
     </ClCompile>
     <ClCompile Include="glad\gl.c">
       <Filter>glad</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_rgfw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="RGFW\RGFW.cpp">
+      <Filter>RGFW</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -52,9 +52,6 @@
     <Filter Include="glm\simd">
       <UniqueIdentifier>{00ae4d86-0d1d-42aa-8569-490e86e123e1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="glfw">
-      <UniqueIdentifier>{f8c631ee-d6c2-477e-81ae-87cd6098ef1e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="assimp">
       <UniqueIdentifier>{4963900c-270c-4276-9e78-3d981914acf2}</UniqueIdentifier>
     </Filter>
@@ -63,6 +60,9 @@
     </Filter>
     <Filter Include="glad">
       <UniqueIdentifier>{d641b504-6204-4d65-9ccc-b14bece6443c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RGFW">
+      <UniqueIdentifier>{6b0adba2-5e16-4a28-81b0-ba2213442fcc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -80,9 +80,6 @@
     </ClInclude>
     <ClInclude Include="stb\stb_truetype.h">
       <Filter>stb</Filter>
-    </ClInclude>
-    <ClInclude Include="glfw\glfw3.h">
-      <Filter>glfw</Filter>
     </ClInclude>
     <ClInclude Include="assimp\ZipArchiveIOSystem.h">
       <Filter>assimp</Filter>
@@ -325,9 +322,6 @@
       <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="imgui\imgui.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_impl_glfw.h">
       <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="imgui\imgui_impl_opengl3.h">
@@ -1221,6 +1215,12 @@
     </ClInclude>
     <ClInclude Include="glm\simd\integer.h">
       <Filter>glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_rgfw.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="RGFW\RGFW.h">
+      <Filter>RGFW</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

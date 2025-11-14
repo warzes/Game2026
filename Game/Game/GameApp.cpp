@@ -6,6 +6,17 @@
 #include "NanoOpenGL3Advance.h"
 #include "NanoRender.h"
 #include "NanoScene.h"
+
+/*
+ https://github.com/muleax/slope
+ tinyfx
+ https://github.com/nfginola/dx11-tech
+
+*/
+
+
+
+
 /*
 idea:
 - https://hardboiledcrab.itch.io/tiled-mediaval-building  - example tile house building
