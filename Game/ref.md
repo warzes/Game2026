@@ -1,4 +1,7 @@
-﻿https://github.com/shakesoda/tinyfx
+﻿https://habr.com/ru/articles/226421/
+		Рендеринг теней при помощи алгоритма Parallel-Split Shadow Mapping
+
+https://github.com/shakesoda/tinyfx
 https://habr.com/ru/articles/440488/
 https://rekovalev.site/opengl/
 

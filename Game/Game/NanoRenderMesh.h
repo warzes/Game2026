@@ -2,7 +2,7 @@
 
 #include "NanoRenderMaterial.h"
 #include "NanoMath.h"
-#include "NanoRenderVertex.h"
+#include "NanoOpenGL3.h"
 
 struct MeshInfo final
 {

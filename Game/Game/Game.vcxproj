@@ -111,7 +111,6 @@
     <ClCompile Include="NanoRenderMesh.cpp" />
     <ClCompile Include="NanoRenderModel.cpp" />
     <ClCompile Include="NanoRenderTextures.cpp" />
-    <ClCompile Include="NanoRenderVertex.cpp" />
     <ClCompile Include="NanoScene.cpp" />
     <ClCompile Include="Region.cpp" />
     <ClCompile Include="RP_1_DirectionalLightsShadowMap.cpp" />
@@ -158,7 +157,6 @@
     <ClInclude Include="NanoRenderMesh.h" />
     <ClInclude Include="NanoRenderModel.h" />
     <ClInclude Include="NanoRenderTextures.h" />
-    <ClInclude Include="NanoRenderVertex.h" />
     <ClInclude Include="NanoScene.h" />
     <ClInclude Include="NanoWindow.h" />
     <ClInclude Include="Region.h" />

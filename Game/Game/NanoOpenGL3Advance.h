@@ -33,7 +33,7 @@ struct GPUBuffer final
 	BufferUsage  usage{ BufferUsage::Static };
 };
 
-bool IsValid(const GPUBuffer& resource) { return resource.handle.handle > 0; }
+inline bool IsValid(const GPUBuffer& resource) { return resource.handle.handle > 0; }
 
 void GPUFree(GPUBuffer& resource);
 

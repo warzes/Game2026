@@ -492,17 +492,17 @@ void SpecifyVertexAttributes(size_t vertexSize, std::span<const VertexAttribute>
 	}
 }
 //=============================================================================
-void SetVertexPAttributes()
+void VertexP3::SetVertexAttributes()
 {
-	const size_t vertexSize = sizeof(VertexP);
+	const size_t vertexSize = sizeof(VertexP3);
 	const VertexAttribute attributes[] =
 	{
-		{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(VertexP, position)},
+		{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(VertexP3, position)},
 	};
 	SpecifyVertexAttributes(vertexSize, attributes);
 }
 //=============================================================================
-void SetVertexPNTAttributes()
+void VertexPNT::SetVertexAttributes()
 {
 	const size_t vertexSize = sizeof(VertexPNT);
 	const VertexAttribute attributes[] =
@@ -510,6 +510,32 @@ void SetVertexPNTAttributes()
 		{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(VertexPNT, position)},
 		{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(VertexPNT, normal)},
 		{.type = GL_FLOAT, .size = 2, .offset = (void*)offsetof(VertexPNT, texcoord)},
+	};
+	SpecifyVertexAttributes(vertexSize, attributes);
+}
+//=============================================================================
+void QuadVertex::SetVertexAttributes()
+{
+	const size_t vertexSize = sizeof(QuadVertex);
+	const VertexAttribute attributes[] =
+	{
+		{.type = GL_FLOAT, .size = 2, .offset = (void*)offsetof(QuadVertex, position)},
+		{.type = GL_FLOAT, .size = 2, .offset = (void*)offsetof(QuadVertex, texCoord)},
+	};
+	SpecifyVertexAttributes(vertexSize, attributes);
+}
+//=============================================================================
+void MeshVertex::SetVertexAttributes()
+{
+	const size_t vertexSize = sizeof(MeshVertex);
+	const VertexAttribute attributes[] =
+	{
+		{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(MeshVertex, position)},
+		{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(MeshVertex, color)},
+		{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(MeshVertex, normal)},
+		{.type = GL_FLOAT, .size = 2, .offset = (void*)offsetof(MeshVertex, texCoord)},
+		{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(MeshVertex, tangent)},
+		{.type = GL_FLOAT, .size = 3, .offset = (void*)offsetof(MeshVertex, bitangent)},
 	};
 	SpecifyVertexAttributes(vertexSize, attributes);
 }

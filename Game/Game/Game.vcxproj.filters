@@ -33,9 +33,6 @@
     <ClCompile Include="NanoOpenGL3.cpp">
       <Filter>Engine\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="NanoRender.cpp">
-      <Filter>Engine\Render</Filter>
-    </ClCompile>
     <ClCompile Include="NanoScene.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
@@ -63,21 +60,6 @@
     <ClCompile Include="ExampleApp001.cpp">
       <Filter>Example</Filter>
     </ClCompile>
-    <ClCompile Include="NanoRenderTextures.cpp">
-      <Filter>Engine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="NanoRenderMaterial.cpp">
-      <Filter>Engine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="NanoRenderMesh.cpp">
-      <Filter>Engine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="NanoRenderModel.cpp">
-      <Filter>Engine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="NanoRenderGeometryGen.cpp">
-      <Filter>Engine\Render</Filter>
-    </ClCompile>
     <ClCompile Include="RP_1_DirectionalLightsShadowMap.cpp">
       <Filter>OldGameApp\SceneRenderPass</Filter>
     </ClCompile>
@@ -96,9 +78,6 @@
     <ClCompile Include="RPSSAOBlur.cpp">
       <Filter>OldGameApp\SceneRenderPass</Filter>
     </ClCompile>
-    <ClCompile Include="NanoRenderVertex.cpp">
-      <Filter>Engine\Render</Filter>
-    </ClCompile>
     <ClCompile Include="RP_2_MainScene.cpp">
       <Filter>OldGameApp\SceneRenderPass</Filter>
     </ClCompile>
@@ -113,6 +92,24 @@
     </ClCompile>
     <ClCompile Include="NanoOpenGL3Advance.cpp">
       <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="NanoRender.cpp">
+      <Filter>Engine\Render\NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="NanoRenderGeometryGen.cpp">
+      <Filter>Engine\Render\NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="NanoRenderMaterial.cpp">
+      <Filter>Engine\Render\NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="NanoRenderMesh.cpp">
+      <Filter>Engine\Render\NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="NanoRenderModel.cpp">
+      <Filter>Engine\Render\NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="NanoRenderTextures.cpp">
+      <Filter>Engine\Render\NewFilter1</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -145,9 +142,6 @@
     <ClInclude Include="NanoOpenGL3.h">
       <Filter>Engine\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="NanoRender.h">
-      <Filter>Engine\Render</Filter>
-    </ClInclude>
     <ClInclude Include="NanoScene.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
@@ -169,21 +163,6 @@
     <ClInclude Include="SceneShadowMap.h">
       <Filter>Example\tmp</Filter>
     </ClInclude>
-    <ClInclude Include="NanoRenderTextures.h">
-      <Filter>Engine\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="NanoRenderMaterial.h">
-      <Filter>Engine\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="NanoRenderMesh.h">
-      <Filter>Engine\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="NanoRenderModel.h">
-      <Filter>Engine\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="NanoRenderGeometryGen.h">
-      <Filter>Engine\Render</Filter>
-    </ClInclude>
     <ClInclude Include="RP_1_DirectionalLightsShadowMap.h">
       <Filter>OldGameApp\SceneRenderPass</Filter>
     </ClInclude>
@@ -203,9 +182,6 @@
     <ClInclude Include="RPSSAOBlur.h">
       <Filter>OldGameApp\SceneRenderPass</Filter>
     </ClInclude>
-    <ClInclude Include="NanoRenderVertex.h">
-      <Filter>Engine\Render</Filter>
-    </ClInclude>
     <ClInclude Include="RP_2_MainScene.h">
       <Filter>OldGameApp\SceneRenderPass</Filter>
     </ClInclude>
@@ -217,6 +193,24 @@
     </ClInclude>
     <ClInclude Include="NanoOpenGL3Advance.h">
       <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="NanoRender.h">
+      <Filter>Engine\Render\NewFilter1</Filter>
+    </ClInclude>
+    <ClInclude Include="NanoRenderGeometryGen.h">
+      <Filter>Engine\Render\NewFilter1</Filter>
+    </ClInclude>
+    <ClInclude Include="NanoRenderMaterial.h">
+      <Filter>Engine\Render\NewFilter1</Filter>
+    </ClInclude>
+    <ClInclude Include="NanoRenderMesh.h">
+      <Filter>Engine\Render\NewFilter1</Filter>
+    </ClInclude>
+    <ClInclude Include="NanoRenderModel.h">
+      <Filter>Engine\Render\NewFilter1</Filter>
+    </ClInclude>
+    <ClInclude Include="NanoRenderTextures.h">
+      <Filter>Engine\Render\NewFilter1</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -270,6 +264,15 @@
     </Filter>
     <Filter Include="Engine\App">
       <UniqueIdentifier>{39a56dec-9451-4530-aca5-2403c0f563a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OldGameApp\Nano">
+      <UniqueIdentifier>{29fb9cc1-f052-4840-b9ee-9e148ab95143}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OldGameApp\Nano\Render">
+      <UniqueIdentifier>{0262b714-ee7c-4000-8037-3cc718027fe8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Render\NewFilter1">
+      <UniqueIdentifier>{78cbc315-07de-4a60-a778-b52a37b8ebed}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
