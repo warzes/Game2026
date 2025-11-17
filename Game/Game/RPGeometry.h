@@ -23,13 +23,13 @@ public:
 private:
 	void drawScene(const std::vector<GameObject*>& gameObject, size_t numGameObject);
 
-	GLuint    m_program{ 0 };
-	int       m_projectionMatrixId{ -1 };
-	int       m_viewMatrixId{ -1 };
-	int       m_modelMatrixId{ -1 };
-	uint16_t  m_framebufferWidth{ 0 }; // TODO: можно удалить - есть в m_fbo
-	uint16_t  m_framebufferHeight{ 0 }; // TODO: можно удалить - есть в m_fbo
-	glm::mat4 m_perspective{ 1.0f };
+	ProgramHandle m_program{ 0 };
+	int           m_projectionMatrixId{ -1 };
+	int           m_viewMatrixId{ -1 };
+	int           m_modelMatrixId{ -1 };
+	uint16_t      m_framebufferWidth{ 0 }; // TODO: можно удалить - есть в m_fbo
+	uint16_t      m_framebufferHeight{ 0 }; // TODO: можно удалить - есть в m_fbo
+	glm::mat4     m_perspective{ 1.0f };
 
-	Framebuffer m_fbo;
+	Framebuffer   m_fbo;
 };

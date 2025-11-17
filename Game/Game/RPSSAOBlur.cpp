@@ -11,13 +11,13 @@ bool RPSSAOBlur::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_framebufferHeight = framebufferHeight;
 
 	m_program = LoadShaderProgram("data/shaders/ssaoBlur/vertex.glsl", "data/shaders/ssaoBlur/fragment.glsl");
-	if (!m_program)
+	if (!m_program.handle)
 	{
 		Fatal("Scene SSAO Blur RenderPass Shader failed!");
 		return false;
 	}
 
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 	SetUniform(GetUniformLocation(m_program, "ssaoInput"), 0);
 
 	std::vector<QuadVertex> vertices = {
@@ -59,7 +59,7 @@ bool RPSSAOBlur::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 void RPSSAOBlur::Close()
 {
 	m_fbo.Destroy();
-	glDeleteProgram(m_program);
+	glDeleteProgram(m_program.handle);
 }
 //=============================================================================
 void RPSSAOBlur::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
@@ -80,7 +80,7 @@ void RPSSAOBlur::Draw(const Framebuffer* preFBO)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 
 	preFBO->BindColorTexture(0, 0);
 

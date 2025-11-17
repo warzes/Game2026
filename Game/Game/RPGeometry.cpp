@@ -11,13 +11,13 @@ bool RPGeometry::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_perspective = glm::perspective(glm::radians(60.0f), window::GetAspect(), 0.01f, 1000.0f);
 
 	m_program = LoadShaderProgram("data/shaders/geometry/vertex.glsl", "data/shaders/geometry/fragment.glsl");
-	if (!m_program)
+	if (!m_program.handle)
 	{
 		Fatal("Scene Geometry RenderPass Shader failed!");
 		return false;
 	}
 
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 
 	m_projectionMatrixId = GetUniformLocation(m_program, "projectionMatrix");
 	m_viewMatrixId = GetUniformLocation(m_program, "viewMatrix");
@@ -51,7 +51,7 @@ bool RPGeometry::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 void RPGeometry::Close()
 {
 	m_fbo.Destroy();
-	glDeleteProgram(m_program);
+	glDeleteProgram(m_program.handle);
 }
 //=============================================================================
 void RPGeometry::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
@@ -73,7 +73,7 @@ void RPGeometry::Draw(const std::vector<GameObject*>& gameObject, size_t numGame
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT/* | GL_STENCIL_BUFFER_BIT*/);
 
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 	SetUniform(m_projectionMatrixId, m_perspective);
 	SetUniform(m_viewMatrixId, camera->GetViewMatrix());
 

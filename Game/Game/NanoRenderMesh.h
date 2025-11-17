@@ -25,7 +25,7 @@ public:
 
 	void Draw(GLenum mode = GL_TRIANGLES, unsigned instanceCount = 1) const;
 
-	void tDraw(GLenum mode = GL_TRIANGLES, GLuint program = 0, bool bindMaterial = true, bool instancing = false, int amount = 1);
+	void tDraw(GLenum mode = GL_TRIANGLES, ProgramHandle program = {}, bool bindMaterial = true, bool instancing = false, int amount = 1);
 
 	auto GetVertexCount() const noexcept { return m_vertexCount; }
 	auto GetIndexCount() const noexcept { return m_indicesCount; }

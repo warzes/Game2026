@@ -59,12 +59,12 @@ private:
 
 	//GLState                       m_state;
 
-	GLuint                        m_shadowMapping{ 0 };
+	ProgramHandle                        m_shadowMapping{ 0 };
 	int                           m_shadowMappingShaderProjectionMatrixId{ -1 };
 	int                           m_shadowMappingShaderViewMatrixId{ -1 };
 	int                           m_shadowMappingShaderModelMatrixId{ -1 };
 
-	GLuint                       m_blinnPhong{ 0 };
+	ProgramHandle                       m_blinnPhong{ 0 };
 	int                          m_blinnPhongShaderModelMatrixId{ -1 };
 	int                          m_blinnPhongShaderNormalMatrixId{ -1 };
 	GLuint                       m_blinnPhongMatrixUBO{ 0 };

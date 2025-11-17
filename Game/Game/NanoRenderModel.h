@@ -6,7 +6,7 @@ struct ModelDrawInfo final
 {
 	GLenum mode{ GL_TRIANGLES };
 	bool   bindMaterials{ true };
-	GLuint shaderProgram{ 0 };
+	ProgramHandle shaderProgram{};
 };
 
 enum class ModelMaterialType : uint8_t

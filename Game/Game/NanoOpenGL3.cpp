@@ -323,17 +323,17 @@ std::string LoadShaderCode(const std::string& path, const std::vector<std::strin
 	return shader;
 }
 //=============================================================================
-GLuint CreateShaderProgram(std::string_view vertexShader)
+ProgramHandle CreateShaderProgram(std::string_view vertexShader)
 {
 	return CreateShaderProgram(vertexShader, "", "");
 }
 //=============================================================================
-GLuint CreateShaderProgram(std::string_view vertexShader, std::string_view fragmentShader)
+ProgramHandle CreateShaderProgram(std::string_view vertexShader, std::string_view fragmentShader)
 {
 	return CreateShaderProgram(vertexShader, "", fragmentShader);
 }
 //=============================================================================
-GLuint CreateShaderProgram(std::string_view vertexShader, std::string_view geometryShader, std::string_view fragmentShader)
+ProgramHandle CreateShaderProgram(std::string_view vertexShader, std::string_view geometryShader, std::string_view fragmentShader)
 {
 	struct LocalShader final
 	{
@@ -345,67 +345,69 @@ GLuint CreateShaderProgram(std::string_view vertexShader, std::string_view geome
 	if (!vertexShader.empty())
 	{
 		vs.id = compileShaderGLSL(GL_VERTEX_SHADER, vertexShader);
-		if (!vs.id) return 0;
+		if (!vs.id) return {};
 	}
 	LocalShader gs;
 	if (!geometryShader.empty())
 	{
 		gs.id = compileShaderGLSL(GL_GEOMETRY_SHADER, geometryShader);
-		if (!gs.id) return 0;
+		if (!gs.id) return {};
 	}
 	LocalShader fs;
 	if (!fragmentShader.empty())
 	{
 		fs.id = compileShaderGLSL(GL_FRAGMENT_SHADER, fragmentShader);
-		if (!fs.id) return 0;
+		if (!fs.id) return {};
 	}
 	if (vs.id == 0 && gs.id == 0 && fs.id == 0)
 	{
 		Error("Shader not valid");
-		return 0;
+		return {};
 	}
 
-	GLuint program = glCreateProgram();
-	if (vs.id) glAttachShader(program, vs.id);
-	if (gs.id) glAttachShader(program, gs.id);
-	if (fs.id) glAttachShader(program, fs.id);
-	glLinkProgram(program);
+	ProgramHandle program(glCreateProgram());
+	assert(program.handle);
+
+	if (vs.id) glAttachShader(program.handle, vs.id);
+	if (gs.id) glAttachShader(program.handle, gs.id);
+	if (fs.id) glAttachShader(program.handle, fs.id);
+	glLinkProgram(program.handle);
 
 	GLint success{ 0 };
-	glGetProgramiv(program, GL_LINK_STATUS, &success);
+	glGetProgramiv(program.handle, GL_LINK_STATUS, &success);
 	if (!success)
 	{
 		GLint length = 512;
-		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+		glGetProgramiv(program.handle, GL_INFO_LOG_LENGTH, &length);
 		std::string infoLog;
 		infoLog.resize(static_cast<size_t>(length + 1), '\0');
-		glGetProgramInfoLog(program, length, nullptr, infoLog.data());
-		glDeleteProgram(program);
+		glGetProgramInfoLog(program.handle, length, nullptr, infoLog.data());
+		glDeleteProgram(program.handle);
 		Error("Failed to compile graphics pipeline.\n" + infoLog);
-		program = 0;
+		program.handle = 0;
 	}
 
 	return program;
 }
 //=============================================================================
-GLuint LoadShaderProgram(const std::string& vsFile, const std::vector<std::string>& defines)
+ProgramHandle LoadShaderProgram(const std::string& vsFile, const std::vector<std::string>& defines)
 {
 	return CreateShaderProgram(LoadShaderCode(vsFile, defines));
 }
 //=============================================================================
-GLuint LoadShaderProgram(const std::string& vsFile, const std::string& fsFile, const std::vector<std::string>& defines)
+ProgramHandle LoadShaderProgram(const std::string& vsFile, const std::string& fsFile, const std::vector<std::string>& defines)
 {
 	return CreateShaderProgram(LoadShaderCode(vsFile, defines), LoadShaderCode(fsFile, defines));
 }
 //=============================================================================
-GLuint LoadShaderProgram(const std::string& vsFile, const std::string& gsFile, const std::string& fsFile, const std::vector<std::string>& defines)
+ProgramHandle LoadShaderProgram(const std::string& vsFile, const std::string& gsFile, const std::string& fsFile, const std::vector<std::string>& defines)
 {
 	return CreateShaderProgram(LoadShaderCode(vsFile, defines), LoadShaderCode(gsFile, defines), LoadShaderCode(fsFile, defines));
 }
 //=============================================================================
-int GetUniformLocation(GLuint program, std::string_view name)
+int GetUniformLocation(ProgramHandle program, std::string_view name)
 {
-	return glGetUniformLocation(program, name.data());
+	return glGetUniformLocation(program.handle, name.data());
 }
 //=============================================================================
 void SetUniform(GLuint id, bool b)

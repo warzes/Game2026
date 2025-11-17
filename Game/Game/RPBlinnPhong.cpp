@@ -11,13 +11,13 @@ bool RPBlinnPhong::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_perspective = glm::perspective(glm::radians(60.0f), window::GetAspect(), 0.01f, 1000.0f);
 
 	m_program = LoadShaderProgram("data/shaders/main/vertex.glsl", "data/shaders/main/fragment.glsl");
-	if (!m_program)
+	if (!m_program.handle)
 	{
 		Fatal("Scene Main RenderPass Shader failed!");
 		return false;
 	}
 
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 
 	m_projectionMatrixId = GetUniformLocation(m_program, "projectionMatrix");
 	m_viewMatrixId = GetUniformLocation(m_program, "viewMatrix");
@@ -53,7 +53,7 @@ bool RPBlinnPhong::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 void RPBlinnPhong::Close()
 {
 	m_fbo.Destroy();
-	glDeleteProgram(m_program);
+	glDeleteProgram(m_program.handle);
 	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
@@ -65,7 +65,7 @@ void RPBlinnPhong::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const s
 	glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT/* | GL_STENCIL_BUFFER_BIT*/);
 
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 	SetUniform(m_projectionMatrixId, m_perspective);
 	SetUniform(m_viewMatrixId, camera->GetViewMatrix());
 

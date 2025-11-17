@@ -56,7 +56,7 @@ void main()
 )";
 
 	GLState state;
-	GLuint shader;
+	ProgramHandle shader;
 	Camera camera;
 	Model modelPlane;
 	Model modelBox;
@@ -79,7 +79,7 @@ void ExampleApp001()
 		state.blendState.srcAlpha = BlendFactor::OneMinusSrcAlpha;
 
 		shader = CreateShaderProgram(shaderCodeVertex, shaderCodeFragment);
-		glUseProgram(shader);
+		glUseProgram(shader.handle);
 		SetUniform(GetUniformLocation(shader, "diffuseTexture"), 0);
 
 		camera.SetPosition(glm::vec3(0.0f, 0.5f, 4.5f));
@@ -125,7 +125,7 @@ void ExampleApp001()
 			glActiveTexture(GL_TEXTURE0);
 
 
-			glUseProgram(shader);
+			glUseProgram(shader.handle);
 			SetUniform(GetUniformLocation(shader, "projectionMatrix"), perspective);
 			SetUniform(GetUniformLocation(shader, "viewMatrix"), camera.GetViewMatrix());
 

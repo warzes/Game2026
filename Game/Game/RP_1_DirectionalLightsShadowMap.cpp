@@ -21,8 +21,8 @@ bool RPDirectionalLightsShadowMap::Init(ShadowQuality shadowQuality)
 //=============================================================================
 void RPDirectionalLightsShadowMap::Close()
 {
-	if (m_program) 
-		glDeleteProgram(m_program);
+	if (m_program.handle) 
+		glDeleteProgram(m_program.handle);
 
 	for (size_t i = 0; i < m_depthFBO.size(); i++)
 	{
@@ -43,7 +43,7 @@ void RPDirectionalLightsShadowMap::Draw(const GameWorldData& worldData)
 	}
 
 	glEnable(GL_DEPTH_TEST);
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 	glViewport(0, 0, static_cast<int>(m_shadowQuality), static_cast<int>(m_shadowQuality));
 
 	glm::mat4 lightView;
@@ -117,12 +117,12 @@ void RPDirectionalLightsShadowMap::BindDepthTexture(size_t id, unsigned slot) co
 bool RPDirectionalLightsShadowMap::initProgram()
 {
 	m_program = LoadShaderProgram("data/shaders/shadowMapping/vertex.glsl", "data/shaders/shadowMapping/fragment.glsl");
-	if (!m_program)
+	if (!m_program.handle)
 	{
 		Fatal("Scene Shadow Mapping Shader failed!");
 		return false;
 	}
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 
 	int albedoTextureId = GetUniformLocation(m_program, "albedoTexture");
 	assert(albedoTextureId > -1);

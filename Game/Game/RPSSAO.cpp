@@ -14,13 +14,13 @@ bool RPSSAO::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_noiseScale = size / 4.0f;
 
 	m_program = LoadShaderProgram("data/shaders/ssao/vertex.glsl", "data/shaders/ssao/fragment.glsl");
-	if (!m_program)
+	if (!m_program.handle)
 	{
 		Fatal("Scene SSAO RenderPass Shader failed!");
 		return false;
 	}
 
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 	SetUniform(GetUniformLocation(m_program, "gPosition"), 0);
 	SetUniform(GetUniformLocation(m_program, "gNormal"), 1);
 	SetUniform(GetUniformLocation(m_program, "texNoise"), 2);
@@ -102,7 +102,7 @@ bool RPSSAO::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 void RPSSAO::Close()
 {
 	m_fbo.Destroy();
-	glDeleteProgram(m_program);
+	glDeleteProgram(m_program.handle);
 }
 //=============================================================================
 void RPSSAO::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
@@ -127,7 +127,7 @@ void RPSSAO::Draw(const Framebuffer* preFBO)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 	SetUniform(GetUniformLocation(m_program, "samples"), m_ssaoKernel);
 	SetUniform(GetUniformLocation(m_program, "noiseScale"), m_noiseScale);
 	SetUniform(GetUniformLocation(m_program, "projection"), m_perspective);

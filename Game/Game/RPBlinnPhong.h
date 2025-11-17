@@ -28,7 +28,7 @@ public:
 private:
 	void drawScene(const std::vector<GameObject*>& gameObject, size_t numGameObject);
 
-	GLuint    m_program{ 0 };
+	ProgramHandle    m_program{ 0 };
 	int       m_projectionMatrixId{ -1 };
 	int       m_viewMatrixId{ -1 };
 	int       m_modelMatrixId{ -1 };

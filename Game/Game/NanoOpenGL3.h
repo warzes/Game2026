@@ -100,18 +100,18 @@ struct FrameBufferHandle { GLuint handle{ 0u }; };
 //=============================================================================
 std::string LoadShaderCode(const std::string& filename, const std::vector<std::string>& defines = {});
 
-GLuint CreateShaderProgram(std::string_view vertexShader);
-GLuint CreateShaderProgram(std::string_view vertexShader, std::string_view fragmentShader);
-GLuint CreateShaderProgram(std::string_view vertexShader, std::string_view geometryShader, std::string_view fragmentShader);
+ProgramHandle CreateShaderProgram(std::string_view vertexShader);
+ProgramHandle CreateShaderProgram(std::string_view vertexShader, std::string_view fragmentShader);
+ProgramHandle CreateShaderProgram(std::string_view vertexShader, std::string_view geometryShader, std::string_view fragmentShader);
 
-GLuint LoadShaderProgram(const std::string& vsFile, const std::vector<std::string>& defines = {});
-GLuint LoadShaderProgram(const std::string& vsFile, const std::string& fsFile, const std::vector<std::string>& defines = {});
-GLuint LoadShaderProgram(const std::string& vsFile, const std::string& gsFile, const std::string& fsFile, const std::vector<std::string>& defines = {});
+ProgramHandle LoadShaderProgram(const std::string& vsFile, const std::vector<std::string>& defines = {});
+ProgramHandle LoadShaderProgram(const std::string& vsFile, const std::string& fsFile, const std::vector<std::string>& defines = {});
+ProgramHandle LoadShaderProgram(const std::string& vsFile, const std::string& gsFile, const std::string& fsFile, const std::vector<std::string>& defines = {});
 
 //=============================================================================
 // Shader Uniforms
 //=============================================================================
-int GetUniformLocation(GLuint program, std::string_view name);
+int GetUniformLocation(ProgramHandle program, std::string_view name);
 
 void SetUniform(GLuint id, bool b);
 void SetUniform(GLuint id, float s);

@@ -11,13 +11,13 @@ bool RPComposite::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_framebufferHeight = framebufferHeight;
 
 	m_program = LoadShaderProgram("data/shaders/composite/vertex.glsl", "data/shaders/composite/fragment.glsl"/*, std::vector<std::string>{"GAMMA_CORRECT"}*/);
-	if (!m_program)
+	if (!m_program.handle)
 	{
 		Fatal("Scene Composite RenderPass Shader failed!");
 		return false;
 	}
 
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 	SetUniform(GetUniformLocation(m_program, "colorInput"), 0);
 	SetUniform(GetUniformLocation(m_program, "brightInput"), 1);
 	SetUniform(GetUniformLocation(m_program, "ssaoSampler"), 2);
@@ -62,7 +62,7 @@ bool RPComposite::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 //=============================================================================
 void RPComposite::Close()
 {
-	glDeleteProgram(m_program);
+	glDeleteProgram(m_program.handle);
 	m_fbo.Destroy();
 }
 //=============================================================================
@@ -83,7 +83,7 @@ void RPComposite::Draw(const Framebuffer* colorFBO, const Framebuffer* SSAOFBO)
 	glViewport(0, 0, static_cast<int>(m_framebufferWidth), static_cast<int>(m_framebufferHeight));
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 
 	colorFBO->BindColorTexture(0, 0);
 	//blurFBO->BindColorTexture(0, 1);

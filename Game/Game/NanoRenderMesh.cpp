@@ -90,7 +90,7 @@ void Mesh::Draw(GLenum mode, unsigned instanceCount) const
 	glBindVertexArray(0);
 }
 //=============================================================================
-void Mesh::tDraw(GLenum mode, GLuint program, bool bindMaterial, bool instancing, int amount)
+void Mesh::tDraw(GLenum mode, ProgramHandle program, bool bindMaterial, bool instancing, int amount)
 {
 	assert(m_vao);
 
@@ -124,7 +124,7 @@ void Mesh::tDraw(GLenum mode, GLuint program, bool bindMaterial, bool instancing
 			nbTextures++;
 		}
 
-		if (program)
+		if (program.handle)
 		{
 			SetUniform(GetUniformLocation(program, "material.color_diffuse"), m_material->diffuseColor);
 			SetUniform(GetUniformLocation(program, "material.color_specular"), m_material->specularColor);

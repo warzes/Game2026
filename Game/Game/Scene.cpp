@@ -143,13 +143,13 @@ void Scene::SetShadowQuality(SHADOW_QUALITY quality)
 bool Scene::initShadowMappingShader()
 {
 	m_shadowMapping = CreateShaderProgram(LoadShaderCode("data/shaders/shadowMapping/vertex.glsl"), LoadShaderCode("data/shaders/shadowMapping/fragment.glsl"));
-	if (!m_shadowMapping)
+	if (!m_shadowMapping.handle)
 	{
 		Fatal("Scene Shadow Mapping Shader failed!");
 		return false;
 	}
 
-	glUseProgram(m_shadowMapping);
+	glUseProgram(m_shadowMapping.handle);
 	SetUniform(GetUniformLocation(m_shadowMapping, "diffuseTexture"), 0);
 	SetUniform(GetUniformLocation(m_shadowMapping, "hasDiffuse"), 1);
 	m_shadowMappingShaderProjectionMatrixId = GetUniformLocation(m_shadowMapping, "projectionMatrix");
@@ -162,13 +162,13 @@ bool Scene::initShadowMappingShader()
 bool Scene::initBlinnPhongShader()
 {
 	m_blinnPhong = CreateShaderProgram(LoadShaderCode("data/shaders/blinn_phong/vertex.glsl"), LoadShaderCode("data/shaders/blinn_phong/fragment.glsl"));
-	if (!m_blinnPhong)
+	if (!m_blinnPhong.handle)
 	{
 		Fatal("Scene Blinn Phong Shader failed!");
 		return false;
 	}
 
-	glUseProgram(m_blinnPhong);
+	glUseProgram(m_blinnPhong.handle);
 	SetUniform(GetUniformLocation(m_blinnPhong, "diffuseTexture"), 0);
 	SetUniform(GetUniformLocation(m_blinnPhong, "specularTexture"), 1);
 	SetUniform(GetUniformLocation(m_blinnPhong, "normalTexture"), 2);
@@ -178,7 +178,7 @@ bool Scene::initBlinnPhongShader()
 	}
 
 	m_blinnPhongMatrixUBO = CreateBuffer(GL_UNIFORM_BUFFER, BufferUsage::Dynamic, sizeof(SceneBlinnPhongMatrices), nullptr);
-	m_blinnPhongMatrixUBOShaderId = glGetUniformBlockIndex(m_blinnPhong, "MatricesUBO");
+	m_blinnPhongMatrixUBOShaderId = glGetUniformBlockIndex(m_blinnPhong.handle, "MatricesUBO");
 
 	m_blinnPhongShaderModelMatrixId = GetUniformLocation(m_blinnPhong, "modelMatrix");
 	m_blinnPhongShaderNormalMatrixId = GetUniformLocation(m_blinnPhong, "normalMatrix");
@@ -206,7 +206,7 @@ void Scene::directionalShadowPass()
 {
 	glViewport(0, 0, static_cast<int>(m_shadowQuality), static_cast<int>(m_shadowQuality));
 
-	glUseProgram(m_shadowMapping);
+	glUseProgram(m_shadowMapping.handle);
 	SetUniform(m_shadowMappingShaderProjectionMatrixId, m_orthoProjection);
 
 	// render directional depth maps
@@ -272,7 +272,7 @@ void Scene::colorMultisamplePass()
 	m_blinnPhongMatrix.view = m_camera->GetViewMatrix();
 	BufferSubData(m_blinnPhongMatrixUBO, GL_UNIFORM_BUFFER, 0, sizeof(SceneBlinnPhongMatrices), &m_blinnPhongMatrix);
 
-	glUseProgram(m_blinnPhong);
+	glUseProgram(m_blinnPhong.handle);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, m_blinnPhongMatrixUBOShaderId, m_blinnPhongMatrixUBO);
 
@@ -378,12 +378,12 @@ void Scene::drawScene(drawScenePass scenePass)
 	int normalMatrixId = -1;
 	if (scenePass == drawScenePass::ShadowMapping)
 	{
-		shader = m_shadowMapping;
+		shader = m_shadowMapping.handle;
 		modelMatrixId = m_shadowMappingShaderModelMatrixId;
 	}
 	else if (scenePass == drawScenePass::BlinnPhong)
 	{
-		shader = m_blinnPhong;
+		shader = m_blinnPhong.handle;
 		modelMatrixId = m_blinnPhongShaderModelMatrixId;
 		normalMatrixId = m_blinnPhongShaderNormalMatrixId;
 	}

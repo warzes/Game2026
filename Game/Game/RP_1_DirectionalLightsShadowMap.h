@@ -36,7 +36,7 @@ private:
 	bool initFBO();
 	void drawScene(const glm::mat4& lightSpaceMatrix, const GameWorldData& worldData);
 
-	GLuint                                       m_program{ 0 };
+	ProgramHandle                                       m_program{ 0 };
 	int                                          m_mvpMatrixId{ -1 };
 	int                                          m_hasAlbedoMapId{ -1 };
 

@@ -18,7 +18,7 @@ public:
 	uint16_t GetHeight() const { return m_framebufferHeight; }
 
 private:
-	GLuint                       m_program{ 0 };
+	ProgramHandle                       m_program{ 0 };
 	uint16_t                     m_framebufferWidth{ 0 }; // TODO: можно удалить - есть в m_fbo
 	uint16_t                     m_framebufferHeight{ 0 }; // TODO: можно удалить - есть в m_fbo
 	glm::mat4 m_perspective{ 1.0f };

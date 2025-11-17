@@ -112,7 +112,6 @@
     <ClCompile Include="NanoRenderModel.cpp" />
     <ClCompile Include="NanoRenderTextures.cpp" />
     <ClCompile Include="NanoScene.cpp" />
-    <ClCompile Include="OpenGL3Wrapper.cpp" />
     <ClCompile Include="Region.cpp" />
     <ClCompile Include="RP_1_DirectionalLightsShadowMap.cpp" />
     <ClCompile Include="RPGeometry.cpp" />
@@ -160,7 +159,6 @@
     <ClInclude Include="NanoRenderTextures.h" />
     <ClInclude Include="NanoScene.h" />
     <ClInclude Include="NanoWindow.h" />
-    <ClInclude Include="OpenGL3Wrapper.h" />
     <ClInclude Include="Region.h" />
     <ClInclude Include="RP_1_DirectionalLightsShadowMap.h" />
     <ClInclude Include="RPGeometry.h" />

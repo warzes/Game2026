@@ -30,7 +30,7 @@ private:
 	uint16_t  m_framebufferHeight{ 0 };
 	glm::mat4 m_perspective{ 1.0f };
 
-	GLuint    m_program{ 0 };
+	ProgramHandle    m_program{ 0 };
 	int       m_projectionMatrixId{ -1 };
 	int       m_viewMatrixId{ -1 };
 	int       m_modelMatrixId{ -1 };

@@ -23,7 +23,7 @@ bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 void RPMainScene::Close()
 {
 	m_fbo.Destroy();
-	glDeleteProgram(m_program);
+	glDeleteProgram(m_program.handle);
 	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
@@ -35,7 +35,7 @@ void RPMainScene::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const Ga
 	glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 	SetUniform(m_projectionMatrixId, m_perspective);
 	SetUniform(m_viewMatrixId, gameData.camera->GetViewMatrix());
 	SetUniform(m_camPosId, gameData.camera->Position);
@@ -138,12 +138,12 @@ bool RPMainScene::initProgram()
 	};
 
 	m_program = LoadShaderProgram("data/shaders/blinnPhong/vertex.glsl", "data/shaders/blinnPhong/fragment.glsl", defines);
-	if (!m_program)
+	if (!m_program.handle)
 	{
 		Fatal("Scene Main RenderPass Shader failed!");
 		return false;
 	}
-	glUseProgram(m_program);
+	glUseProgram(m_program.handle);
 
 	int albedoMap = GetUniformLocation(m_program, "material.albedoMap");
 	assert(albedoMap > -1);

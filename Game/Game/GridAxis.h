@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "NanoRender.h"
 
@@ -15,7 +15,7 @@ private:
 	GLuint m_vaoG;
 	GLuint m_vboG;
 	GLuint m_eboG;
-	GLuint m_gridShader;
+	ProgramHandle m_gridShader;
 	float* m_grid;
 	int* m_indices;
 	int m_dim;
@@ -25,6 +25,6 @@ private:
 	// Axis Data
 	GLuint m_vaoA;
 	GLuint m_vboA;
-	GLuint m_axisShader;
+	ProgramHandle m_axisShader;
 	float* m_axis;
 };

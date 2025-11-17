@@ -1466,6 +1466,13 @@ struct Plane {
     constexpr Plane() : normal(0.0f, 0.0f, 1.0f), distance(0.0f) {}
     constexpr Plane(const Vector3& n, real d) : normal(n.normalized()), distance(d) {}
     constexpr Plane(const Vector3& n, const Vector3& point) : normal(n.normalized()), distance(n.normalized().dot(point)) {}
+    constexpr Plane(real a, real b, real c, real d) : normal(a, b, c), distance(d) {
+        real length = normal.length();
+        if(length > 0.0f) {
+            normal = normal / length;
+            distance = distance / length;
+        }
+    }
     
     // Создание плоскости по трем точкам
     constexpr static Plane from_points(const Vector3& p1, const Vector3& p2, const Vector3& p3) {
@@ -1575,7 +1582,7 @@ struct Sphere {
     
     // Пересечение луча со сферой (только ближайшее пересечение)
     constexpr bool ray_intersect(const Vector3& ray_origin, const Vector3& ray_direction, real& t) const {
-        real t1, t2;
+        real t1 = 0.0f, t2 = 0.0f;
         if (ray_intersect(ray_origin, ray_direction, t1, t2)) {
             t = (t1 >= 0) ? t1 : t2;
             return t >= 0;
@@ -1788,7 +1795,7 @@ struct Capsule {
         }
         
         real t = (point - point_a).dot(ab) / length_sq;
-        t = std::clamp(t, 0.0f, 1.0f);  // Ограничиваем параметр [0, 1]
+        t = clamp(t, 0.0f, 1.0f);  // Ограничиваем параметр [0, 1]
         return point_a + ab * t;
     }
     
@@ -1881,16 +1888,16 @@ struct Frustum {
         Frustum frustum;
         
         // Левые и правые плоскости
-        frustum.planes[0] = Plane(matrix[3] + matrix[0], matrix[3][0] + matrix[0][0], matrix[3][1] + matrix[0][1], matrix[3][2] + matrix[0][2]); // лево
-        frustum.planes[1] = Plane(matrix[3] - matrix[0], matrix[3][0] - matrix[0][0], matrix[3][1] - matrix[0][1], matrix[3][2] - matrix[0][2]); // право
+        frustum.planes[0] = Plane(Vector3(matrix[3][0] + matrix[0][0], matrix[3][1] + matrix[0][1], matrix[3][2] + matrix[0][2]), matrix[3][3] + matrix[0][3]); // лево
+        frustum.planes[1] = Plane(Vector3(matrix[3][0] - matrix[0][0], matrix[3][1] - matrix[0][1], matrix[3][2] - matrix[0][2]), matrix[3][3] - matrix[0][3]); // право
         
         // Верхние и нижние плоскости
-        frustum.planes[2] = Plane(matrix[3] - matrix[1], matrix[3][0] - matrix[1][0], matrix[3][1] - matrix[1][1], matrix[3][2] - matrix[1][2]); // верх
-        frustum.planes[3] = Plane(matrix[3] + matrix[1], matrix[3][0] + matrix[1][0], matrix[3][1] + matrix[1][1], matrix[3][2] + matrix[1][2]); // низ
+        frustum.planes[2] = Plane(Vector3(matrix[3][0] - matrix[1][0], matrix[3][1] - matrix[1][1], matrix[3][2] - matrix[1][2]), matrix[3][3] - matrix[1][3]); // верх
+        frustum.planes[3] = Plane(Vector3(matrix[3][0] + matrix[1][0], matrix[3][1] + matrix[1][1], matrix[3][2] + matrix[1][2]), matrix[3][3] + matrix[1][3]); // низ
         
         // Ближние и дальние плоскости
-        frustum.planes[4] = Plane(matrix[3] + matrix[2], matrix[3][0] + matrix[2][0], matrix[3][1] + matrix[2][1], matrix[3][2] + matrix[2][2]); // ближ
-        frustum.planes[5] = Plane(matrix[3] - matrix[2], matrix[3][0] - matrix[2][0], matrix[3][1] - matrix[2][1], matrix[3][2] - matrix[2][2]); // даль
+        frustum.planes[4] = Plane(Vector3(matrix[3][0] + matrix[2][0], matrix[3][1] + matrix[2][1], matrix[3][2] + matrix[2][2]), matrix[3][3] + matrix[2][3]); // ближ
+        frustum.planes[5] = Plane(Vector3(matrix[3][0] - matrix[2][0], matrix[3][1] - matrix[2][1], matrix[3][2] - matrix[2][2]), matrix[3][3] - matrix[2][3]); // даль
         
         // Нормализация нормалей плоскостей
         for (int i = 0; i < 6; i++) {
@@ -1927,9 +1934,9 @@ struct Frustum {
             Vector3 positive_vertex = box.min;
             
             // Выбираем вершину, наиболее удаленную от нормали плоскости
-            if (plane.normal.x() >= 0) positive_vertex.x() = box.max.x();
-            if (plane.normal.y() >= 0) positive_vertex.y() = box.max.y();
-            if (plane.normal.z() >= 0) positive_vertex.z() = box.max.z();
+            if (plane.normal.x() >= 0) positive_vertex[0] = box.max.x();
+            if (plane.normal.y() >= 0) positive_vertex[1] = box.max.y();
+            if (plane.normal.z() >= 0) positive_vertex[2] = box.max.z();
             
             // Если наиболее удаленная вершина за пределами плоскости, то AABB вне фрустума
             if (plane.distance_to_point(positive_vertex) < 0.0f) {
@@ -1951,15 +1958,14 @@ struct Frustum {
     }
 };
 
-// Определение константы для clamp
 #ifndef MATH_LIB_CLAMP_DEFINED
 #define MATH_LIB_CLAMP_DEFINED
-namespace std {
-    template<typename T>
-    constexpr T clamp(T value, T low, T high) {
-        return (value < low) ? low : (value > high) ? high : value;
-    }
+template<typename T>
+constexpr T clamp(T value, T low, T high) {
+    return (value < low) ? low : (value > high) ? high : value;
 }
+#endif
+
 // Структура для информации о столкновении
 struct CollisionInfo {
     bool collided = false;          // Произошло ли столкновение
@@ -2001,7 +2007,7 @@ constexpr CollisionInfo point_line(const Vector3& point, const Vector3& line_sta
     }
     
     real t = point_vec.dot(line_vec) / line_len_sq;
-    t = std::clamp(t, 0.0f, 1.0f); // Ограничиваем параметр в пределах отрезка
+    t = clamp(t, 0.0f, 1.0f); // Ограничиваем параметр в пределах отрезка
     
     Vector3 closest_point = line_start + line_vec * t;
     Vector3 diff = point - closest_point;
@@ -2026,7 +2032,7 @@ constexpr CollisionInfo point_ray(const Vector3& point, const Vector3& ray_origi
     
     Vector3 point_vec = point - ray_origin;
     real t = point_vec.dot(ray_direction) / ray_direction.length_squared();
-    t = std::max(0.0f, t); // Только точки на луче (не позади начала)
+    t = (t > 0.0f) ? t : 0.0f; // Только точки на луче (не позади начала)
     
     Vector3 closest_point = ray_origin + ray_direction * t;
     Vector3 diff = point - closest_point;
@@ -2039,7 +2045,7 @@ constexpr CollisionInfo point_ray(const Vector3& point, const Vector3& ray_origi
         if(info.contact_normal.length_squared() == 0.0f) {
             info.contact_normal = Vector3(0, 0, 1);
         }
-        info.penetration_depth = std::max(0.0f, 1e-5f - distance);
+        info.penetration_depth = (1e-5f - distance > 0.0f) ? 1e-5f - distance : 0.0f;
     }
     
     return info;
@@ -2468,4 +2474,3 @@ constexpr CollisionInfo ray_plane(const Vector3& ray_origin, const Vector3& ray_
 }
 
 } // namespace collision
-#endif

@@ -96,17 +96,17 @@ GridAxis::GridAxis(int gridDim)
 
 	glBindVertexArray(0);
 
-	glUseProgram(m_gridShader);
+	glUseProgram(m_gridShader.handle);
 	SetUniform(GetUniformLocation(m_gridShader, "model"), glm::mat4(1.0f));
 
-	glUseProgram(m_axisShader);
+	glUseProgram(m_axisShader.handle);
 	SetUniform(GetUniformLocation(m_axisShader, "model"), glm::mat4(1.0f));
 }
 //=============================================================================
 GridAxis::~GridAxis()
 {
-	glDeleteProgram(m_gridShader);
-	glDeleteProgram(m_axisShader);
+	glDeleteProgram(m_gridShader.handle);
+	glDeleteProgram(m_axisShader.handle);
 
 	glBindVertexArray(m_vaoG);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -134,7 +134,7 @@ void GridAxis::Draw(const glm::mat4& projection, const glm::mat4 view)
 
 	// draw grid
 	glBindVertexArray(m_vaoG);
-	glUseProgram(m_gridShader);
+	glUseProgram(m_gridShader.handle);
 	SetUniform(GetUniformLocation(m_gridShader, "view"), view);
 	SetUniform(GetUniformLocation(m_gridShader, "proj"), projection);
 
@@ -142,7 +142,7 @@ void GridAxis::Draw(const glm::mat4& projection, const glm::mat4 view)
 
 	// draw axis
 	glBindVertexArray(m_vaoA);
-	glUseProgram(m_axisShader);
+	glUseProgram(m_axisShader.handle);
 	//SetUniform(GetUniformLocation(m_axisShader, "model"), glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.01f, 0.0f)));
 	SetUniform(GetUniformLocation(m_axisShader, "view"), view);
 	SetUniform(GetUniformLocation(m_axisShader, "proj"), projection);
