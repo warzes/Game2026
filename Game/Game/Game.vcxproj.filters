@@ -111,6 +111,9 @@
     <ClCompile Include="NanoRenderTextures.cpp">
       <Filter>Engine\Render\NewFilter1</Filter>
     </ClCompile>
+    <ClCompile Include="OpenGL3Wrapper.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -211,6 +214,9 @@
     </ClInclude>
     <ClInclude Include="NanoRenderTextures.h">
       <Filter>Engine\Render\NewFilter1</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGL3Wrapper.h">
+      <Filter>Engine\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
