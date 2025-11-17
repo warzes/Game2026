@@ -785,5 +785,102 @@ int main() {
         return 1;
     }
     
-    return 0;
-}
+    // Тесты для геометрических примитивов и проверок столкновений
+    bool test_primitives() {
+        std::cout << "Тестирование геометрических примитивов..." << std::endl;
+        
+        // Тест плоскости
+        Plane plane(Vector3(0, 1, 0), 5.0f); // Горизонтальная плоскость на высоте 5
+        ASSERT_FLOAT_EQUAL(plane.distance_to_point(Vector3(0, 5, 0)), 0.0f, EPSILON);
+        ASSERT_FLOAT_EQUAL(plane.distance_to_point(Vector3(0, 6, 0)), 1.0f, EPSILON);
+        ASSERT_FLOAT_EQUAL(plane.distance_to_point(Vector3(0, 4, 0)), -1.0f, EPSILON);
+        
+        // Тест сферы
+        Sphere sphere(Vector3(0, 0, 0), 2.0f);
+        ASSERT(sphere.contains_point(Vector3(0, 0, 0)), "Сфера должна содержать центр");
+        ASSERT(sphere.contains_point(Vector3(1, 1, 1)), "Сфера должна содержать точку внутри");
+        ASSERT(!sphere.contains_point(Vector3(3, 0, 0)), "Сфера не должна содержать точку вне");
+        
+        // Проверка пересечения сфер
+        Sphere sphere2(Vector3(3, 0, 0), 2.0f);
+        ASSERT(sphere.intersects_sphere(sphere2), "Сферы должны пересекаться");
+        Sphere sphere3(Vector3(5, 0, 0), 1.0f);
+        ASSERT(!sphere.intersects_sphere(sphere3), "Сферы не должны пересекаться");
+        
+        // Тест AABB
+        AABB aabb(Vector3(-1, -1, -1), Vector3(1, 1, 1));
+        ASSERT(aabb.contains_point(Vector3(0, 0, 0)), "AABB должен содержать центр");
+        ASSERT(aabb.contains_point(Vector3(0.5f, 0.5f, 0.5f)), "AABB должен содержать внутреннюю точку");
+        ASSERT(!aabb.contains_point(Vector3(2, 0, 0)), "AABB не должен содержать внешнюю точку");
+        
+        // Проверка пересечения AABB
+        AABB aabb2(Vector3(0, 0, 0), Vector3(2, 2, 2));
+        ASSERT(aabb.intersects_aabb(aabb2), "AABB должны пересекаться");
+        AABB aabb3(Vector3(3, 3, 3), Vector3(4, 4, 4));
+        ASSERT(!aabb.intersects_aabb(aabb3), "AABB не должны пересекаться");
+        
+        std::cout << "Геометрические примитивы: OK" << std::endl;
+        return true;
+    }
+    
+    // Тесты для функций проверки столкновений
+    bool test_collision_functions() {
+        std::cout << "Тестирование функций проверки столкновений..." << std::endl;
+        
+        // Тест пересечения луча со сферой
+        Sphere sphere(Vector3(0, 0, 0), 1.0f);
+        Vector3 ray_origin(0, 0, -5);
+        Vector3 ray_direction(0, 0, 1);
+        
+        real t1, t2;
+        bool intersects = sphere.ray_intersect(ray_origin, ray_direction, t1, t2);
+        ASSERT(intersects, "Луч должен пересекать сферу");
+        ASSERT_FLOAT_EQUAL(t1, 4.0f, EPSILON); // 5 - 1 = 4
+        ASSERT_FLOAT_EQUAL(t2, 6.0f, EPSILON); // 5 + 1 = 6
+        
+        // Тест пересечения луча с AABB
+        AABB aabb(Vector3(-1, -1, -1), Vector3(1, 1, 1));
+        intersects = aabb.ray_intersect(ray_origin, ray_direction, t1, t2);
+        ASSERT(intersects, "Луч должен пересекать AABB");
+        ASSERT_FLOAT_EQUAL(t1, 4.0f, EPSILON); // Расстояние до ближней плоскости
+        ASSERT_FLOAT_EQUAL(t2, 6.0f, EPSILON); // Расстояние до дальней плоскости
+        
+        // Тест пересечения луча с плоскостью
+        Plane plane(Vector3(0, 1, 0), 0.0f); // XY-плоскость
+        intersects = plane.ray_intersect(ray_origin, ray_direction, t1);
+        ASSERT(intersects, "Луч должен пересекать плоскость");
+        ASSERT_FLOAT_EQUAL(t1, 5.0f, EPSILON); // Пересечение в точке (0,0,0)
+        
+        // Тесты точка-геометрия
+        Vector3 point(0, 0, 0);
+        ASSERT(sphere.contains_point(point), "Сфера должна содержать точку");
+        ASSERT(aabb.contains_point(point), "AABB должен содержать точку");
+        ASSERT(plane.is_point_on_plane(point, 1e-4f), "Точка должна быть на плоскости");
+        
+        std::cout << "Функции проверки столкновений: OK" << std::endl;
+        return true;
+    }
+    
+    int main() {
+        std::cout << "Запуск расширенных юнит-тестов..." << std::endl;
+        
+        bool all_tests_passed = true;
+        
+        // Запуск существующих тестов
+        all_tests_passed &= test_vector_operations();
+        all_tests_passed &= test_matrix_operations();
+        all_tests_passed &= test_quaternion_operations();
+        all_tests_passed &= test_transform_operations();
+        
+        // Запуск новых тестов
+        all_tests_passed &= test_primitives();
+        all_tests_passed &= test_collision_functions();
+        
+        if (all_tests_passed) {
+            std::cout << "Все юнит-тесты пройдены!" << std::endl;
+            return 0;
+        } else {
+            std::cout << "Некоторые тесты провалены!" << std::endl;
+            return 1;
+        }
+    }

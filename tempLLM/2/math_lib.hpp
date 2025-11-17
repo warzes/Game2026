@@ -1960,4 +1960,512 @@ namespace std {
         return (value < low) ? low : (value > high) ? high : value;
     }
 }
+// Структура для информации о столкновении
+struct CollisionInfo {
+    bool collided = false;          // Произошло ли столкновение
+    Vector3 contact_point;          // Точка контакта
+    Vector3 contact_normal;         // Нормаль столкновения
+    real penetration_depth = 0.0f;  // Глубина проникновения
+    real collision_time = 0.0f;     // Время столкновения (для динамических проверок)
+    Vector3 contact_points[2];      // Дополнительные точки контакта (для сложных случаев)
+    size_t contact_point_count = 0; // Количество точек контакта
+};
+
+// Вспомогательные функции для вычисления столкновений
+namespace collision {
+
+// Проверка столкновения точки с точкой
+constexpr CollisionInfo point_point(const Vector3& p1, const Vector3& p2, real tolerance = 1e-5f) {
+    CollisionInfo info;
+    info.collided = (p1 - p2).length_squared() <= tolerance * tolerance;
+    if(info.collided) {
+        info.contact_point = (p1 + p2) * 0.5f;
+        info.contact_normal = Vector3(0, 0, 1); // Нормаль произвольна для точек
+        info.penetration_depth = 0.0f;
+    }
+    return info;
+}
+
+// Проверка столкновения точки с линией (отрезком)
+constexpr CollisionInfo point_line(const Vector3& point, const Vector3& line_start, const Vector3& line_end) {
+    CollisionInfo info;
+    
+    Vector3 line_vec = line_end - line_start;
+    Vector3 point_vec = point - line_start;
+    real line_len_sq = line_vec.length_squared();
+    
+    if(line_len_sq < 1e-6f) {
+        // Линия вырождена в точку
+        info = point_point(point, line_start);
+        return info;
+    }
+    
+    real t = point_vec.dot(line_vec) / line_len_sq;
+    t = std::clamp(t, 0.0f, 1.0f); // Ограничиваем параметр в пределах отрезка
+    
+    Vector3 closest_point = line_start + line_vec * t;
+    Vector3 diff = point - closest_point;
+    real distance = diff.length();
+    
+    info.collided = distance < 1e-5f; // Можно добавить радиус для большей гибкости
+    if(info.collided) {
+        info.contact_point = closest_point;
+        info.contact_normal = diff.normalized();
+        if(info.contact_normal.length_squared() == 0.0f) {
+            info.contact_normal = Vector3(0, 0, 1); // Нормализация не сработает, если точка на линии
+        }
+        info.penetration_depth = std::max(0.0f, 1e-5f - distance);
+    }
+    
+    return info;
+}
+
+// Проверка столкновения точки с лучом
+constexpr CollisionInfo point_ray(const Vector3& point, const Vector3& ray_origin, const Vector3& ray_direction) {
+    CollisionInfo info;
+    
+    Vector3 point_vec = point - ray_origin;
+    real t = point_vec.dot(ray_direction) / ray_direction.length_squared();
+    t = std::max(0.0f, t); // Только точки на луче (не позади начала)
+    
+    Vector3 closest_point = ray_origin + ray_direction * t;
+    Vector3 diff = point - closest_point;
+    real distance = diff.length();
+    
+    info.collided = distance < 1e-5f;
+    if(info.collided) {
+        info.contact_point = closest_point;
+        info.contact_normal = diff.normalized();
+        if(info.contact_normal.length_squared() == 0.0f) {
+            info.contact_normal = Vector3(0, 0, 1);
+        }
+        info.penetration_depth = std::max(0.0f, 1e-5f - distance);
+    }
+    
+    return info;
+}
+
+// Проверка столкновения точки с треугольником
+constexpr CollisionInfo point_triangle(const Vector3& point, const Vector3& v0, const Vector3& v1, const Vector3& v2) {
+    CollisionInfo info;
+    
+    // Вычисляем плоскость треугольника
+    Vector3 edge1 = v1 - v0;
+    Vector3 edge2 = v2 - v0;
+    Vector3 normal = edge1.cross(edge2).normalized();
+    
+    // Проверяем, насколько точка близка к плоскости треугольника
+    real dist_to_plane = std::abs(normal.dot(point - v0));
+    
+    if(dist_to_plane > 1e-5f) {
+        return info; // Точка слишком далеко от плоскости треугольника
+    }
+    
+    // Проект точки на плоскость треугольника и проверяем, внутри ли она
+    // Используем барицентрические координаты
+    Vector3 vp = point - v0;
+    real dot00 = edge2.dot(edge2);
+    real dot01 = edge2.dot(edge1);
+    real dot02 = edge2.dot(vp);
+    real dot11 = edge1.dot(edge1);
+    real dot12 = edge1.dot(vp);
+    
+    real inv_denom = 1.0f / (dot00 * dot11 - dot01 * dot01);
+    real u = (dot11 * dot02 - dot01 * dot12) * inv_denom;
+    real v = (dot00 * dot12 - dot01 * dot02) * inv_denom;
+    
+    // Проверяем, находится ли точка внутри треугольника
+    if(u >= 0.0f && v >= 0.0f && (u + v) <= 1.0f) {
+        info.collided = true;
+        info.contact_point = point; // Точка уже на треугольнике
+        info.contact_normal = normal;
+        info.penetration_depth = dist_to_plane;
+    }
+    
+    return info;
+}
+
+// Проверка столкновения точки с прямоугольником
+constexpr CollisionInfo point_rectangle(const Vector3& point, const Vector3& center, const Vector3& axis_x, const Vector3& axis_y, real width, real height) {
+    CollisionInfo info;
+    
+    // Вычисляем локальные координаты точки относительно плоскости прямоугольника
+    Vector3 local = point - center;
+    real local_x = local.dot(axis_x);
+    real local_y = local.dot(axis_y);
+    
+    // Проверяем, находится ли точка в пределах прямоугольника
+    if(std::abs(local_x) <= width/2.0f && std::abs(local_y) <= height/2.0f) {
+        // Вычисляем нормаль к ближайшему краю
+        real dist_x = std::abs(std::abs(local_x) - width/2.0f);
+        real dist_y = std::abs(std::abs(local_y) - height/2.0f);
+        
+        if(dist_x < dist_y) {
+            // Ближе к левому или правому краю
+            info.contact_normal = (local_x > 0) ? axis_x : -axis_x;
+            info.contact_point = center + axis_x * ((local_x > 0) ? width/2.0f : -width/2.0f) + axis_y * local_y;
+        } else {
+            // Ближе к верхнему или нижнему краю
+            info.contact_normal = (local_y > 0) ? axis_y : -axis_y;
+            info.contact_point = center + axis_x * local_x + axis_y * ((local_y > 0) ? height/2.0f : -height/2.0f);
+        }
+        
+        info.collided = true;
+        info.penetration_depth = std::min(dist_x, dist_y);
+    }
+    
+    return info;
+}
+
+// Проверка столкновения точки с квадратом
+constexpr CollisionInfo point_square(const Vector3& point, const Vector3& center, const Vector3& axis_x, const Vector3& axis_y, real size) {
+    return point_rectangle(point, center, axis_x, axis_y, size, size);
+}
+
+// Проверка столкновения точки с кругом
+constexpr CollisionInfo point_circle(const Vector3& point, const Vector3& center, const Vector3& normal, real radius) {
+    CollisionInfo info;
+    
+    // Находим проекцию точки на плоскость круга
+    Vector3 to_point = point - center;
+    Vector3 projection = to_point - normal * to_point.dot(normal);
+    Vector3 projected_point = center + projection;
+    
+    // Проверяем, находится ли проекция внутри круга
+    real distance = projection.length();
+    
+    if(distance <= radius) {
+        info.collided = true;
+        info.contact_point = projected_point;
+        if(distance > 1e-6f) {
+            info.contact_normal = projection.normalized();
+        } else {
+            info.contact_normal = Vector3(1, 0, 0); // Направление произвольно, если точка в центре
+        }
+        info.penetration_depth = radius - distance;
+    }
+    
+    return info;
+}
+
+// Проверка столкновения точки с эллипсом
+constexpr CollisionInfo point_ellipse(const Vector3& point, const Vector3& center, const Vector3& axis_x, const Vector3& axis_y, real radius_x, real radius_y) {
+    CollisionInfo info;
+    
+    // Находим проекцию точки на плоскость эллипса
+    Vector3 to_point = point - center;
+    real local_x = to_point.dot(axis_x);
+    real local_y = to_point.dot(axis_y);
+    
+    // Проверяем, находится ли точка внутри эллипса: (x/rx)^2 + (y/ry)^2 <= 1
+    real ellipse_value = (local_x * local_x) / (radius_x * radius_x) + (local_y * local_y) / (radius_y * radius_y);
+    
+    if(ellipse_value <= 1.0f) {
+        info.collided = true;
+        
+        // Находим ближайшую точку на границе эллипса
+        // Для упрощения используем нормаль вдоль вектора от центра к точке
+        Vector3 dir = axis_x * local_x + axis_y * local_y;
+        if(dir.length_squared() > 1e-6f) {
+            Vector3 norm_dir = dir.normalized();
+            real angle = std::atan2(norm_dir.dot(axis_y), norm_dir.dot(axis_x));
+            Vector3 closest_boundary = center + axis_x * radius_x * std::cos(angle) + axis_y * radius_y * std::sin(angle);
+            
+            info.contact_point = closest_boundary;
+            info.contact_normal = (dir - (closest_boundary - center)).normalized();
+        } else {
+            info.contact_point = center;
+            info.contact_normal = axis_x; // Направление произвольно
+        }
+        
+        info.penetration_depth = std::max(0.0f, radius_x - dir.length()); // Приближенное значение
+    }
+    
+    return info;
+}
+
+// Проверка столкновения точки со сферой
+constexpr CollisionInfo point_sphere(const Vector3& point, const Sphere& sphere) {
+    CollisionInfo info;
+    
+    Vector3 to_point = point - sphere.center;
+    real distance = to_point.length();
+    
+    if(distance <= sphere.radius) {
+        info.collided = true;
+        if(distance > 1e-6f) {
+            info.contact_normal = to_point / distance;
+        } else {
+            info.contact_normal = Vector3(0, 1, 0); // Направление произвольно, если точка в центре
+        }
+        
+        // Находим точку на поверхности сферы, ближайшую к точке
+        info.contact_point = sphere.center + info.contact_normal * sphere.radius;
+        info.penetration_depth = sphere.radius - distance;
+    }
+    
+    return info;
+}
+
+// Проверка столкновения точки с AABB
+constexpr CollisionInfo point_aabb(const Vector3& point, const AABB& aabb) {
+    CollisionInfo info;
+    
+    // Проверяем, находится ли точка внутри AABB
+    if(point.x() >= aabb.min.x() && point.x() <= aabb.max.x() &&
+       point.y() >= aabb.min.y() && point.y() <= aabb.max.y() &&
+       point.z() >= aabb.min.z() && point.z() <= aabb.max.z()) {
+        
+        info.collided = true;
+        
+        // Находим ближайшие грани
+        Vector3 center = aabb.center();
+        Vector3 extents = aabb.half_extents();
+        
+        // Вычисляем расстояния до ближайших граней
+        real dx = std::min(std::abs(point.x() - aabb.min.x()), std::abs(point.x() - aabb.max.x()));
+        real dy = std::min(std::abs(point.y() - aabb.min.y()), std::abs(point.y() - aabb.max.y()));
+        real dz = std::min(std::abs(point.z() - aabb.min.z()), std::abs(point.z() - aabb.max.z()));
+        
+        // Определяем нормаль столкновения
+        if(dx <= dy && dx <= dz) {
+            // X-грань ближе всего
+            info.contact_normal = Vector3((point.x() < center.x()) ? -1.0f : 1.0f, 0.0f, 0.0f);
+            info.contact_point = Vector3((point.x() < center.x()) ? aabb.min.x() : aabb.max.x(), point.y(), point.z());
+        } else if(dy <= dz) {
+            // Y-грань ближе всего
+            info.contact_normal = Vector3(0.0f, (point.y() < center.y()) ? -1.0f : 1.0f, 0.0f);
+            info.contact_point = Vector3(point.x(), (point.y() < center.y()) ? aabb.min.y() : aabb.max.y(), point.z());
+        } else {
+            // Z-грань ближе всего
+            info.contact_normal = Vector3(0.0f, 0.0f, (point.z() < center.z()) ? -1.0f : 1.0f);
+            info.contact_point = Vector3(point.x(), point.y(), (point.z() < center.z()) ? aabb.min.z() : aabb.max.z());
+        }
+        
+        info.penetration_depth = std::min({dx, dy, dz});
+    }
+    
+    return info;
+}
+
+// Проверка столкновения точки с плоскостью
+constexpr CollisionInfo point_plane(const Vector3& point, const Plane& plane) {
+    CollisionInfo info;
+    
+    real distance = plane.distance_to_point(point);
+    
+    // Рассматриваем столкновение, если точка близка к плоскости
+    if(std::abs(distance) < 1e-5f) {
+        info.collided = true;
+        info.contact_point = point - plane.normal * distance; // Точка на плоскости
+        info.contact_normal = plane.normal;
+        info.penetration_depth = std::abs(distance);
+    }
+    
+    return info;
+}
+
+// Проверка столкновения сферы с AABB
+constexpr CollisionInfo sphere_aabb(const Sphere& sphere, const AABB& aabb) {
+    CollisionInfo info;
+    
+    // Находим ближайшую точку на AABB к центру сферы
+    Vector3 closest_point(
+        std::clamp(sphere.center.x(), aabb.min.x(), aabb.max.x()),
+        std::clamp(sphere.center.y(), aabb.min.y(), aabb.max.y()),
+        std::clamp(sphere.center.z(), aabb.min.z(), aabb.max.z())
+    );
+    
+    // Вычисляем расстояние между центром сферы и ближайшей точкой на AABB
+    Vector3 diff = sphere.center - closest_point;
+    real distance = diff.length();
+    
+    if(distance <= sphere.radius) {
+        info.collided = true;
+        
+        if(distance > 1e-6f) {
+            info.contact_normal = diff / distance;
+        } else {
+            // Если центр сферы внутри AABB, используем нормаль к ближайшей грани
+            Vector3 center = aabb.center();
+            Vector3 extents = aabb.half_extents();
+            
+            // Определяем ближайшую грань
+            real dx = (closest_point.x() < center.x()) ? (closest_point.x() - aabb.min.x()) : (aabb.max.x() - closest_point.x());
+            real dy = (closest_point.y() < center.y()) ? (closest_point.y() - aabb.min.y()) : (aabb.max.y() - closest_point.y());
+            real dz = (closest_point.z() < center.z()) ? (closest_point.z() - aabb.min.z()) : (aabb.max.z() - closest_point.z());
+            
+            if(dx <= dy && dx <= dz) {
+                info.contact_normal = Vector3((closest_point.x() < center.x()) ? -1.0f : 1.0f, 0.0f, 0.0f);
+            } else if(dy <= dz) {
+                info.contact_normal = Vector3(0.0f, (closest_point.y() < center.y()) ? -1.0f : 1.0f, 0.0f);
+            } else {
+                info.contact_normal = Vector3(0.0f, 0.0f, (closest_point.z() < center.z()) ? -1.0f : 1.0f);
+            }
+        }
+        
+        info.contact_point = closest_point;
+        info.penetration_depth = sphere.radius - distance;
+    }
+    
+    return info;
+}
+
+// Проверка столкновения двух сфер
+constexpr CollisionInfo sphere_sphere(const Sphere& s1, const Sphere& s2) {
+    CollisionInfo info;
+    
+    Vector3 center_diff = s2.center - s1.center;
+    real distance_sq = center_diff.length_squared();
+    real radius_sum = s1.radius + s2.radius;
+    
+    if(distance_sq <= radius_sum * radius_sum) {
+        info.collided = true;
+        
+        real distance = std::sqrt(distance_sq);
+        if(distance > 1e-6f) {
+            info.contact_normal = center_diff / distance;
+        } else {
+            // Сферы в одной точке, выбираем произвольное направление
+            info.contact_normal = Vector3(1, 0, 0);
+        }
+        
+        // Точка контакта примерно посередине перекрытия
+        real penetration = radius_sum - distance;
+        info.penetration_depth = penetration;
+        
+        if(distance > 1e-6f) {
+            info.contact_point = s1.center + center_diff * (s1.radius / radius_sum);
+        } else {
+            info.contact_point = s1.center;
+        }
+    }
+    
+    return info;
+}
+
+// Проверка столкновения луча со сферой
+constexpr CollisionInfo ray_sphere(const Vector3& ray_origin, const Vector3& ray_direction, const Sphere& sphere) {
+    CollisionInfo info;
+    
+    Vector3 oc = ray_origin - sphere.center;
+    real a = ray_direction.dot(ray_direction);
+    real b = 2.0f * oc.dot(ray_direction);
+    real c = oc.dot(oc) - sphere.radius * sphere.radius;
+    real discriminant = b * b - 4 * a * c;
+    
+    if(discriminant < 0) {
+        return info; // Нет пересечения
+    }
+    
+    real sqrt_discriminant = std::sqrt(discriminant);
+    real t1 = (-b - sqrt_discriminant) / (2.0f * a);
+    real t2 = (-b + sqrt_discriminant) / (2.0f * a);
+    
+    // Берем ближайшее положительное значение (ближайшее пересечение впереди)
+    if(t1 >= 0) {
+        info.collided = true;
+        info.collision_time = t1;
+    } else if(t2 >= 0) {
+        info.collided = true;
+        info.collision_time = t2;
+    } else {
+        return info; // Оба пересечения позади луча
+    }
+    
+    // Вычисляем точку пересечения и нормаль
+    Vector3 hit_point = ray_origin + ray_direction * info.collision_time;
+    info.contact_point = hit_point;
+    info.contact_normal = (hit_point - sphere.center).normalized();
+    
+    return info;
+}
+
+// Проверка столкновения луча с AABB
+constexpr CollisionInfo ray_aabb(const Vector3& ray_origin, const Vector3& ray_direction, const AABB& aabb) {
+    CollisionInfo info;
+    
+    // Алгоритм Slab для луча-AABB пересечения
+    real t_min = -std::numeric_limits<real>::infinity();
+    real t_max = std::numeric_limits<real>::infinity();
+    
+    for(int i = 0; i < 3; i++) {
+        if(std::abs(ray_direction[i]) < 1e-6f) {
+            // Луч параллелен плоскости
+            if(ray_origin[i] < aabb.min[i] || ray_origin[i] > aabb.max[i]) {
+                return info; // Луч не пересекает AABB
+            }
+        } else {
+            // Пересечение с двумя плоскостями
+            real inv_dir = 1.0f / ray_direction[i];
+            real t1 = (aabb.min[i] - ray_origin[i]) * inv_dir;
+            real t2 = (aabb.max[i] - ray_origin[i]) * inv_dir;
+            
+            if(t1 > t2) std::swap(t1, t2);
+            
+            t_min = std::max(t_min, t1);
+            t_max = std::min(t_max, t2);
+            
+            if(t_min > t_max) return info; // Нет пересечения
+            if(t_max < 0) return info;    // Оба пересечения позади
+        }
+    }
+    
+    if(t_min > t_max) return info; // Нет пересечения
+    
+    // Если t_min < 0, то начало луча внутри AABB
+    real t = (t_min >= 0) ? t_min : t_max;
+    if(t < 0) return info; // Оба пересечения позади
+    
+    info.collided = true;
+    info.collision_time = t;
+    info.contact_point = ray_origin + ray_direction * t;
+    
+    // Вычисляем нормаль к грани, с которой произошло пересечение
+    Vector3 hit_pos = info.contact_point;
+    Vector3 center = aabb.center();
+    
+    // Определяем, какая грань была пересечена
+    real eps = 1e-5f;
+    if(std::abs(hit_pos.x() - aabb.min.x()) < eps) {
+        info.contact_normal = Vector3(-1, 0, 0);
+    } else if(std::abs(hit_pos.x() - aabb.max.x()) < eps) {
+        info.contact_normal = Vector3(1, 0, 0);
+    } else if(std::abs(hit_pos.y() - aabb.min.y()) < eps) {
+        info.contact_normal = Vector3(0, -1, 0);
+    } else if(std::abs(hit_pos.y() - aabb.max.y()) < eps) {
+        info.contact_normal = Vector3(0, 1, 0);
+    } else if(std::abs(hit_pos.z() - aabb.min.z()) < eps) {
+        info.contact_normal = Vector3(0, 0, -1);
+    } else if(std::abs(hit_pos.z() - aabb.max.z()) < eps) {
+        info.contact_normal = Vector3(0, 0, 1);
+    }
+    
+    return info;
+}
+
+// Проверка столкновения луча с плоскостью
+constexpr CollisionInfo ray_plane(const Vector3& ray_origin, const Vector3& ray_direction, const Plane& plane) {
+    CollisionInfo info;
+    
+    real denominator = plane.normal.dot(ray_direction);
+    
+    if(std::abs(denominator) < 1e-6f) {
+        // Луч параллелен плоскости
+        return info;
+    }
+    
+    real t = (plane.distance - plane.normal.dot(ray_origin)) / denominator;
+    
+    if(t >= 0) {
+        info.collided = true;
+        info.collision_time = t;
+        info.contact_point = ray_origin + ray_direction * t;
+        info.contact_normal = plane.normal;
+    }
+    
+    return info;
+}
+
+} // namespace collision
 #endif
