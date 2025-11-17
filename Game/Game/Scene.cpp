@@ -177,7 +177,7 @@ bool Scene::initBlinnPhongShader()
 		SetUniform(GetUniformLocation(m_blinnPhong, "depthMap[" + std::to_string(i) + "]"), 4+(int)i);
 	}
 
-	m_blinnPhongMatrixUBO = CreateBuffer(GL_UNIFORM_BUFFER, BufferUsage::Dynamic, sizeof(SceneBlinnPhongMatrices), nullptr);
+	m_blinnPhongMatrixUBO = CreateBuffer(BufferType::UniformBuffer, BufferUsage::DynamicDraw, sizeof(SceneBlinnPhongMatrices), nullptr);
 	m_blinnPhongMatrixUBOShaderId = glGetUniformBlockIndex(m_blinnPhong.handle, "MatricesUBO");
 
 	m_blinnPhongShaderModelMatrixId = GetUniformLocation(m_blinnPhong, "modelMatrix");
@@ -270,11 +270,11 @@ void Scene::colorMultisamplePass()
 
 	m_blinnPhongMatrix.projection = m_perspective;
 	m_blinnPhongMatrix.view = m_camera->GetViewMatrix();
-	BufferSubData(m_blinnPhongMatrixUBO, GL_UNIFORM_BUFFER, 0, sizeof(SceneBlinnPhongMatrices), &m_blinnPhongMatrix);
+	BufferSubData(m_blinnPhongMatrixUBO, BufferType::UniformBuffer, 0, sizeof(SceneBlinnPhongMatrices), &m_blinnPhongMatrix);
 
 	glUseProgram(m_blinnPhong.handle);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, m_blinnPhongMatrixUBOShaderId, m_blinnPhongMatrixUBO);
+	glBindBufferBase(GL_UNIFORM_BUFFER, m_blinnPhongMatrixUBOShaderId, m_blinnPhongMatrixUBO.handle);
 
 	SetUniform(GetUniformLocation(m_blinnPhong, "cam.viewPos"), m_camera->Position);
 

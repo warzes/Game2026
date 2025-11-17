@@ -67,7 +67,7 @@ private:
 	ProgramHandle                       m_blinnPhong{ 0 };
 	int                          m_blinnPhongShaderModelMatrixId{ -1 };
 	int                          m_blinnPhongShaderNormalMatrixId{ -1 };
-	GLuint                       m_blinnPhongMatrixUBO{ 0 };
+	BufferHandle                 m_blinnPhongMatrixUBO{ 0 };
 	GLuint                       m_blinnPhongMatrixUBOShaderId{ 0 };
 	SceneBlinnPhongMatrices      m_blinnPhongMatrix;
 

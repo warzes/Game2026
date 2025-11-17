@@ -20,7 +20,7 @@ private:
 	Framebuffer m_fbo;
 	ProgramHandle                       m_program{ 0 };
 	GLuint                       m_vao{ 0 };
-	GLuint                       m_vbo{ 0 };
+	BufferHandle                 m_vbo{ 0 };
 	uint16_t                     m_framebufferWidth{ 0 }; // TODO: можно удалить - есть в m_fbo
 	uint16_t                     m_framebufferHeight{ 0 }; // TODO: можно удалить - есть в m_fbo
 };

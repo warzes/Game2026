@@ -15,15 +15,15 @@ Mesh::Mesh(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>&
 	GLuint currentEBO = GetCurrentBuffer(GL_ELEMENT_ARRAY_BUFFER);
 
 	// Buffers
-	m_vbo = CreateBuffer(GL_ARRAY_BUFFER, BufferUsage::Static, vertices.size() * sizeof(MeshVertex), vertices.data());
+	m_vbo = CreateBuffer(BufferType::ArrayBuffer, BufferUsage::StaticDraw, vertices.size() * sizeof(MeshVertex), vertices.data());
 	if (!indices.empty())
-		m_ebo = CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferUsage::Static, indices.size() * sizeof(uint32_t), indices.data());
+		m_ebo = CreateBuffer(BufferType::ElementArrayBuffer, BufferUsage::StaticDraw, indices.size() * sizeof(uint32_t), indices.data());
 
 	// VAO
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	if (m_ebo > 0) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo.handle);
+	if (m_ebo.handle > 0) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo.handle);
 	MeshVertex::SetVertexAttributes();
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, currentVBO);
@@ -36,8 +36,8 @@ Mesh::Mesh(Mesh&& old) noexcept
 	: m_vertexCount(std::exchange(old.m_vertexCount, 0))
 	, m_indicesCount(std::exchange(old.m_indicesCount, 0))
 	, m_vao(std::exchange(old.m_vao, 0))
-	, m_vbo(std::exchange(old.m_vbo, 0))
-	, m_ebo(std::exchange(old.m_ebo, 0))
+	, m_vbo(std::exchange(old.m_vbo.handle, 0))
+	, m_ebo(std::exchange(old.m_ebo.handle, 0))
 	, m_material(std::exchange(old.m_material, std::nullopt))
 	, m_pbrMaterial(std::exchange(old.m_pbrMaterial, std::nullopt))
 	, m_aabb(old.m_aabb)
@@ -46,8 +46,8 @@ Mesh::Mesh(Mesh&& old) noexcept
 //=============================================================================
 Mesh::~Mesh()
 {
-	if (m_vbo) glDeleteBuffers(1, &m_vbo);
-	if (m_ebo) glDeleteBuffers(1, &m_ebo);
+	if (m_vbo.handle) glDeleteBuffers(1, &m_vbo.handle);
+	if (m_ebo.handle) glDeleteBuffers(1, &m_ebo.handle);
 	if (m_vao) glDeleteVertexArrays(1, &m_vao);
 }
 //=============================================================================
@@ -59,8 +59,8 @@ Mesh& Mesh::operator=(Mesh&& old) noexcept
 		m_vertexCount = std::exchange(old.m_vertexCount, 0);
 		m_indicesCount = std::exchange(old.m_indicesCount, 0);
 		m_vao = std::exchange(old.m_vao, 0);
-		m_vbo = std::exchange(old.m_vbo, 0);
-		m_ebo = std::exchange(old.m_ebo, 0);
+		m_vbo.handle = std::exchange(old.m_vbo.handle, 0);
+		m_ebo.handle = std::exchange(old.m_ebo.handle, 0);
 		m_material = std::exchange(old.m_material, std::nullopt);
 		m_pbrMaterial = std::exchange(old.m_pbrMaterial, std::nullopt);
 		m_aabb = old.m_aabb;
@@ -73,7 +73,7 @@ void Mesh::Draw(GLenum mode, unsigned instanceCount) const
 	assert(m_vao);
 	glBindVertexArray(m_vao);
 
-	if (m_ebo > 0)
+	if (m_ebo.handle > 0)
 	{
 		if (instanceCount > 1)
 			glDrawElementsInstanced(mode, m_indicesCount, GL_UNSIGNED_INT, 0, instanceCount);
@@ -140,7 +140,7 @@ void Mesh::tDraw(GLenum mode, ProgramHandle program, bool bindMaterial, bool ins
 	}
 
 	glBindVertexArray(m_vao);
-	if (m_ebo > 0)
+	if (m_ebo.handle > 0)
 	{
 		if (instancing)
 			glDrawElementsInstanced(mode, m_indicesCount, GL_UNSIGNED_INT, 0, amount);

@@ -1795,7 +1795,7 @@ struct Capsule {
         }
         
         real t = (point - point_a).dot(ab) / length_sq;
-        t = clamp(t, 0.0f, 1.0f);  // Ограничиваем параметр [0, 1]
+        t = std::clamp(t, 0.0f, 1.0f);  // Ограничиваем параметр [0, 1]
         return point_a + ab * t;
     }
     
@@ -2007,7 +2007,7 @@ constexpr CollisionInfo point_line(const Vector3& point, const Vector3& line_sta
     }
     
     real t = point_vec.dot(line_vec) / line_len_sq;
-    t = clamp(t, 0.0f, 1.0f); // Ограничиваем параметр в пределах отрезка
+    t = std::clamp(t, 0.0f, 1.0f); // Ограничиваем параметр в пределах отрезка
     
     Vector3 closest_point = line_start + line_vec * t;
     Vector3 diff = point - closest_point;

@@ -30,7 +30,7 @@ struct GPUBuffer final
 	BufferHandle handle;
 	unsigned     size{ 0 };
 	GLenum       target{ 0 };
-	BufferUsage  usage{ BufferUsage::Static };
+	BufferUsage  usage{ BufferUsage::StaticDraw };
 };
 
 inline bool IsValid(const GPUBuffer& resource) { return resource.handle.handle > 0; }

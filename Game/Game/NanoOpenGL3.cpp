@@ -130,12 +130,38 @@ GLenum GetDataTypeGL(DataType dataType)
 	}
 }
 //=============================================================================
+[[nodiscard]] inline GLenum GetGLEnum(BufferType type)
+{
+	switch (type) {
+	case BufferType::ArrayBuffer:        return GL_ARRAY_BUFFER;
+	case BufferType::ElementArrayBuffer: return GL_ELEMENT_ARRAY_BUFFER;
+	case BufferType::UniformBuffer:      return GL_UNIFORM_BUFFER;
+	default: std::unreachable();
+	}
+}
+//=============================================================================
 [[nodiscard]] inline GLenum GetGLEnum(PolygonMode mode)
 {
 	switch (mode) {
 	case PolygonMode::Point: return GL_POINT;
 	case PolygonMode::Line:  return GL_LINE;
 	case PolygonMode::Fill:  return GL_FILL;
+	default: std::unreachable();
+	}
+}
+//=============================================================================
+[[nodiscard]] inline GLenum GetGLEnum(BufferUsage mode)
+{
+	switch (mode) {
+	case BufferUsage::StaticDraw: return GL_STATIC_DRAW;
+	case BufferUsage::DynamicDraw: return GL_DYNAMIC_DRAW;
+	case BufferUsage::StreamDraw: return GL_STREAM_DRAW;
+	case BufferUsage::StaticRead: return GL_STATIC_READ;
+	case BufferUsage::DynamicRead: return GL_DYNAMIC_READ;
+	case BufferUsage::StreamRead: return GL_STREAM_READ;
+	case BufferUsage::StaticCopy: return GL_STATIC_COPY;
+	case BufferUsage::DynamicCopy: return GL_DYNAMIC_COPY;
+	case BufferUsage::StreamCopy: return GL_STREAM_COPY;
 	default: std::unreachable();
 	}
 }
@@ -387,6 +413,10 @@ ProgramHandle CreateShaderProgram(std::string_view vertexShader, std::string_vie
 		program.handle = 0;
 	}
 
+	if (vs.id) glDetachShader(program.handle, vs.id);
+	if (gs.id) glDetachShader(program.handle, gs.id);
+	if (fs.id) glDetachShader(program.handle, fs.id);
+
 	return program;
 }
 //=============================================================================
@@ -542,33 +572,26 @@ void MeshVertex::SetVertexAttributes()
 	SpecifyVertexAttributes(vertexSize, attributes);
 }
 //=============================================================================
-GLuint CreateBuffer(GLenum target, BufferUsage usage, GLsizeiptr size, const void* data)
+BufferHandle CreateBuffer(BufferType target, BufferUsage usage, GLsizeiptr size, const void* data)
 {
-	GLuint currentBuffer = GetCurrentBuffer(target);
-	GLenum glUsage = 0;
-	switch (usage)
-	{
-	case BufferUsage::Static:  glUsage = GL_STATIC_DRAW; break;
-	case BufferUsage::Dynamic: glUsage = GL_DYNAMIC_DRAW; break;
-	default: std::unreachable(); break;
-	}
+	GLuint currentBuffer = GetCurrentBuffer(GetGLEnum(target));
 
-	GLuint buffer{ 0 };
-	glGenBuffers(1, &buffer);
-	glBindBuffer(target, buffer);
-	glBufferData(target, size, data, glUsage);
-	glBindBuffer(target, currentBuffer);
+	BufferHandle buffer{};
+	glGenBuffers(1, &buffer.handle);
+	glBindBuffer(GetGLEnum(target), buffer.handle);
+	glBufferData(GetGLEnum(target), size, data, GetGLEnum(usage));
+	glBindBuffer(GetGLEnum(target), currentBuffer);
 
 	return buffer;
 }
 //=============================================================================
-void BufferSubData(GLuint bufferId, GLenum target, GLintptr offset, GLsizeiptr size, const void* data)
+void BufferSubData(BufferHandle bufferId, BufferType target, GLintptr offset, GLsizeiptr size, const void* data)
 {
-	GLuint currentBuffer = GetCurrentBuffer(target);
+	GLuint currentBuffer = GetCurrentBuffer(GetGLEnum(target));
 
-	glBindBuffer(target, bufferId);
-	glBufferSubData(target, offset, size, data);
-	glBindBuffer(target, currentBuffer);
+	glBindBuffer(GetGLEnum(target), bufferId.handle);
+	glBufferSubData(GetGLEnum(target), offset, size, data);
+	glBindBuffer(GetGLEnum(target), currentBuffer);
 }
 //=============================================================================
 GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVertically)

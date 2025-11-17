@@ -4,6 +4,26 @@
 // Enums
 //=============================================================================
 
+enum class BufferUsage : uint8_t
+{
+	StaticDraw,
+	DynamicDraw,
+	StreamDraw,
+	StaticRead,
+	DynamicRead,
+	StreamRead,
+	StaticCopy,
+	DynamicCopy,
+	StreamCopy
+};
+
+enum class BufferType : uint8_t
+{
+	ArrayBuffer,
+	ElementArrayBuffer,
+	UniformBuffer
+};
+
 enum class ComparisonFunc : uint8_t
 {
 	Never,
@@ -15,6 +35,8 @@ enum class ComparisonFunc : uint8_t
 	GreaterEqual,
 	Always
 };
+
+
 
 enum class BlendFactor : uint8_t
 {
@@ -89,6 +111,7 @@ GLenum GetDataTypeGL(DataType dataType);
 //=============================================================================
 struct ProgramHandle final { GLuint handle{ 0u }; };
 struct BufferHandle final { GLuint handle{ 0u }; };
+struct VertexArrayHandle final { GLuint handle{ 0u }; };
 struct TextureHandle final { GLuint handle{ 0u }; };
 struct SamplerHandle final { GLuint handle{ 0u }; };
 
@@ -184,14 +207,10 @@ struct MeshVertex final
 //=============================================================================
 // Buffer
 //=============================================================================
-enum class BufferUsage : uint8_t
-{
-	Static,
-	Dynamic
-};
-GLuint CreateBuffer(GLenum target, BufferUsage usage, GLsizeiptr size, const void* data);
 
-void BufferSubData(GLuint bufferId, GLenum target, GLintptr offset, GLsizeiptr size, const void* data);
+BufferHandle CreateBuffer(BufferType target, BufferUsage usage, GLsizeiptr size, const void* data);
+
+void BufferSubData(BufferHandle bufferId, BufferType target, GLintptr offset, GLsizeiptr size, const void* data);
 
 //=============================================================================
 // Textures

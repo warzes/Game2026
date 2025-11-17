@@ -35,10 +35,10 @@ bool RPSSAO::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	};
 
 	GLuint currentVBO = GetCurrentBuffer(GL_ARRAY_BUFFER);
-	m_vbo = CreateBuffer(GL_ARRAY_BUFFER, BufferUsage::Static, vertices.size() * sizeof(QuadVertex), vertices.data());
+	m_vbo = CreateBuffer(BufferType::ArrayBuffer, BufferUsage::StaticDraw, vertices.size() * sizeof(QuadVertex), vertices.data());
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo.handle);
 	QuadVertex::SetVertexAttributes();
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, currentVBO);
