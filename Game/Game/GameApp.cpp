@@ -14,9 +14,6 @@
 
 */
 
-
-
-
 /*
 idea:
 - https://hardboiledcrab.itch.io/tiled-mediaval-building  - example tile house building
