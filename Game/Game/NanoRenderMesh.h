@@ -39,8 +39,8 @@ private:
 	uint32_t                   m_vertexCount{ 0 };
 	uint32_t                   m_indicesCount{ 0 };
 	GLuint                     m_vao{ 0 };
-	BufferHandle                     m_vbo{};
-	BufferHandle                     m_ebo{};
+	BufferHandle               m_vbo{};
+	BufferHandle               m_ebo{};
 	std::optional<Material>    m_material{};
 	std::optional<PBRMaterial> m_pbrMaterial{};
 	AABB                       m_aabb{};

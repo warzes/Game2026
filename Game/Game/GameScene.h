@@ -1,15 +1,9 @@
-﻿#pragma once
+#pragma once
 
 #include "NanoRender.h"
 #include "NanoScene.h"
-#include "RP_1_DirectionalLightsShadowMap.h"
-#include "RP_2_MainScene.h"
-#include "RPGeometry.h"
-#include "RPSSAO.h"
-#include "RPSSAOBlur.h"
-#include "RPBlinnPhong.h"
-#include "RPComposite.h"
 #include "GameWorldData.h"
+#include "RenderPass1.h"
 
 struct GameObject final
 {
@@ -40,15 +34,6 @@ private:
 
 	void blittingToScreen(GLuint fbo, uint16_t srcWidth, uint16_t srcHeight);
 
-	GameWorldData                m_data;
-
-	RPDirectionalLightsShadowMap m_rpDirShadowMap;
-	RPMainScene                  m_rpMainScene;
-
-	RPGeometry                   m_rpGeometry;
-	RPSSAO                       m_rpSSAO;
-	RPSSAOBlur                   m_rpSSAOBlur;
-	RPBlinnPhong                 m_rpBlinnPhong;
-
-	RPComposite                  m_rpComposite;
+	GameWorldData m_data;
+	RenderPass1   m_rpDirShadowMap;
 };

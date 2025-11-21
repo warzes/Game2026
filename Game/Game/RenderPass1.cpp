@@ -1,10 +1,10 @@
-п»ї#include "stdafx.h"
-#include "RP_1_DirectionalLightsShadowMap.h"
-#include "GameSceneO.h"
+#include "stdafx.h"
+#include "RenderPass1.h"
+#include "GameScene.h"
 #include "NanoIO.h"
 #include "NanoLog.h"
 //=============================================================================
-bool RPDirectionalLightsShadowMap::Init(ShadowQuality shadowQuality)
+bool RenderPass1::Init(ShadowQuality shadowQuality)
 {
 	m_shadowQuality = shadowQuality;
 	m_orthoDimension = 10.0f;
@@ -19,9 +19,9 @@ bool RPDirectionalLightsShadowMap::Init(ShadowQuality shadowQuality)
 	return true;
 }
 //=============================================================================
-void RPDirectionalLightsShadowMap::Close()
+void RenderPass1::Close()
 {
-	if (m_program.handle) 
+	if (m_program.handle)
 		glDeleteProgram(m_program.handle);
 
 	for (size_t i = 0; i < m_depthFBO.size(); i++)
@@ -30,7 +30,7 @@ void RPDirectionalLightsShadowMap::Close()
 	}
 }
 //=============================================================================
-void RPDirectionalLightsShadowMap::Draw(const GameWorldDataO& worldData)
+void RenderPass1::Draw(const GameWorldData& worldData)
 {
 	if (m_shadowQuality == ShadowQuality::Off) return;
 	if (worldData.numDirLights == 0) return;
@@ -68,7 +68,7 @@ void RPDirectionalLightsShadowMap::Draw(const GameWorldDataO& worldData)
 	}
 }
 //=============================================================================
-void RPDirectionalLightsShadowMap::SetShadowQuality(ShadowQuality quality)
+void RenderPass1::SetShadowQuality(ShadowQuality quality)
 {
 	if (m_shadowQuality == quality) return;
 
@@ -80,7 +80,7 @@ void RPDirectionalLightsShadowMap::SetShadowQuality(ShadowQuality quality)
 	}
 }
 //=============================================================================
-void RPDirectionalLightsShadowMap::drawScene(const glm::mat4& lightSpaceMatrix, const GameWorldDataO& worldData)
+void RenderPass1::drawScene(const glm::mat4& lightSpaceMatrix, const GameWorldData& worldData)
 {
 	for (size_t i = 0; i < worldData.numGameObject; i++)
 	{
@@ -109,12 +109,12 @@ void RPDirectionalLightsShadowMap::drawScene(const glm::mat4& lightSpaceMatrix, 
 	}
 }
 //=============================================================================
-void RPDirectionalLightsShadowMap::BindDepthTexture(size_t id, unsigned slot) const
+void RenderPass1::BindDepthTexture(size_t id, unsigned slot) const
 {
 	m_depthFBO[id].BindDepthTexture(slot);
 }
 //=============================================================================
-bool RPDirectionalLightsShadowMap::initProgram()
+bool RenderPass1::initProgram()
 {
 	m_program = LoadShaderProgram("data/shaders/shadowMapping/vertex.glsl", "data/shaders/shadowMapping/fragment.glsl");
 	if (!m_program.handle)
@@ -133,12 +133,12 @@ bool RPDirectionalLightsShadowMap::initProgram()
 
 	SetUniform((GLuint)albedoTextureId, 0);
 
-	glUseProgram(0); // TODO: РІРѕР·РјРѕР¶РЅРѕ РІРµСЂРЅСѓС‚СЊ РїСЂРѕС€Р»СѓСЋ
+	glUseProgram(0); // TODO: возможно вернуть прошлую
 
 	return true;
 }
 //=============================================================================
-bool RPDirectionalLightsShadowMap::initFBO()
+bool RenderPass1::initFBO()
 {
 	FramebufferInfo depthFboInfo;
 	depthFboInfo.depthAttachment = DepthAttachment{ .type = AttachmentType::Texture };

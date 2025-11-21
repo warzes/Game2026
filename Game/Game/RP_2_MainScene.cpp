@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "RP_2_MainScene.h"
-#include "GameScene.h"
+#include "GameSceneO.h"
 #include "NanoLog.h"
 #include "NanoWindow.h"
 //=============================================================================
@@ -27,7 +27,7 @@ void RPMainScene::Close()
 	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
-void RPMainScene::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const GameWorldData& gameData)
+void RPMainScene::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const GameWorldDataO& gameData)
 {
 	m_fbo.Bind();
 	glEnable(GL_DEPTH_TEST);
@@ -80,7 +80,7 @@ void RPMainScene::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_fbo.Resize(m_framebufferWidth, m_framebufferHeight);
 }
 //=============================================================================
-void RPMainScene::drawScene(const GameWorldData& gameData)
+void RPMainScene::drawScene(const GameWorldDataO& gameData)
 {
 	GLuint albedoTex = 0;
 	GLuint normalTex = 0;

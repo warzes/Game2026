@@ -63,7 +63,6 @@ struct DirectionalLight final
 	glm::vec3 color{ 1.0f };
 };
 
-
 struct PointLight final
 {
 	glm::vec3 position{ 0.0f };

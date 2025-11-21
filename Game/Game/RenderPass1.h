@@ -1,8 +1,10 @@
-﻿#pragma once
+#pragma once
+
+// Render Pass DirectionalLightsShadowMap
 
 #include "Framebuffer.h"
 
-enum class ShadowQuality 
+enum class ShadowQuality
 {
 	Off = 0,
 	Tiny = 256,
@@ -13,15 +15,15 @@ enum class ShadowQuality
 	Mega = 8192
 };
 
-struct GameWorldDataO;
+struct GameWorldData;
 
-class RPDirectionalLightsShadowMap final
+class RenderPass1 final
 {
 public:
 	bool Init(ShadowQuality shadowQuality);
 	void Close();
 
-	void Draw(const GameWorldDataO& worldData);
+	void Draw(const GameWorldData& worldData);
 
 	void SetShadowQuality(ShadowQuality quality);
 
@@ -34,9 +36,9 @@ public:
 private:
 	bool initProgram();
 	bool initFBO();
-	void drawScene(const glm::mat4& lightSpaceMatrix, const GameWorldDataO& worldData);
+	void drawScene(const glm::mat4& lightSpaceMatrix, const GameWorldData& worldData);
 
-	ProgramHandle                                       m_program{ 0 };
+	ProgramHandle                                m_program{ 0 };
 	int                                          m_mvpMatrixId{ -1 };
 	int                                          m_hasAlbedoMapId{ -1 };
 

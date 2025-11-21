@@ -2,7 +2,7 @@
 #include "RPGeometry.h"
 #include "NanoWindow.h"
 #include "NanoLog.h"
-#include "GameScene.h"
+#include "GameSceneO.h"
 //=============================================================================
 bool RPGeometry::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
@@ -66,7 +66,7 @@ void RPGeometry::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_fbo.Resize(m_framebufferWidth, m_framebufferHeight);
 }
 //=============================================================================
-void RPGeometry::Draw(const std::vector<GameObject*>& gameObject, size_t numGameObject, Camera* camera)
+void RPGeometry::Draw(const std::vector<GameObjectO*>& gameObject, size_t numGameObject, Camera* camera)
 {
 	m_fbo.Bind();
 	glViewport(0, 0, static_cast<int>(m_framebufferWidth), static_cast<int>(m_framebufferHeight));
@@ -80,7 +80,7 @@ void RPGeometry::Draw(const std::vector<GameObject*>& gameObject, size_t numGame
 	drawScene(gameObject, numGameObject);
 }
 //=============================================================================
-void RPGeometry::drawScene(const std::vector<GameObject*>& gameObject, size_t numGameObject)
+void RPGeometry::drawScene(const std::vector<GameObjectO*>& gameObject, size_t numGameObject)
 {
 	ModelDrawInfo drawInfo;
 	drawInfo.bindMaterials = true;

@@ -7,24 +7,24 @@
 #include "NanoRender.h"
 #include "NanoScene.h"
 #include "GridAxis.h"
-#include "GameScene.h"
+#include "GameSceneO.h"
 //=============================================================================
 namespace
 {
-	GameScene scene;
+	GameSceneO scene;
 
 	Camera camera;
-	GameObject modelTest;
+	GameObjectO modelTest;
 	DirectionalLight dirLight;
 
 	PointLight pointLights[10];
 
 
-	GameObject sphereEntity;
-	GameObject box1Entity;
-	GameObject box2Entity;
-	GameObject box3Entity;
-	GameObject box4Entity;
+	GameObjectO sphereEntity;
+	GameObjectO box1Entity;
+	GameObjectO box2Entity;
+	GameObjectO box3Entity;
+	GameObjectO box4Entity;
 }
 //=============================================================================
 void OldGameApp()

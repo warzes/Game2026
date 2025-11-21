@@ -3,7 +3,7 @@
 #include "Framebuffer.h"
 
 class RPDirectionalLightsShadowMap;
-struct GameWorldData;
+struct GameWorldDataO;
 
 class RPMainScene final
 {
@@ -13,7 +13,7 @@ public:
 
 	void Resize(uint16_t framebufferWidth, uint16_t framebufferHeight);
 
-	void Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const GameWorldData& gameData);
+	void Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const GameWorldDataO& gameData);
 
 	const Framebuffer& GetFBO() const { return m_fbo; }
 	GLuint GetFBOId() const { return m_fbo.GetId(); }
@@ -24,7 +24,7 @@ private:
 	bool initProgram();
 	bool initFBO();
 	void setSize(uint16_t framebufferWidth, uint16_t framebufferHeight);
-	void drawScene(const GameWorldData& gameData);
+	void drawScene(const GameWorldDataO& gameData);
 
 	uint16_t  m_framebufferWidth{ 0 };
 	uint16_t  m_framebufferHeight{ 0 };

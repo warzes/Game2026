@@ -3,7 +3,7 @@
 #include "Framebuffer.h"
 
 class Camera;
-struct GameObject;
+struct GameObjectO;
 class RPDirectionalLightsShadowMap;
 struct DirectionalLight;
 
@@ -17,7 +17,7 @@ public:
 
 	void Draw(const RPDirectionalLightsShadowMap& rpShadowMap, 
 		const std::vector<DirectionalLight*>& dirLights, size_t numDirLights,
-		const std::vector<GameObject*>& gameObject, size_t numGameObject, 
+		const std::vector<GameObjectO*>& gameObject, size_t numGameObject, 
 		Camera* camera);
 
 	const Framebuffer& GetFBO() const { return m_fbo; }
@@ -26,7 +26,7 @@ public:
 	uint16_t GetHeight() const { return m_framebufferHeight; }
 
 private:
-	void drawScene(const std::vector<GameObject*>& gameObject, size_t numGameObject);
+	void drawScene(const std::vector<GameObjectO*>& gameObject, size_t numGameObject);
 
 	ProgramHandle    m_program{ 0 };
 	int       m_projectionMatrixId{ -1 };

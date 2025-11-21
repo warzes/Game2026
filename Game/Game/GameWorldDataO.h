@@ -1,12 +1,12 @@
-#pragma once
+﻿#pragma once
 
 class Camera;
-struct GameObject;
+struct GameObjectO;
 struct DirectionalLight;
 struct PointLight;
 struct SpotLight;
 
-struct GameWorldData final // TODO;
+struct GameWorldDataO final // TODO;
 {
 	void Init()
 	{
@@ -26,7 +26,7 @@ struct GameWorldData final // TODO;
 	}
 
 	Camera*                        camera{ nullptr };
-	std::vector<GameObject*>       gameObjects;
+	std::vector<GameObjectO*>       gameObjects;
 	size_t                         numGameObject{ 0 };
 	std::vector<DirectionalLight*> dirLights;
 	size_t                         numDirLights{ 0 };

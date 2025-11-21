@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "GameScene.h"
 #include "NanoWindow.h"
 #include "NanoIO.h"
@@ -13,30 +13,14 @@ bool GameScene::Init()
 
 	if (!m_rpDirShadowMap.Init(ShadowQuality::High))
 		return false;
-	if (!m_rpGeometry.Init(wndWidth, wndHeight))
-		return false;
-	if (!m_rpSSAO.Init(wndWidth, wndHeight))
-		return false;
-	if (!m_rpSSAOBlur.Init(wndWidth, wndHeight))
-		return false;
-	if (!m_rpBlinnPhong.Init(wndWidth, wndHeight))
-		return false;
-	if (!m_rpMainScene.Init(wndWidth, wndHeight))
-		return false;
-	if (!m_rpComposite.Init(wndWidth, wndHeight))
-		return false;
-		
+
+
+
 	return true;
 }
 //=============================================================================
 void GameScene::Close()
 {
-	m_rpMainScene.Close();
-	m_rpBlinnPhong.Close();
-	m_rpComposite.Close();
-	m_rpSSAOBlur.Close();
-	m_rpSSAO.Close();
-	m_rpGeometry.Close();
 	m_rpDirShadowMap.Close();
 }
 //=============================================================================
@@ -110,13 +94,6 @@ void GameScene::beginDraw()
 {
 	const auto wndWidth = window::GetWidth();
 	const auto wndHeight = window::GetHeight();
-
-	m_rpGeometry.Resize(wndWidth, wndHeight);
-	m_rpSSAO.Resize(wndWidth, wndHeight);
-	m_rpSSAOBlur.Resize(wndWidth, wndHeight);
-	m_rpBlinnPhong.Resize(wndWidth, wndHeight);
-	m_rpMainScene.Resize(wndWidth, wndHeight);
-	m_rpComposite.Resize(wndWidth, wndHeight);
 }
 //=============================================================================
 void GameScene::draw()
@@ -126,39 +103,8 @@ void GameScene::draw()
 	m_rpDirShadowMap.Draw(m_data);
 	//m_rpSpotShadowMap.Draw(m_data);
 	//m_rpPointShadowMap.Draw(m_data);
-	//m_rpAreaShadowMap.Draw(m_data);
 
-	//================================================================================
-	// 2.) Render Pass: render Scene as normal using the generated depth / shadow map
-	m_rpMainScene.Draw(m_rpDirShadowMap, m_data);
-
-	//================================================================================
-	// 3.) Render Pass: SSAO
-	if (EnableSSAO)
-	{
-		//================================================================================
-		// 3.1 Render Pass: geometry
-		m_rpGeometry.Draw(m_data.gameObjects, m_data.numGameObject, m_data.camera);
-
-		//================================================================================
-		// 3.2 Render Pass: SSAO
-		//		Set state: glDisable(GL_DEPTH_TEST);
-		m_rpSSAO.Draw(&m_rpGeometry.GetFBO());
-
-		//================================================================================
-		// 3.3 Render Pass: SSAO Blur
-		m_rpSSAOBlur.Draw(&m_rpSSAO.GetFBO());
-	}
-
-	//================================================================================
-	// 4 Render Pass: post frame
-	//		Set state: glDisable(GL_DEPTH_TEST);
-	//m_rpComposite.Draw(&m_rpBlinnPhong.GetFBO(), EnableSSAO ? &m_rpSSAOBlur.GetFBO() : nullptr);
-	m_rpComposite.Draw(&m_rpMainScene.GetFBO(), EnableSSAO ? &m_rpSSAOBlur.GetFBO() : nullptr);
-
-	//================================================================================
-	// 5 Render Pass: blitting main fbo
-	blittingToScreen(m_rpComposite.GetFBOId(), m_rpComposite.GetWidth(), m_rpComposite.GetHeight());
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 //=============================================================================
 void GameScene::endDraw()

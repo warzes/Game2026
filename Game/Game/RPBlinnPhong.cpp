@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "RPBlinnPhong.h"
-#include "GameScene.h"
+#include "GameSceneO.h"
 #include "NanoLog.h"
 #include "NanoWindow.h"
 //=============================================================================
@@ -57,7 +57,7 @@ void RPBlinnPhong::Close()
 	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
-void RPBlinnPhong::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const std::vector<DirectionalLight*>& dirLights, size_t numDirLights, const std::vector<GameObject*>& gameObject, size_t numGameObject, Camera* camera)
+void RPBlinnPhong::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const std::vector<DirectionalLight*>& dirLights, size_t numDirLights, const std::vector<GameObjectO*>& gameObject, size_t numGameObject, Camera* camera)
 {
 	m_fbo.Bind();
 	glEnable(GL_DEPTH_TEST);
@@ -118,7 +118,7 @@ void RPBlinnPhong::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_fbo.Resize(m_framebufferWidth, m_framebufferHeight);
 }
 //=============================================================================
-void RPBlinnPhong::drawScene(const std::vector<GameObject*>& gameObject, size_t numGameObject)
+void RPBlinnPhong::drawScene(const std::vector<GameObjectO*>& gameObject, size_t numGameObject)
 {
 	ModelDrawInfo drawInfo;
 	drawInfo.bindMaterials = true;

@@ -98,9 +98,10 @@
     <ClCompile Include="ExampleApp002.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GameApp.cpp" />
+    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="NanoOpenGL3Advance.cpp" />
     <ClCompile Include="OldGameApp.cpp" />
-    <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="GameSceneO.cpp" />
     <ClCompile Include="GridAxis.cpp" />
     <ClCompile Include="LightO.cpp" />
     <ClCompile Include="NanoCore.cpp" />
@@ -113,6 +114,7 @@
     <ClCompile Include="NanoRenderTextures.cpp" />
     <ClCompile Include="NanoScene.cpp" />
     <ClCompile Include="Region.cpp" />
+    <ClCompile Include="RenderPass1.cpp" />
     <ClCompile Include="RP_1_DirectionalLightsShadowMap.cpp" />
     <ClCompile Include="RPGeometry.cpp" />
     <ClCompile Include="RPBlinnPhong.cpp" />
@@ -141,7 +143,9 @@
     <ClInclude Include="GameApp.h" />
     <ClInclude Include="GameConfig.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="GameSceneO.h" />
     <ClInclude Include="GameWorldData.h" />
+    <ClInclude Include="GameWorldDataO.h" />
     <ClInclude Include="GridAxis.h" />
     <ClInclude Include="LightO.h" />
     <ClInclude Include="NanoCore.h" />
@@ -160,6 +164,7 @@
     <ClInclude Include="NanoScene.h" />
     <ClInclude Include="NanoWindow.h" />
     <ClInclude Include="Region.h" />
+    <ClInclude Include="RenderPass1.h" />
     <ClInclude Include="RP_1_DirectionalLightsShadowMap.h" />
     <ClInclude Include="RPGeometry.h" />
     <ClInclude Include="RPBlinnPhong.h" />

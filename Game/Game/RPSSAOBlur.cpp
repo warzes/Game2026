@@ -2,7 +2,7 @@
 #include "RPSSAOBlur.h"
 #include "NanoWindow.h"
 #include "NanoLog.h"
-#include "GameScene.h"
+#include "GameSceneO.h"
 // TODO: в каждом renderpass создается свой квад, а нужно сделать общий
 //=============================================================================
 bool RPSSAOBlur::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
