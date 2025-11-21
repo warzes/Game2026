@@ -115,6 +115,8 @@
     <ClCompile Include="NanoScene.cpp" />
     <ClCompile Include="Region.cpp" />
     <ClCompile Include="RenderPass1.cpp" />
+    <ClCompile Include="RenderPass2.cpp" />
+    <ClCompile Include="RenderPass6.cpp" />
     <ClCompile Include="RP_1_DirectionalLightsShadowMap.cpp" />
     <ClCompile Include="RPGeometry.cpp" />
     <ClCompile Include="RPBlinnPhong.cpp" />
@@ -165,6 +167,8 @@
     <ClInclude Include="NanoWindow.h" />
     <ClInclude Include="Region.h" />
     <ClInclude Include="RenderPass1.h" />
+    <ClInclude Include="RenderPass2.h" />
+    <ClInclude Include="RenderPass6.h" />
     <ClInclude Include="RP_1_DirectionalLightsShadowMap.h" />
     <ClInclude Include="RPGeometry.h" />
     <ClInclude Include="RPBlinnPhong.h" />

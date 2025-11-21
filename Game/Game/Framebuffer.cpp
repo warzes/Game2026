@@ -32,6 +32,18 @@ void Framebuffer::Bind()
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 }
 //=============================================================================
+void Framebuffer::BindOnlyDraw()
+{
+	assert(m_fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+}
+//=============================================================================
+void Framebuffer::BindOnlyRead()
+{
+	assert(m_fbo);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
+}
+//=============================================================================
 void Framebuffer::Unbind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

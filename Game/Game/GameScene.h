@@ -4,6 +4,8 @@
 #include "NanoScene.h"
 #include "GameWorldData.h"
 #include "RenderPass1.h"
+#include "RenderPass2.h"
+#include "RenderPass6.h"
 
 struct GameObject final
 {
@@ -36,4 +38,11 @@ private:
 
 	GameWorldData m_data;
 	RenderPass1   m_rpDirShadowMap;
+	RenderPass2   m_rpMainScene;
+	// SSAO
+	//RenderPass3   m_rpGeometry;
+	//RenderPass4   m_rpSSAO;
+	//RenderPass5   m_rpSSAOBlur;
+
+	RenderPass6   m_rpComposite;
 };

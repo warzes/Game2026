@@ -56,7 +56,7 @@ void GameApp()
 
 		camera.SetPosition(glm::vec3(0.0f, 0.5f, 4.5f));
 
-		modelTest.model.Load("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj", ModelMaterialType::PBR);
+		modelTest.model.Load("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj", ModelMaterialType::BlinnPhong);
 		modelTest.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(-30.0f, 0.0f, 15.0f));
 
 		sphereEntity.model.Create(GeometryGenerator::CreateSphere(0.5f, 16, 16));

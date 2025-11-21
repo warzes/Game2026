@@ -64,6 +64,8 @@ public:
 	void Destroy();
 
 	void Bind();
+	void BindOnlyDraw();
+	void BindOnlyRead();
 	static void Unbind();
 
 	void Resize(uint16_t width, uint16_t height);

@@ -117,6 +117,12 @@
     <ClCompile Include="RenderPass1.cpp">
       <Filter>NewGameApp\RenderPass</Filter>
     </ClCompile>
+    <ClCompile Include="RenderPass2.cpp">
+      <Filter>NewGameApp\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPass6.cpp">
+      <Filter>NewGameApp\RenderPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -225,6 +231,12 @@
       <Filter>NewGameApp</Filter>
     </ClInclude>
     <ClInclude Include="RenderPass1.h">
+      <Filter>NewGameApp\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPass2.h">
+      <Filter>NewGameApp\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPass6.h">
       <Filter>NewGameApp\RenderPass</Filter>
     </ClInclude>
   </ItemGroup>
