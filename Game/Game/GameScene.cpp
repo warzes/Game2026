@@ -11,7 +11,7 @@ bool GameScene::Init()
 	const auto wndWidth = window::GetWidth();
 	const auto wndHeight = window::GetHeight();
 
-	if (!m_rpDirShadowMap.Init(ShadowQuality::Small))
+	if (!m_rpDirShadowMap.Init(ShadowQuality::High))
 		return false;
 	if (!m_rpMainScene.Init(wndWidth, wndHeight))
 		return false;

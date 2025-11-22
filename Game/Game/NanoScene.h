@@ -61,6 +61,7 @@ struct DirectionalLight final
 {
 	glm::vec3 direction{ 0.1f };
 	glm::vec3 color{ 1.0f };
+	float luminosity{ 1.0f }; // TODO:
 };
 
 struct PointLight final

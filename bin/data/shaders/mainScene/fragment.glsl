@@ -1,6 +1,7 @@
 #version 330 core
 
 #include "../utils.glsl"
+#include "../BlinnPhong.glsl"
 
 in VS_OUT {
 	vec3 VertColor;
@@ -15,15 +16,13 @@ in VS_OUT {
 } fs_in;
 
 uniform mat4 projectionMatrix;
+uniform vec3 viewPos;
 
 uniform sampler2D u_DiffuseMap;
 uniform bool hasDiffuseMap;
 
 uniform sampler2D u_SpecularMap;
 uniform bool hasSpecularMap;
-
-uniform sampler2D u_MaskMap;
-uniform bool hasMaskMap;
 
 uniform vec4 u_Diffuse = vec4(1.0, 1.0, 1.0, 1.0);
 uniform vec3 u_Specular = vec3(1.0, 1.0, 1.0);
@@ -44,12 +43,17 @@ uniform sampler2D u_NormalMap;
 uniform bool hasNormalMap;
 #endif
 
-uniform sampler2D u_ShadowMap;
-uniform mat4 lightSpaceMatrix;
-
 const float alphaClippingThreshold = 0.1;
 
 layout(location = 0) out vec4 FragColor;
+
+vec3 ComputeNormal(vec2 texCoords, vec3 normal, sampler2D normalMap, mat3 TBN)
+{
+    normal = texture(normalMap, texCoords).rgb;
+    normal = normalize(normal * 2.0 - 1.0);
+    normal = normalize(TBN * normal);
+    return normal;
+}
 
 void main()
 {
@@ -70,16 +74,27 @@ void main()
 		diffuse = texture(u_DiffuseMap, texCoords) * diffuse;
 	}
 
-	//diffuse.a *= texture(u_MaskMap, texCoords).r;
-
 	// early discard
 	if(diffuse.a < alphaClippingThreshold) discard;
 
+	vec3 normal = normalize(fs_in.Normal);
 #if defined(NORMAL_MAPPING)
-	//const vec3 normal = ComputeNormal(texCoords, fs_in.Normal, u_NormalMap, fs_in.TBN);
-#else
-	//const vec3 normal = normalize(fs_in.Normal);
+	if (hasNormalMap)
+	{
+		normal = ComputeNormal(texCoords, fs_in.Normal, u_NormalMap, fs_in.TBN);
+	}	
 #endif
 
-	FragColor = diffuse;
+	// TODO: u_SpecularMap
+
+	FragColor = ComputeBlinnPhongLighting(
+		texCoords,
+		normal,
+		viewPos,
+		fs_in.FragPos,
+		diffuse,
+		u_Specular,
+		u_SpecularMap,
+		u_Shininess
+	);
 }

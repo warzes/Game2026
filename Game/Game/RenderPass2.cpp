@@ -41,18 +41,15 @@ void RenderPass2::Draw(const RenderPass1& rpShadowMap, const GameWorldData& game
 
 	SetUniform(m_viewPosId, gameData.camera->Position);
 
-	int textureOffset{ 5 };
-	const auto* light = gameData.dirLights[0];
-	SetUniform(GetUniformLocation(m_program, "lightSpaceMatrix"), rpShadowMap.GetLightSpaceMatrix(0));
-	rpShadowMap.BindDepthTexture(0, textureOffset);
-
-	/*for (int i = 0; i < gameData.numDirLights; ++i)
+	int textureOffset{ 4 };
+	for (int i = 0; i < gameData.numDirLights; ++i)
 	{
 		const auto* light = gameData.dirLights[i];
 
 		std::string prefix = "dirLight[" + std::to_string(i) + "].";
 		SetUniform(GetUniformLocation(m_program, prefix + "direction"), light->direction);
 		SetUniform(GetUniformLocation(m_program, prefix + "color"), light->color);
+		SetUniform(GetUniformLocation(m_program, prefix + "luminosity"), light->luminosity);
 		SetUniform(GetUniformLocation(m_program, prefix + "depthMap"), textureOffset);
 		SetUniform(GetUniformLocation(m_program, prefix + "lightSpaceMatrix"), rpShadowMap.GetLightSpaceMatrix(i));
 
@@ -62,7 +59,7 @@ void RenderPass2::Draw(const RenderPass1& rpShadowMap, const GameWorldData& game
 	}
 	SetUniform(GetUniformLocation(m_program, "dirLightCount"), (int)gameData.numDirLights);
 
-	for (int i = 0; i < gameData.numPointLights; ++i)
+	/*for (int i = 0; i < gameData.numPointLights; ++i)
 	{
 		const auto* light = gameData.pointLights[i];
 
@@ -89,11 +86,9 @@ void RenderPass2::drawScene(const GameWorldData& gameData)
 {
 	GLuint diffuseTex = 0;
 	GLuint specularTex = 0;
-	GLuint maskTex = 0;
 	GLuint heightMapTex = textures::GetWhiteTexture2D().id;
 	GLuint normalTex = 0;
 
-	// TODO: mask texture
 	// TODO: heightmap textuere
 
 	for (size_t i = 0; i < gameData.numGameObject; i++)
@@ -109,25 +104,22 @@ void RenderPass2::drawScene(const GameWorldData& gameData)
 			const auto& material = mesh.GetMaterial();
 			diffuseTex = 0;
 			specularTex = 0;
-			maskTex = 0;
 			normalTex = 0;
 			if (material)
 			{
-				if (!material->diffuseTextures.empty()) diffuseTex = material->diffuseTextures[0].id;
+				if (!material->diffuseTextures.empty())  diffuseTex = material->diffuseTextures[0].id;
 				if (!material->specularTextures.empty()) specularTex = material->specularTextures[0].id;
-				if (!material->normalTextures.empty()) normalTex = material->normalTextures[0].id;
+				if (!material->normalTextures.empty())   normalTex = material->normalTextures[0].id;
 			}
 
 			SetUniform(m_hasDiffuseMapId, diffuseTex > 0);
 			SetUniform(m_hasSpecularMapId, specularTex > 0);
-			SetUniform(m_hasMaskMapId, maskTex > 0);
 			SetUniform(m_hasNormalMapId, normalTex > 0);
 
 			BindTexture2D(0, diffuseTex);
 			BindTexture2D(1, specularTex);
-			BindTexture2D(2, maskTex);
-			BindTexture2D(3, heightMapTex);
-			BindTexture2D(4, normalTex);
+			BindTexture2D(2, heightMapTex);
+			BindTexture2D(3, normalTex);
 
 
 			mesh.Draw(GL_TRIANGLES);
@@ -155,18 +147,15 @@ bool RenderPass2::initProgram()
 	int diffuseMap = GetUniformLocation(m_program, "u_DiffuseMap");
 	assert(diffuseMap > -1);
 	int specularMap = GetUniformLocation(m_program, "u_SpecularMap");
-	//assert(specularMap > -1);
-	int maskMap = GetUniformLocation(m_program, "u_MaskMap");
-	//assert(maskMap > -1);
+	assert(specularMap > -1);
 	int heightMap = GetUniformLocation(m_program, "u_HeightMap");
 	int normalMap = GetUniformLocation(m_program, "u_NormalMap");
 
 		
 	SetUniform(diffuseMap, 0);
 	SetUniform(specularMap, 1);
-	SetUniform(maskMap, 2);
-	if (heightMap > -1) SetUniform(heightMap, 3);
-	if (normalMap > -1) SetUniform(normalMap, 4);
+	if (heightMap > -1) SetUniform(heightMap, 2);
+	if (normalMap > -1) SetUniform(normalMap, 3);
 
 	m_projectionMatrixId = GetUniformLocation(m_program, "projectionMatrix");
 	assert(m_projectionMatrixId > -1);
@@ -181,8 +170,6 @@ bool RenderPass2::initProgram()
 	assert(m_hasDiffuseMapId > -1);
 	m_hasSpecularMapId = GetUniformLocation(m_program, "hasSpecularMap");
 	//assert(m_hasSpecularMapId > -1);
-	m_hasMaskMapId = GetUniformLocation(m_program, "hasMaskMap");
-	//assert(m_hasMaskMapId > -1);
 	m_hasNormalMapId = GetUniformLocation(m_program, "hasNormalMap");
 	//assert(m_hasNormalMapId > -1);
 

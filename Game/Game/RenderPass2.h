@@ -38,7 +38,6 @@ private:
 
 	int           m_hasDiffuseMapId{ -1 };
 	int           m_hasSpecularMapId{ -1 };
-	int           m_hasMaskMapId{ -1 };
 	int           m_hasNormalMapId{ -1 };
 
 
