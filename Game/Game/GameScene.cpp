@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "GameScene.h"
 #include "NanoWindow.h"
 #include "NanoIO.h"
@@ -75,6 +75,28 @@ void GameScene::BindLight(PointLight* ent)
 	}
 	m_data.pointLights[m_data.numPointLights] = ent;
 	m_data.numPointLights++;
+}
+//=============================================================================
+void GameScene::BindLight(AmbientBoxLight* ent)
+{
+	if (m_data.numBoxLights >= MaxAmbientBoxLight)
+	{
+		Error("Max box light");
+		return;
+	}
+	m_data.boxLights[m_data.numBoxLights] = ent;
+	m_data.numBoxLights++;
+}
+//=============================================================================
+void GameScene::BindLight(AmbientSphereLight* ent)
+{
+	if (m_data.numSphereLights >= MaxAmbientSphereLight)
+	{
+		Error("Max sphere light");
+		return;
+	}
+	m_data.sphereLights[m_data.numSphereLights] = ent;
+	m_data.numSphereLights++;
 }
 //=============================================================================
 void GameScene::Draw()

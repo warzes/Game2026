@@ -1,4 +1,4 @@
-#include "stdafx.h"
+п»ї#include "stdafx.h"
 #include "RenderPass2.h"
 #include "GameScene.h"
 #include "NanoLog.h"
@@ -59,15 +59,57 @@ void RenderPass2::Draw(const RenderPass1& rpShadowMap, const GameWorldData& game
 	}
 	SetUniform(GetUniformLocation(m_program, "dirLightCount"), (int)gameData.numDirLights);
 
-	/*for (int i = 0; i < gameData.numPointLights; ++i)
+	for (int i = 0; i < gameData.numPointLights; ++i)
 	{
 		const auto* light = gameData.pointLights[i];
 
 		std::string prefix = "pointLight[" + std::to_string(i) + "].";
 		SetUniform(GetUniformLocation(m_program, prefix + "position"), light->position);
 		SetUniform(GetUniformLocation(m_program, prefix + "color"), light->color);
+		SetUniform(GetUniformLocation(m_program, prefix + "attenuation"), light->attenuation);
+		SetUniform(GetUniformLocation(m_program, prefix + "intensity"), light->intensity);
 	}
-	SetUniform(GetUniformLocation(m_program, "pointLightCount"), (int)gameData.numPointLights);*/
+	SetUniform(GetUniformLocation(m_program, "pointLightCount"), (int)gameData.numPointLights);
+
+	for (int i = 0; i < gameData.numSpotLights; ++i)
+	{
+		const auto* light = gameData.spotLights[i];
+
+		std::string prefix = "spotLight[" + std::to_string(i) + "].";
+		SetUniform(GetUniformLocation(m_program, prefix + "position"), light->position);
+		SetUniform(GetUniformLocation(m_program, prefix + "direction"), light->direction);
+		SetUniform(GetUniformLocation(m_program, prefix + "color"), light->color);
+		SetUniform(GetUniformLocation(m_program, prefix + "attenuation"), light->attenuation);
+		SetUniform(GetUniformLocation(m_program, prefix + "intensity"), light->intensity);
+		SetUniform(GetUniformLocation(m_program, prefix + "cutOff"), light->cutOff);
+		SetUniform(GetUniformLocation(m_program, prefix + "outerCutOff"), light->outerCutOff);
+
+	}
+	SetUniform(GetUniformLocation(m_program, "spotLightCount"), (int)gameData.numSpotLights);
+
+	for (int i = 0; i < gameData.numBoxLights; ++i)
+	{
+		const auto* light = gameData.boxLights[i];
+
+		std::string prefix = "ambientBoxLight[" + std::to_string(i) + "].";
+		SetUniform(GetUniformLocation(m_program, prefix + "size"), light->size);
+		SetUniform(GetUniformLocation(m_program, prefix + "position"), light->position);
+		SetUniform(GetUniformLocation(m_program, prefix + "color"), light->color);
+		SetUniform(GetUniformLocation(m_program, prefix + "intensity"), light->intensity);
+	}
+	SetUniform(GetUniformLocation(m_program, "ambientBoxLightCount"), (int)gameData.numBoxLights);
+
+	for (int i = 0; i < gameData.numSphereLights; ++i)
+	{
+		const auto* light = gameData.sphereLights[i];
+
+		std::string prefix = "ambientSphereLight[" + std::to_string(i) + "].";
+		SetUniform(GetUniformLocation(m_program, prefix + "position"), light->position);
+		SetUniform(GetUniformLocation(m_program, prefix + "color"), light->color);
+		SetUniform(GetUniformLocation(m_program, prefix + "intensity"), light->intensity);
+		SetUniform(GetUniformLocation(m_program, prefix + "radius"), light->radius);
+	}
+	SetUniform(GetUniformLocation(m_program, "ambientSphereLightCount"), (int)gameData.numSphereLights);
 
 	glBindSampler(0, m_sampler);
 	drawScene(gameData);
@@ -134,6 +176,9 @@ bool RenderPass2::initProgram()
 		"NORMAL_MAPPING",
 		std::string("MAX_DIR_LIGHTS ") + std::to_string(MaxDirectionalLight),
 		std::string("MAX_POINT_LIGHTS ") + std::to_string(MaxPointLight),
+		std::string("MAX_SPOT_LIGHTS ") + std::to_string(MaxSpotLight),
+		std::string("MAX_AMBIENT_BOX_LIGHTS ") + std::to_string(MaxAmbientBoxLight),
+		std::string("MAX_AMBIENT_SPHERE_LIGHTS ") + std::to_string(MaxAmbientSphereLight),
 	};
 
 	m_program = LoadShaderProgram("data/shaders/mainScene/vertex.glsl", "data/shaders/mainScene/fragment.glsl", defines);
@@ -173,7 +218,7 @@ bool RenderPass2::initProgram()
 	m_hasNormalMapId = GetUniformLocation(m_program, "hasNormalMap");
 	//assert(m_hasNormalMapId > -1);
 
-	glUseProgram(0); // TODO: возможно вернуть прошлую версию шейдера
+	glUseProgram(0); // TODO: РІРѕР·РјРѕР¶РЅРѕ РІРµСЂРЅСѓС‚СЊ РїСЂРѕС€Р»СѓСЋ РІРµСЂСЃРёСЋ С€РµР№РґРµСЂР°
 
 	return true;
 }

@@ -38,6 +38,8 @@ namespace
 
 	PointLight pointLights[10];
 
+	AmbientSphereLight ambientSphereLight;
+
 	GameObject sphereEntity;
 	GameObject box1Entity;
 	GameObject box2Entity;
@@ -71,7 +73,7 @@ void GameApp()
 		box4Entity.model.Create(GeometryGenerator::CreateBox());
 		box4Entity.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-		dirLight.direction = glm::vec3(-0.7f, -0.6f, -0.7f);
+		dirLight.direction = glm::vec3(-0.2f, -0.6f, -0.2f);
 		dirLight.color = glm::vec3(1.0f, 0.9f, 0.9f);
 		dirLight.luminosity = 3;
 
@@ -81,8 +83,13 @@ void GameApp()
 			float y = rand() % 20 - 10;
 
 			pointLights[i].position = glm::vec3(x, 1.0f, y);
-			pointLights[i].color = glm::vec3(5.0f, 0.8f, 4.5f);
+			pointLights[i].color = glm::vec3(1.0f, 0.0f, 1.0f);
 		}
+
+		ambientSphereLight.position = glm::vec3(2.0f, 0.0f, 0.0f);
+		ambientSphereLight.radius = { 2.0f };
+		ambientSphereLight.intensity = 10.0f;
+		ambientSphereLight.color = glm::vec3(1.0f, 0.0, 0.0f);
 
 		while (!engine::ShouldClose())
 		{
@@ -119,6 +126,7 @@ void GameApp()
 			{
 				scene.BindLight(&pointLights[i]);
 			}
+			scene.BindLight(&ambientSphereLight);
 
 			scene.Draw();
 

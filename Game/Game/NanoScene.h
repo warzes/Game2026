@@ -61,13 +61,15 @@ struct DirectionalLight final
 {
 	glm::vec3 direction{ 0.1f };
 	glm::vec3 color{ 1.0f };
-	float luminosity{ 1.0f }; // TODO:
+	float luminosity{ 1.0f }; // TODO: test
 };
 
 struct PointLight final
 {
 	glm::vec3 position{ 0.0f };
 	glm::vec3 color{ 1.0f };
+	glm::vec3 attenuation{ 1.0f, 0.0f, 0.5f };
+	float intensity{ 1.0f }; // TODO: test
 };
 
 struct SpotLight final
@@ -75,7 +77,24 @@ struct SpotLight final
 	glm::vec3 position{ 0.0f };
 	glm::vec3 direction{ 0.1f };
 	glm::vec3 color{ 1.0f };
-
+	glm::vec3 attenuation{ 1.0f, 0.0f, 0.5f };
+	float intensity{ 1.0f }; // TODO: test
 	float cutOff{ 0.0f };
 	float outerCutOff{ 0.0f };
+};
+
+struct AmbientBoxLight final
+{
+	glm::vec3 size{ 1.0f };
+	glm::vec3 position{ 0.0f };
+	glm::vec3 color{ 1.0f };
+	float intensity{ 1.0f };
+};
+
+struct AmbientSphereLight final
+{
+	glm::vec3 position{ 0.0f };
+	glm::vec3 color{ 1.0f };
+	float intensity{ 1.0f };
+	float radius{ 0.5f };
 };

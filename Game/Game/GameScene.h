@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "NanoRender.h"
 #include "NanoScene.h"
@@ -28,6 +28,8 @@ public:
 	void BindLight(DirectionalLight* ent);
 	void BindLight(SpotLight* ent);
 	void BindLight(PointLight* ent);
+	void BindLight(AmbientBoxLight* ent);
+	void BindLight(AmbientSphereLight* ent);
 
 private:
 	void beginDraw();
