@@ -5,8 +5,8 @@ Mesh::Mesh(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>&
 {
 	assert(!vertices.empty());
 
-	m_vertexCount = vertices.size();
-	m_indicesCount = indices.size();
+	m_vertexCount = static_cast<uint32_t>(vertices.size());
+	m_indicesCount = static_cast<uint32_t>(indices.size());
 
 	m_material = material;
 	m_pbrMaterial = pbrMaterial;
@@ -76,16 +76,16 @@ void Mesh::Draw(GLenum mode, unsigned instanceCount) const
 	if (m_ebo.handle > 0)
 	{
 		if (instanceCount > 1)
-			glDrawElementsInstanced(mode, m_indicesCount, GL_UNSIGNED_INT, 0, instanceCount);
+			glDrawElementsInstanced(mode, static_cast<GLsizei>(m_indicesCount), GL_UNSIGNED_INT, 0, static_cast<GLsizei>(instanceCount));
 		else
-			glDrawElements(mode, m_indicesCount, GL_UNSIGNED_INT, 0);
+			glDrawElements(mode, static_cast<GLsizei>(m_indicesCount), GL_UNSIGNED_INT, 0);
 	}
 	else
 	{
 		if (instanceCount > 1)
 			; // TODO:???
 		else
-			glDrawArrays(mode, 0, m_vertexCount);
+			glDrawArrays(mode, 0, static_cast<GLsizei>(m_vertexCount));
 	}
 	glBindVertexArray(0);
 }
@@ -143,16 +143,16 @@ void Mesh::tDraw(GLenum mode, ProgramHandle program, bool bindMaterial, bool ins
 	if (m_ebo.handle > 0)
 	{
 		if (instancing)
-			glDrawElementsInstanced(mode, m_indicesCount, GL_UNSIGNED_INT, 0, amount);
+			glDrawElementsInstanced(mode, static_cast<GLsizei>(m_indicesCount), GL_UNSIGNED_INT, 0, amount);
 		else
-			glDrawElements(mode, m_indicesCount, GL_UNSIGNED_INT, 0);
+			glDrawElements(mode, static_cast<GLsizei>(m_indicesCount), GL_UNSIGNED_INT, 0);
 	}
 	else
 	{
 		if (instancing)
 			; // TODO:???
 		else
-			glDrawArrays(mode, 0, m_vertexCount);
+			glDrawArrays(mode, 0, static_cast<GLsizei>(m_vertexCount));
 	}
 	glBindVertexArray(0);
 }

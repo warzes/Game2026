@@ -94,7 +94,7 @@ std::vector<char> io::LoadBinaryFile(const std::filesystem::path& path)
 	// Create a buffer with the right size
 	std::size_t fileSize = std::filesystem::file_size(path);
 	std::vector<char> buffer(static_cast<uint64_t>(fileSize));
-	binaryFile.read(&buffer[0], buffer.size());
+	binaryFile.read(&buffer[0], static_cast<std::streamsize>(buffer.size()));
 
 	// Close the file and return
 	binaryFile.close();

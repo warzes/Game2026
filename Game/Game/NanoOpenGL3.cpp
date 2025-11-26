@@ -80,7 +80,6 @@ GLenum GetColorFormatGL(ColorFormat format)
 	case ColorFormat::RGBA: return GL_RGBA;
 	default: std::unreachable();
 	}
-	return 0;
 }
 //=============================================================================
 GLenum GetDataTypeGL(DataType dataType)
@@ -166,7 +165,7 @@ GLenum GetDataTypeGL(DataType dataType)
 	}
 }
 //=============================================================================
-[[nodiscard]] inline GLenum GetGLEnum(TextureFilter filter)
+[[nodiscard]] inline GLint GetGLEnum(TextureFilter filter)
 {
 	switch (filter) {
 	case TextureFilter::Nearest:              return GL_NEAREST;
@@ -179,7 +178,7 @@ GLenum GetDataTypeGL(DataType dataType)
 	}
 }
 //=============================================================================
-[[nodiscard]] inline GLenum GetGLEnum(TextureWrap wrap)
+[[nodiscard]] inline GLint GetGLEnum(TextureWrap wrap)
 {
 	switch (wrap) {
 	case TextureWrap::Repeat:         return GL_REPEAT;
@@ -497,7 +496,7 @@ void SetUniform(int id, std::span<const glm::vec2> v)
 		Error("Uniform error");
 		return;
 	}
-	const GLsizei count = v.size();
+	const GLsizei count = static_cast<GLsizei>(v.size());
 	glUniform2fv(id, count, glm::value_ptr(v[0]));
 }
 //=============================================================================
@@ -518,7 +517,7 @@ void SetUniform(int id, std::span<const glm::vec3> v)
 		Error("Uniform error");
 		return;
 	}
-	const GLsizei count = v.size();
+	const GLsizei count = static_cast<GLsizei>(v.size());
 	glUniform3fv(id, count, glm::value_ptr(v[0]));
 }
 //=============================================================================
@@ -539,7 +538,7 @@ void SetUniform(int id, std::span<const glm::vec4> v)
 		Error("Uniform error");
 		return;
 	}
-	const GLsizei count = v.size();
+	const GLsizei count = static_cast<GLsizei>(v.size());
 	glUniform4fv(id, count, glm::value_ptr(v[0]));
 }
 //=============================================================================
@@ -584,7 +583,7 @@ void SpecifyVertexAttributes(size_t vertexSize, std::span<const VertexAttribute>
 		const GLuint index = static_cast<GLuint>(i);
 
 		glEnableVertexAttribArray(index);
-		glVertexAttribPointer(index, attr.size, attr.type, attr.normalized ? GL_TRUE : GL_FALSE, vertexSize, attr.offset);
+		glVertexAttribPointer(index, attr.size, attr.type, attr.normalized ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(vertexSize), attr.offset);
 		glVertexAttribDivisor(index, attr.perInstance ? 1 : 0);
 	}
 }
@@ -637,14 +636,14 @@ void MeshVertex::SetVertexAttributes()
 	SpecifyVertexAttributes(vertexSize, attributes);
 }
 //=============================================================================
-BufferHandle CreateBuffer(BufferTarget target, BufferUsage usage, GLsizeiptr size, const void* data)
+BufferHandle CreateBuffer(BufferTarget target, BufferUsage usage, size_t size, const void* data)
 {
 	GLuint currentBuffer = GetCurrentBuffer(GetGLEnum(target));
 
 	BufferHandle buffer{};
 	glGenBuffers(1, &buffer.handle);
 	glBindBuffer(GetGLEnum(target), buffer.handle);
-	glBufferData(GetGLEnum(target), size, data, GetGLEnum(usage));
+	glBufferData(GetGLEnum(target), static_cast<GLsizeiptr>(size), data, GetGLEnum(usage));
 	glBindBuffer(GetGLEnum(target), currentBuffer);
 
 	return buffer;
@@ -669,15 +668,17 @@ GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVerti
 	stbi_uc* data = stbi_load(path.data(), &width, &height, &nrComponents, 0);
 	if (data)
 	{
-		GLenum internalFormat{ 0 };
+		GLint internalFormat{ 0 };
 		GLenum dataFormat{ 0 };
 		if (nrComponents == 1)
 		{
-			internalFormat = dataFormat = GL_RED;
+			internalFormat = GL_RED;
+			dataFormat = GL_RED;
 		}
 		else if (nrComponents == 2)
 		{
-			internalFormat = dataFormat = GL_RG;
+			internalFormat = GL_RG;
+			dataFormat = GL_RG;
 		}
 		else if (nrComponents == 3)
 		{
@@ -694,7 +695,7 @@ GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVerti
 			std::unreachable();
 		}
 
-		GLint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
+		GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
 
 		glGenTextures(1, &textureID);
 		glBindTexture(GL_TEXTURE_2D, textureID);
@@ -719,7 +720,7 @@ GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVerti
 //=============================================================================
 GLuint CreateTexture2D(GLint internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels)
 {
-	GLint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
+	GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
 
 	GLuint textureID{ 0 };
 	glGenTextures(1, &textureID);
@@ -789,7 +790,7 @@ GLuint CreateSamplerState(const SamplerStateInfo& info)
 	if (info.compareEnabled)
 	{
 		glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-		glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_FUNC, GetGLEnum(info.comparisonFunc));
+		glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_FUNC, static_cast<GLint>(GetGLEnum(info.comparisonFunc)));
 	}
 	else
 	{

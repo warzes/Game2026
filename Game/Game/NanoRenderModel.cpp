@@ -47,7 +47,8 @@ bool Model::Load(const std::string& fileName, ModelMaterialType materialType)
 void Model::Create(const MeshInfo& ci)
 {
 	Free();
-	m_meshes.emplace_back(Mesh{ ci.vertices, ci.indices, ci.material, ci.pbrMaterial });
+	Mesh mesh(ci.vertices, ci.indices, ci.material, ci.pbrMaterial);
+	m_meshes.emplace_back(std::move(mesh));
 	computeAABB();
 
 	// TODO: центрировать модель, так как бывают не от центра
@@ -86,7 +87,7 @@ void Model::tDraw(GLenum mode)
 //=============================================================================
 void Model::tDraw(const ModelDrawInfo& drawInfo)
 {
-	for (int i = 0; i < m_meshes.size(); i++)
+	for (size_t i = 0; i < m_meshes.size(); i++)
 	{
 		m_meshes[i].tDraw(drawInfo.mode, drawInfo.shaderProgram, drawInfo.bindMaterials);
 	}
@@ -259,20 +260,20 @@ std::vector<Texture2D> Model::loadMaterialTextures(std::string_view directory, c
 {
 	std::vector<Texture2D> texs;
 
-	for (int i{ 0 }; i < mat->GetTextureCount(type); ++i)
+	for (unsigned i{ 0 }; i < mat->GetTextureCount(type); ++i)
 	{
 		aiString path;
 		mat->GetTexture(type, i, &path);
 
-		int index = std::string(path.C_Str()).find_last_of("/");
+		size_t index = std::string(path.C_Str()).find_last_of("/");
 		std::string texName = std::string(path.C_Str()).substr(index + 1);
 
 		Texture2D texture;
-		if (texName.at(0) == '*' && index == -1)
+		if (texName.at(0) == '*' && index == std::string::npos)
 		{
 			int embedded{ static_cast<int>(texName.at(1) - '0') };
 			aiTexture* embTex = scene->mTextures[embedded];
-			aiTexel* texData = embTex->pcData;
+			//aiTexel* texData = embTex->pcData;
 			std::string name = m_name + " --- " + std::string(embTex->mFilename.C_Str()) + " --- " + texName;
 			texture = textures::CreateTextureFromData(name, embTex, colorSpace, false);
 		}
@@ -282,9 +283,9 @@ std::vector<Texture2D> Model::loadMaterialTextures(std::string_view directory, c
 			texture = textures::LoadTexture2D(texPath, colorSpace);
 		}
 		bool isFind{ false };
-		for (size_t i = 0; i < texs.size(); i++)
+		for (size_t j = 0; j < texs.size(); j++)
 		{
-			if (texs[i].id == texture.id)
+			if (texs[j].id == texture.id)
 			{
 				isFind = true;
 				break;

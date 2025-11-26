@@ -222,15 +222,17 @@ Texture2D textures::LoadTexture2D(const std::string& fileName, ColorSpace colorS
 			return GetDefaultDiffuse2D();
 		}
 
-		GLenum internalFormat{ 0 };
+		GLint internalFormat{ 0 };
 		GLenum dataFormat{ 0 };
 		if (channels == 1)
 		{
-			internalFormat = dataFormat = GL_RED;
+			internalFormat = GL_RED;
+			dataFormat = GL_RED;
 		}
 		else if (channels == 2)
 		{
-			internalFormat = dataFormat = GL_RG;
+			internalFormat = GL_RG;
+			dataFormat = GL_RG;
 		}
 		else if (channels == 3)
 		{
@@ -285,9 +287,9 @@ Texture2D textures::CreateTextureFromData(std::string_view name, aiTexture* embT
 		int width, height, channels;
 		stbi_uc* data{ nullptr };
 		if (embTex->mHeight == 0)
-			data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(embTex->pcData), embTex->mWidth, &width, &height, &channels, 0);
+			data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(embTex->pcData), static_cast<int>(embTex->mWidth), &width, &height, &channels, 0);
 		else
-			data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(embTex->pcData), embTex->mWidth * embTex->mHeight, &width, &height, &channels, 0);
+			data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(embTex->pcData), static_cast<int>(embTex->mWidth * embTex->mHeight), &width, &height, &channels, 0);
 		if (!data || channels < 1 || channels > 4 || width < 0 || height < 0)
 		{
 			stbi_image_free(data);
@@ -295,15 +297,17 @@ Texture2D textures::CreateTextureFromData(std::string_view name, aiTexture* embT
 			return GetDefaultDiffuse2D();
 		}
 
-		GLenum internalFormat{ 0 };
+		GLint internalFormat{ 0 };
 		GLenum dataFormat{ 0 };
 		if (channels == 1)
 		{
-			internalFormat = dataFormat = GL_RED;
+			internalFormat = GL_RED;
+			dataFormat = GL_RED;
 		}
 		else if (channels == 2)
 		{
-			internalFormat = dataFormat = GL_RG;
+			internalFormat = GL_RG;
+			dataFormat = GL_RG;
 		}
 		else if (channels == 3)
 		{
@@ -320,7 +324,7 @@ Texture2D textures::CreateTextureFromData(std::string_view name, aiTexture* embT
 			std::unreachable();
 		}
 
-		GLint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
+		GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
 
 		GLuint textureID{ 0 };
 		glGenTextures(1, &textureID);

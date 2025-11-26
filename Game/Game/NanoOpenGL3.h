@@ -261,7 +261,7 @@ struct MeshVertex final
 // Buffer
 //=============================================================================
 
-BufferHandle CreateBuffer(BufferTarget target, BufferUsage usage, GLsizeiptr size, const void* data);
+BufferHandle CreateBuffer(BufferTarget target, BufferUsage usage, size_t size, const void* data);
 
 void BufferSubData(BufferHandle bufferId, BufferTarget target, GLintptr offset, GLsizeiptr size, const void* data);
 
