@@ -268,11 +268,11 @@ void BufferSubData(BufferHandle bufferId, BufferTarget target, GLintptr offset, 
 //=============================================================================
 // Textures
 //=============================================================================
-GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVertically = false); // TODO: delete
+TextureHandle LoadTexture2D_DELETE(std::string_view path, bool gammaCorrection, bool flipVertically = false);
 
-GLuint CreateTexture2D(GLint internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels = nullptr);
+GLuint CreateTexture2DOLD(GLint internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels = nullptr);
 
-void BindTexture2D(GLenum id, GLuint texture);
+void BindTexture2DOLD(GLenum id, GLuint texture);
 
 //=============================================================================
 // Sampler

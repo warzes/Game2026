@@ -119,7 +119,7 @@ void RenderPass1::BindDepthTexture(size_t id, unsigned slot) const
 //=============================================================================
 bool RenderPass1::initProgram()
 {
-	m_program = LoadShaderProgram("data/shaders/shadowMapping/vertex.glsl", "data/shaders/shadowMapping/fragment.glsl");
+	m_program = LoadShaderProgram("data/shaders2/DirLightShadow/vertex.glsl", "data/shaders2/DirLightShadow/fragment.glsl");
 	if (!m_program.handle)
 	{
 		Fatal("Scene Shadow Mapping Shader failed!");

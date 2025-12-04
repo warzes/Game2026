@@ -1,10 +1,10 @@
 ﻿#include "stdafx.h"
-#include "RP_2_MainScene.h"
-#include "GameSceneO.h"
+#include "RenderPass2.h"
+#include "GameScene.h"
 #include "NanoLog.h"
 #include "NanoWindow.h"
 //=============================================================================
-bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
+bool RenderPass2::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
 	setSize(framebufferWidth, framebufferHeight);
 	if (!initProgram())
@@ -20,14 +20,14 @@ bool RPMainScene::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	return true;
 }
 //=============================================================================
-void RPMainScene::Close()
+void RenderPass2::Close()
 {
 	m_fbo.Destroy();
 	glDeleteProgram(m_program.handle);
 	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
-void RPMainScene::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const GameWorldDataO& gameData)
+void RenderPass2::Draw(const RenderPass1& rpShadowMap, const GameWorldData& gameData)
 {
 	m_fbo.Bind();
 	glEnable(GL_DEPTH_TEST);
@@ -38,9 +38,10 @@ void RPMainScene::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const Ga
 	glUseProgram(m_program.handle);
 	SetUniform(m_projectionMatrixId, m_perspective);
 	SetUniform(m_viewMatrixId, gameData.camera->GetViewMatrix());
-	SetUniform(m_camPosId, gameData.camera->Position);
 
-	int textureOffset{ 5 };
+	SetUniform(m_viewPosId, gameData.camera->Position);
+
+	int textureOffset{ 4 };
 	for (int i = 0; i < gameData.numDirLights; ++i)
 	{
 		const auto* light = gameData.dirLights[i];
@@ -48,6 +49,7 @@ void RPMainScene::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const Ga
 		std::string prefix = "dirLight[" + std::to_string(i) + "].";
 		SetUniform(GetUniformLocation(m_program, prefix + "direction"), light->direction);
 		SetUniform(GetUniformLocation(m_program, prefix + "color"), light->color);
+		SetUniform(GetUniformLocation(m_program, prefix + "luminosity"), light->luminosity);
 		SetUniform(GetUniformLocation(m_program, prefix + "depthMap"), textureOffset);
 		SetUniform(GetUniformLocation(m_program, prefix + "lightSpaceMatrix"), rpShadowMap.GetLightSpaceMatrix(i));
 
@@ -64,15 +66,57 @@ void RPMainScene::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const Ga
 		std::string prefix = "pointLight[" + std::to_string(i) + "].";
 		SetUniform(GetUniformLocation(m_program, prefix + "position"), light->position);
 		SetUniform(GetUniformLocation(m_program, prefix + "color"), light->color);
+		SetUniform(GetUniformLocation(m_program, prefix + "attenuation"), light->attenuation);
+		SetUniform(GetUniformLocation(m_program, prefix + "intensity"), light->intensity);
 	}
 	SetUniform(GetUniformLocation(m_program, "pointLightCount"), (int)gameData.numPointLights);
+
+	for (int i = 0; i < gameData.numSpotLights; ++i)
+	{
+		const auto* light = gameData.spotLights[i];
+
+		std::string prefix = "spotLight[" + std::to_string(i) + "].";
+		SetUniform(GetUniformLocation(m_program, prefix + "position"), light->position);
+		SetUniform(GetUniformLocation(m_program, prefix + "direction"), light->direction);
+		SetUniform(GetUniformLocation(m_program, prefix + "color"), light->color);
+		SetUniform(GetUniformLocation(m_program, prefix + "attenuation"), light->attenuation);
+		SetUniform(GetUniformLocation(m_program, prefix + "intensity"), light->intensity);
+		SetUniform(GetUniformLocation(m_program, prefix + "cutOff"), light->cutOff);
+		SetUniform(GetUniformLocation(m_program, prefix + "outerCutOff"), light->outerCutOff);
+
+	}
+	SetUniform(GetUniformLocation(m_program, "spotLightCount"), (int)gameData.numSpotLights);
+
+	for (int i = 0; i < gameData.numBoxLights; ++i)
+	{
+		const auto* light = gameData.boxLights[i];
+
+		std::string prefix = "ambientBoxLight[" + std::to_string(i) + "].";
+		SetUniform(GetUniformLocation(m_program, prefix + "size"), light->size);
+		SetUniform(GetUniformLocation(m_program, prefix + "position"), light->position);
+		SetUniform(GetUniformLocation(m_program, prefix + "color"), light->color);
+		SetUniform(GetUniformLocation(m_program, prefix + "intensity"), light->intensity);
+	}
+	SetUniform(GetUniformLocation(m_program, "ambientBoxLightCount"), (int)gameData.numBoxLights);
+
+	for (int i = 0; i < gameData.numSphereLights; ++i)
+	{
+		const auto* light = gameData.sphereLights[i];
+
+		std::string prefix = "ambientSphereLight[" + std::to_string(i) + "].";
+		SetUniform(GetUniformLocation(m_program, prefix + "position"), light->position);
+		SetUniform(GetUniformLocation(m_program, prefix + "color"), light->color);
+		SetUniform(GetUniformLocation(m_program, prefix + "intensity"), light->intensity);
+		SetUniform(GetUniformLocation(m_program, prefix + "radius"), light->radius);
+	}
+	SetUniform(GetUniformLocation(m_program, "ambientSphereLightCount"), (int)gameData.numSphereLights);
 
 	glBindSampler(0, m_sampler);
 	drawScene(gameData);
 	glBindSampler(0, 0);
 }
 //=============================================================================
-void RPMainScene::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
+void RenderPass2::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
 	if (m_framebufferWidth == framebufferWidth && m_framebufferHeight == framebufferHeight)
 		return;
@@ -80,13 +124,14 @@ void RPMainScene::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_fbo.Resize(m_framebufferWidth, m_framebufferHeight);
 }
 //=============================================================================
-void RPMainScene::drawScene(const GameWorldDataO& gameData)
+void RenderPass2::drawScene(const GameWorldData& gameData)
 {
-	GLuint albedoTex = 0;
+	GLuint diffuseTex = 0;
+	GLuint specularTex = 0;
+	GLuint heightMapTex = textures::GetWhiteTexture2D().id;
 	GLuint normalTex = 0;
-	GLuint metallicRoughnessTex = 0;
-	GLuint aoTex = 0;
-	GLuint emissiveTex = 0;
+
+	// TODO: heightmap textuere
 
 	for (size_t i = 0; i < gameData.numGameObject; i++)
 	{
@@ -98,46 +143,45 @@ void RPMainScene::drawScene(const GameWorldDataO& gameData)
 		const auto& meshes = gameData.gameObjects[i]->model.GetMeshes();
 		for (const auto& mesh : meshes)
 		{
-			const auto& material = mesh.GetPbrMaterial();
-			albedoTex = 0;
+			const auto& material = mesh.GetMaterial();
+			diffuseTex = 0;
+			specularTex = 0;
 			normalTex = 0;
-			metallicRoughnessTex = 0;
-			aoTex = 0;
-			emissiveTex = 0;
 			if (material)
 			{
-				albedoTex = material->albedoTexture.id;
-				normalTex = material->normalTexture.id;
-				metallicRoughnessTex = material->metallicRoughnessTexture.id;
+				if (!material->diffuseTextures.empty())  diffuseTex = material->diffuseTextures[0].id;
+				if (!material->specularTextures.empty()) specularTex = material->specularTextures[0].id;
+				if (!material->normalTextures.empty())   normalTex = material->normalTextures[0].id;
 			}
 
-			SetUniform(m_hasAlbedoMapId, albedoTex > 0);
+			SetUniform(m_hasDiffuseMapId, diffuseTex > 0);
+			SetUniform(m_hasSpecularMapId, specularTex > 0);
 			SetUniform(m_hasNormalMapId, normalTex > 0);
-			SetUniform(m_hasMetallicRoughnessMapId, metallicRoughnessTex > 0);
-			SetUniform(m_hasAOMapId, aoTex > 0);
-			SetUniform(m_hasEmissiveMapId, emissiveTex > 0);
 
-			BindTexture2DOLD(0, albedoTex);
-			BindTexture2DOLD(1, normalTex);
-			BindTexture2DOLD(2, metallicRoughnessTex);
-			BindTexture2DOLD(3, aoTex);
-			BindTexture2DOLD(4, emissiveTex);
+			BindTexture2DOLD(0, diffuseTex);
+			BindTexture2DOLD(1, specularTex);
+			BindTexture2DOLD(2, heightMapTex);
+			BindTexture2DOLD(3, normalTex);
+
 
 			mesh.Draw(GL_TRIANGLES);
 		}
 	}
 }
 //=============================================================================
-bool RPMainScene::initProgram()
+bool RenderPass2::initProgram()
 {
-	const std::vector<std::string> defines = { 
+	const std::vector<std::string> defines = {
+		"PARALLAX_MAPPING",
+		"NORMAL_MAPPING",
 		std::string("MAX_DIR_LIGHTS ") + std::to_string(MaxDirectionalLight),
 		std::string("MAX_POINT_LIGHTS ") + std::to_string(MaxPointLight),
-
-		std::string("MAX_LIGHTS ") + std::to_string(MaxDirectionalLight /*+ MaxSpotLight + MaxPointLight*/),
+		std::string("MAX_SPOT_LIGHTS ") + std::to_string(MaxSpotLight),
+		std::string("MAX_AMBIENT_BOX_LIGHTS ") + std::to_string(MaxAmbientBoxLight),
+		std::string("MAX_AMBIENT_SPHERE_LIGHTS ") + std::to_string(MaxAmbientSphereLight),
 	};
 
-	m_program = LoadShaderProgram("data/shaders/blinnPhong/vertex.glsl", "data/shaders/blinnPhong/fragment.glsl", defines);
+	m_program = LoadShaderProgram("data/shaders2/BlinnPhong/vertex.glsl", "data/shaders2/BlinnPhong/fragment.glsl", defines);
 	if (!m_program.handle)
 	{
 		Fatal("Scene Main RenderPass Shader failed!");
@@ -145,27 +189,18 @@ bool RPMainScene::initProgram()
 	}
 	glUseProgram(m_program.handle);
 
-	int albedoMap = GetUniformLocation(m_program, "material.albedoMap");
-	assert(albedoMap > -1);
-	int normalMap = GetUniformLocation(m_program, "material.normalMap");
-	assert(normalMap > -1);
-	int metallicRoughnessMap = GetUniformLocation(m_program, "material.metallicRoughnessMap");
-	assert(metallicRoughnessMap > -1);
-	int aoMap = GetUniformLocation(m_program, "material.aoMap");
-	assert(aoMap > -1);
-	int emissiveMap = GetUniformLocation(m_program, "material.emissiveMap");
-	assert(emissiveMap > -1);
+	int diffuseMap = GetUniformLocation(m_program, "u_DiffuseMap");
+	assert(diffuseMap > -1);
+	int specularMap = GetUniformLocation(m_program, "u_SpecularMap");
+	assert(specularMap > -1);
+	int heightMap = GetUniformLocation(m_program, "u_HeightMap");
+	int normalMap = GetUniformLocation(m_program, "u_NormalMap");
 
-	m_opacityId = GetUniformLocation(m_program, "material.opacity");
-	assert(m_opacityId > -1);
-
-	SetUniform(albedoMap, 0);
-	SetUniform(normalMap, 1);
-	SetUniform(metallicRoughnessMap, 2);
-	SetUniform(aoMap, 3);
-	SetUniform(emissiveMap, 4);
-
-	SetUniform(m_opacityId, 1.0f);
+		
+	SetUniform(diffuseMap, 0);
+	SetUniform(specularMap, 1);
+	if (heightMap > -1) SetUniform(heightMap, 2);
+	if (normalMap > -1) SetUniform(normalMap, 3);
 
 	m_projectionMatrixId = GetUniformLocation(m_program, "projectionMatrix");
 	assert(m_projectionMatrixId > -1);
@@ -173,27 +208,22 @@ bool RPMainScene::initProgram()
 	assert(m_viewMatrixId > -1);
 	m_modelMatrixId = GetUniformLocation(m_program, "modelMatrix");
 	assert(m_modelMatrixId > -1);
-	m_camPosId = GetUniformLocation(m_program, "camPos");
-	assert(m_camPosId > -1);
+	m_viewPosId = GetUniformLocation(m_program, "viewPos");
+	assert(m_viewPosId > -1);
 
-
-	m_hasAlbedoMapId = GetUniformLocation(m_program, "hasAlbedoMap");
-	assert(m_hasAlbedoMapId > -1);
+	m_hasDiffuseMapId = GetUniformLocation(m_program, "hasDiffuseMap");
+	assert(m_hasDiffuseMapId > -1);
+	m_hasSpecularMapId = GetUniformLocation(m_program, "hasSpecularMap");
+	//assert(m_hasSpecularMapId > -1);
 	m_hasNormalMapId = GetUniformLocation(m_program, "hasNormalMap");
-	assert(m_hasNormalMapId > -1);
-	m_hasMetallicRoughnessMapId = GetUniformLocation(m_program, "hasMetallicRoughnessMap");
-	assert(m_hasMetallicRoughnessMapId > -1);
-	m_hasAOMapId = GetUniformLocation(m_program, "hasAOMap");
-	assert(m_hasAOMapId > -1);
-	m_hasEmissiveMapId = GetUniformLocation(m_program, "hasEmissiveMap");
-	assert(m_hasEmissiveMapId > -1);
+	//assert(m_hasNormalMapId > -1);
 
 	glUseProgram(0); // TODO: возможно вернуть прошлую версию шейдера
 
 	return true;
 }
 //=============================================================================
-bool RPMainScene::initFBO()
+bool RenderPass2::initFBO()
 {
 	FramebufferInfo fboInfo;
 
@@ -214,7 +244,7 @@ bool RPMainScene::initFBO()
 	return true;
 }
 //=============================================================================
-void RPMainScene::setSize(uint16_t framebufferWidth, uint16_t framebufferHeight)
+void RenderPass2::setSize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
 	m_framebufferWidth = framebufferWidth;
 	m_framebufferHeight = framebufferHeight;

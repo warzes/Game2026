@@ -658,11 +658,13 @@ void BufferSubData(BufferHandle bufferId, BufferTarget target, GLintptr offset, 
 	glBindBuffer(GetGLEnum(target), currentBuffer);
 }
 //=============================================================================
-GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVertically)
+TextureHandle LoadTexture2D_DELETE(std::string_view path, bool gammaCorrection, bool flipVertically)
 {
+	удалить - функция в NanoRenderTexture
+
 	stbi_set_flip_vertically_on_load(flipVertically);
 
-	GLuint textureID{ 0 };
+	TextureHandle textureID{ 0 };
 
 	int width, height, nrComponents;
 	stbi_uc* data = stbi_load(path.data(), &width, &height, &nrComponents, 0);
@@ -697,8 +699,8 @@ GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVerti
 
 		GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
 
-		glGenTextures(1, &textureID);
-		glBindTexture(GL_TEXTURE_2D, textureID);
+		glGenTextures(1, &textureID.handle);
+		glBindTexture(GL_TEXTURE_2D, textureID.handle);
 		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -718,7 +720,7 @@ GLuint LoadTexture2D(std::string_view path, bool gammaCorrection, bool flipVerti
 	return textureID;
 }
 //=============================================================================
-GLuint CreateTexture2D(GLint internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels)
+GLuint CreateTexture2DOLD(GLint internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels)
 {
 	GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
 
@@ -732,7 +734,7 @@ GLuint CreateTexture2D(GLint internalformat, GLsizei width, GLsizei height, GLen
 	return textureID;
 }
 //=============================================================================
-void BindTexture2D(GLenum id, GLuint texture)
+void BindTexture2DOLD(GLenum id, GLuint texture)
 {
 	glActiveTexture(GL_TEXTURE0 + id);
 	glBindTexture(GL_TEXTURE_2D, texture);

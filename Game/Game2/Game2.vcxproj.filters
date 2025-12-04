@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="GameApp.cpp">
+      <Filter>NewGameApp</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>NewGameApp</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPass1.cpp">
+      <Filter>NewGameApp\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPass2.cpp">
+      <Filter>NewGameApp\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPass6.cpp">
+      <Filter>NewGameApp\RenderPass</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="GameApp.h" />
+    <ClInclude Include="GameConfig.h" />
+    <ClInclude Include="GameWorldData.h">
+      <Filter>NewGameApp</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>NewGameApp</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPass1.h">
+      <Filter>NewGameApp\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPass2.h">
+      <Filter>NewGameApp\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPass6.h">
+      <Filter>NewGameApp\RenderPass</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="NewGameApp">
+      <UniqueIdentifier>{445caf56-c388-42dd-aab5-f5d3bf9002fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NewGameApp\RenderPass">
+      <UniqueIdentifier>{f716966d-b81c-404a-80e4-7f597da31584}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
