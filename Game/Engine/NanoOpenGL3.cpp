@@ -70,7 +70,7 @@ namespace
 }
 //#endif
 //=============================================================================
-GLenum GetColorFormatGL(ColorFormat format)
+GLenum GetColorFormatGL(ColorFormat format) noexcept
 {
 	switch (format)
 	{
@@ -82,12 +82,12 @@ GLenum GetColorFormatGL(ColorFormat format)
 	}
 }
 //=============================================================================
-GLenum GetDataTypeGL(DataType dataType)
+GLenum GetDataTypeGL(DataType dataType) noexcept
 {
 	return (dataType == DataType::Float) ? GL_FLOAT : GL_UNSIGNED_BYTE;
 }
 //=============================================================================
-[[nodiscard]] inline GLenum GetGLEnum(ComparisonFunc func)
+[[nodiscard]] inline GLenum GetGLEnum(ComparisonFunc func) noexcept
 {
 	switch (func) {
 	case ComparisonFunc::Never:        return GL_NEVER;
@@ -102,7 +102,7 @@ GLenum GetDataTypeGL(DataType dataType)
 	}
 }
 //=============================================================================
-[[nodiscard]] inline GLenum GetGLEnum(BlendFactor factor)
+[[nodiscard]] inline GLenum GetGLEnum(BlendFactor factor) noexcept
 {
 	switch (factor) {
 	case BlendFactor::Zero:             return GL_ZERO;
@@ -119,7 +119,7 @@ GLenum GetDataTypeGL(DataType dataType)
 	}
 }
 //=============================================================================
-[[nodiscard]] inline GLenum GetGLEnum(CullFace cull)
+[[nodiscard]] inline GLenum GetGLEnum(CullFace cull) noexcept
 {
 	switch (cull) {
 	case CullFace::Front:        return GL_FRONT;
@@ -129,7 +129,7 @@ GLenum GetDataTypeGL(DataType dataType)
 	}
 }
 //=============================================================================
-[[nodiscard]] inline GLenum GetGLEnum(BufferTarget type)
+[[nodiscard]] inline GLenum GetGLEnum(BufferTarget type) noexcept
 {
 	switch (type) {
 	case BufferTarget::Array:        return GL_ARRAY_BUFFER;
@@ -139,7 +139,7 @@ GLenum GetDataTypeGL(DataType dataType)
 	}
 }
 //=============================================================================
-[[nodiscard]] inline GLenum GetGLEnum(PolygonMode mode)
+[[nodiscard]] inline GLenum GetGLEnum(PolygonMode mode) noexcept
 {
 	switch (mode) {
 	case PolygonMode::Point: return GL_POINT;
@@ -149,7 +149,7 @@ GLenum GetDataTypeGL(DataType dataType)
 	}
 }
 //=============================================================================
-[[nodiscard]] inline GLenum GetGLEnum(BufferUsage mode)
+[[nodiscard]] inline GLenum GetGLEnum(BufferUsage mode) noexcept
 {
 	switch (mode) {
 	case BufferUsage::StaticDraw: return GL_STATIC_DRAW;
@@ -165,7 +165,7 @@ GLenum GetDataTypeGL(DataType dataType)
 	}
 }
 //=============================================================================
-[[nodiscard]] inline GLint GetGLEnum(TextureFilter filter)
+[[nodiscard]] inline GLint GetGLEnum(TextureFilter filter) noexcept
 {
 	switch (filter) {
 	case TextureFilter::Nearest:              return GL_NEAREST;
@@ -178,7 +178,7 @@ GLenum GetDataTypeGL(DataType dataType)
 	}
 }
 //=============================================================================
-[[nodiscard]] inline GLint GetGLEnum(TextureWrap wrap)
+[[nodiscard]] inline GLint GetGLEnum(TextureWrap wrap) noexcept
 {
 	switch (wrap) {
 	case TextureWrap::Repeat:         return GL_REPEAT;
@@ -658,21 +658,210 @@ void BufferSubData(BufferHandle bufferId, BufferTarget target, GLintptr offset, 
 	glBindBuffer(GetGLEnum(target), currentBuffer);
 }
 //=============================================================================
-GLuint CreateTexture2DOLD(GLint internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels)
+TextureHandle CreateTexture1D(unsigned width, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels)
 {
-	GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
-
-	GLuint textureID{ 0 };
-	glGenTextures(1, &textureID);
-
-	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, internalformat, width, height, 0, format, type, pixels);
-
-	glBindTexture(GL_TEXTURE_2D, currentTexture);
-	return textureID;
+	if (width == 0 || format == PixelFormat::None)
+	{
+		Error("Invalid texture parameters");
+		return {};
+	}
+	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_1D);
+	
+	TextureHandle texture;
+	glGenTextures(1, &texture.handle);
+	glBindTexture(GL_TEXTURE_1D, texture.handle);
+	glTexImage1D(GL_TEXTURE_1D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	
+	glBindTexture(GL_TEXTURE_1D, currentTexture);
+	return texture;
 }
 //=============================================================================
-void BindTexture2DOLD(GLenum id, TextureHandle texture)
+TextureHandle CreateTexture2D(unsigned width, unsigned height, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels)
+{
+	if (width == 0 || height == 0 || format == PixelFormat::None)
+	{
+		Error("Invalid texture parameters");
+		return {};
+	}
+
+	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
+
+	TextureHandle texture;
+	glGenTextures(1, &texture.handle);
+	glBindTexture(GL_TEXTURE_2D, texture.handle);
+	glTexImage2D(GL_TEXTURE_2D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+
+	glBindTexture(GL_TEXTURE_2D, currentTexture);
+	return texture;
+}
+//=============================================================================
+TextureHandle CreateTexture3D(unsigned width, unsigned height, unsigned depth, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels)
+{
+	if (width == 0 || height == 0 || depth == 0 || format == PixelFormat::None)
+	{
+		Error("Invalid texture parameters");
+		return {};
+	}
+	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_3D);
+	
+	TextureHandle texture;
+	glGenTextures(1, &texture.handle);
+	glBindTexture(GL_TEXTURE_3D, texture.handle);
+	glTexImage3D(GL_TEXTURE_3D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(depth), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+
+	glBindTexture(GL_TEXTURE_3D, currentTexture);
+	return texture;
+}
+//=============================================================================
+TextureHandle CreateTexture1DArray(InternalFormat internalformat, unsigned width, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels)
+{
+	if (width == 0 || arraySize == 0 || format == PixelFormat::None)
+	{
+		Error("Invalid texture parameters");
+		return {};
+	}
+	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_1D_ARRAY);
+	TextureHandle texture;
+	glGenTextures(1, &texture.handle);
+	glBindTexture(GL_TEXTURE_1D_ARRAY, texture.handle);
+	glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(arraySize), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glBindTexture(GL_TEXTURE_1D_ARRAY, currentTexture);
+	return texture;
+}
+//=============================================================================
+TextureHandle CreateTexture2DArray(InternalFormat internalformat, unsigned width, unsigned height, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels)
+{
+	if (width == 0 || height == 0 || arraySize == 0 || format == PixelFormat::None)
+	{
+		Error("Invalid texture parameters");
+		return {};
+	}
+	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D_ARRAY);
+	TextureHandle texture;
+	glGenTextures(1, &texture.handle);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture.handle);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(arraySize), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, currentTexture);
+	return texture;
+}
+//=============================================================================
+TextureHandle CreateCubeTexture(InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* posX, const void* negX, const void* posY, const void* negY, const void* posZ, const void* negZ)
+{
+	if (width == 0 || height == 0 || format == PixelFormat::None)
+	{
+		Error("Invalid texture parameters");
+		return {};
+	}
+	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_CUBE_MAP);
+	TextureHandle texture;
+	glGenTextures(1, &texture.handle);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture.handle);
+
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), posX);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), negX);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), posY);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), negY);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), posZ);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), negZ);
+	
+	glBindTexture(GL_TEXTURE_CUBE_MAP, currentTexture);
+	return texture;
+}
+//=============================================================================
+void SetTexture1DData(TextureHandle texture, InternalFormat internalformat, unsigned width, PixelFormat format, PixelType type, const void* pixels)
+{
+	if (width == 0 || format == PixelFormat::None || !pixels)
+	{
+		Error("Invalid texture parameters");
+		return;
+	}
+	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_1D);
+
+	glBindTexture(GL_TEXTURE_1D, texture.handle);
+	glTexImage1D(GL_TEXTURE_1D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glBindTexture(GL_TEXTURE_1D, currentTexture);
+}
+//=============================================================================
+void SetTexture2DData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* pixels)
+{
+	if (width == 0 || height == 0 || format == PixelFormat::None || !pixels)
+	{
+		Error("Invalid texture parameters");
+		return;
+	}
+
+	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, texture.handle);
+	glTexImage2D(GL_TEXTURE_2D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glBindTexture(GL_TEXTURE_2D, currentTexture);
+}
+//=============================================================================
+void SetTexture3DData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned height, unsigned depth, PixelFormat format, PixelType type, const void* pixels)
+{
+	if (width == 0 || height == 0 || depth == 0 || format == PixelFormat::None || !pixels)
+	{
+		Error("Invalid texture parameters");
+		return;
+	}
+
+	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_3D);
+
+	glBindTexture(GL_TEXTURE_3D, texture.handle);
+	glTexImage3D(GL_TEXTURE_3D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(depth), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glBindTexture(GL_TEXTURE_3D, currentTexture);
+}
+//=============================================================================
+void SetTexture1DArrayData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels)
+{
+	if (width == 0 || arraySize == 0 || format == PixelFormat::None)
+	{
+		Error("Invalid texture parameters");
+		return;
+	}
+	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_1D_ARRAY);
+
+	glBindTexture(GL_TEXTURE_1D_ARRAY, texture.handle);
+	glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(arraySize), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glBindTexture(GL_TEXTURE_1D_ARRAY, currentTexture);
+}
+//=============================================================================
+void SetTexture2DArrayData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned height, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels)
+{
+	if (width == 0 || height == 0 || arraySize == 0 || format == PixelFormat::None)
+	{
+		Error("Invalid texture parameters");
+		return;
+	}
+	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D_ARRAY);
+
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture.handle);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(arraySize), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, currentTexture);
+}
+//=============================================================================
+void SetCubeTextureData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* posX, const void* negX, const void* posY, const void* negY, const void* posZ, const void* negZ)
+{
+	if (width == 0 || height == 0 || format == PixelFormat::None)
+	{
+		Error("Invalid texture parameters");
+		return;
+	}
+	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_CUBE_MAP);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture.handle);
+
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), posX);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), negX);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), posY);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), negY);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), posZ);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), negZ);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, currentTexture);
+}
+//=============================================================================
+void BindTexture2D(GLenum id, TextureHandle texture)
 {
 	glActiveTexture(GL_TEXTURE0 + id);
 	glBindTexture(GL_TEXTURE_2D, texture.handle);

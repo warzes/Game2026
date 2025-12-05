@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#define DISABLE_SRGB 0
+
 #define VERSION_OPENGL33 3
 #define VERSION_OPENGL46 4
 

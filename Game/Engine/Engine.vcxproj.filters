@@ -56,6 +56,9 @@
     <ClInclude Include="EngineConfig.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="OpenGL3Enum.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -133,5 +136,10 @@
     <Filter Include="Engine\scene">
       <UniqueIdentifier>{55dc66e2-a8e0-4a1b-b7ab-e8922c969627}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OpenGL3Enum.inl">
+      <Filter>Engine\OpenGL</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -55,7 +55,7 @@ void DirectionalLightO::Draw()
 	//m_shaderIcon.setMatrix("model", m_model);
 	//m_shaderIcon.setMatrix("view", m_view);
 	//m_shaderIcon.setMatrix("proj", m_proj);
-	BindTexture2DOLD(0, m_icon.id);
+	BindTexture2D(0, m_icon.id);
 	glDrawArrays(GL_POINTS, 0, 1);
 
 	/*m_shaderDirection.use();
@@ -83,7 +83,7 @@ void DirectionalLightO::Draw(float orthoDim)
 	//m_shaderIcon.setMatrix("model", m_model);
 	//m_shaderIcon.setMatrix("view", m_view);
 	//m_shaderIcon.setMatrix("proj", m_proj);
-	BindTexture2DOLD(0, m_icon.id);
+	BindTexture2D(0, m_icon.id);
 	glDrawArrays(GL_POINTS, 0, 1);
 
 	/*m_shaderDirection.use();
@@ -155,7 +155,7 @@ void SpotLightO::Draw()
 	//m_shaderIcon.setMatrix("model", m_model);
 	//m_shaderIcon.setMatrix("view", m_view);
 	//m_shaderIcon.setMatrix("proj", m_proj);
-	BindTexture2DOLD(0, m_icon.id);
+	BindTexture2D(0, m_icon.id);
 	glDrawArrays(GL_POINTS, 0, 1);
 
 	/*m_shaderCutOff.use();

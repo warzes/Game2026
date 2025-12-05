@@ -158,10 +158,10 @@ void RenderPass2::drawScene(const GameWorldData& gameData)
 			SetUniform(m_hasSpecularMapId, IsValid(specularTex));
 			SetUniform(m_hasNormalMapId, IsValid(normalTex));
 
-			BindTexture2DOLD(0, diffuseTex);
-			BindTexture2DOLD(1, specularTex);
-			BindTexture2DOLD(2, heightMapTex);
-			BindTexture2DOLD(3, normalTex);
+			BindTexture2D(0, diffuseTex);
+			BindTexture2D(1, specularTex);
+			BindTexture2D(2, heightMapTex);
+			BindTexture2D(3, normalTex);
 
 
 			mesh.Draw(GL_TRIANGLES);

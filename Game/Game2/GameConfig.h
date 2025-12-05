@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#define DISABLE_SRGB 0
-
 inline float ScaleScreen = 1.0f;
 
 inline bool EnableSSAO = false;

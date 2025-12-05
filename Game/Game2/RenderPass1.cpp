@@ -105,7 +105,7 @@ void RenderPass1::drawScene(const glm::mat4& lightSpaceMatrix, const GameWorldDa
 			}
 
 			SetUniform(m_hasDiffuseMapId, hasDiffuseMap);
-			BindTexture2DOLD(0, diffuseTex);
+			BindTexture2D(0, diffuseTex);
 
 			mesh.Draw(GL_TRIANGLES);
 		}

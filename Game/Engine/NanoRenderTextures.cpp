@@ -231,38 +231,33 @@ Texture2D textures::LoadTexture2D(const std::string& fileName, ColorSpace colorS
 
 		int width, height, nrComponents;
 		stbi_uc* pixels = stbi_load(fileName.c_str(), &width, &height, &nrComponents, 0);
-		if (!pixels || nrComponents < 1 || nrComponents > 4 || width < 0 || height < 0)
+		if (!pixels || nrComponents < 1 || nrComponents > 4 || width <= 0 || height <= 0)
 		{
 			stbi_image_free(pixels);
 			Error("Failed to load texture " + fileName);
 			return GetDefaultDiffuse2D();
 		}
 
-		GLint internalFormat{ 0 };
-		GLenum dataFormat{ 0 };
+		InternalFormat internalFormat{};
 		PixelFormat pixelFormat{ PixelFormat::None };
 		if (nrComponents == 1)
 		{
-			internalFormat = GL_RED;
-			dataFormat = GL_RED;
+			internalFormat = InternalFormat::R8;
 			pixelFormat = PixelFormat::Red;
 		}
 		else if (nrComponents == 2)
 		{
-			internalFormat = GL_RG;
-			dataFormat = GL_RG;
+			internalFormat = InternalFormat::RG8;
 			pixelFormat = PixelFormat::Rg;
 		}
 		else if (nrComponents == 3)
 		{
-			internalFormat = colorSpace == ColorSpace::sRGB ? GL_SRGB8 : GL_RGB8;
-			dataFormat = GL_RGB;
+			internalFormat = (colorSpace == ColorSpace::sRGB) ? InternalFormat::SRGB8 : InternalFormat::RGB8;
 			pixelFormat = PixelFormat::Rgb;
 		}
 		else if (nrComponents == 4)
 		{
-			internalFormat = colorSpace == ColorSpace::sRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
-			dataFormat = GL_RGBA;
+			internalFormat = (colorSpace == ColorSpace::sRGB) ? InternalFormat::SRGB8_ALPHA8 : InternalFormat::RGBA8;
 			pixelFormat = PixelFormat::Rgba;
 		}
 		else
@@ -271,10 +266,8 @@ Texture2D textures::LoadTexture2D(const std::string& fileName, ColorSpace colorS
 		}
 		GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
 
-		TextureHandle textureID{ 0 };
-		glGenTextures(1, &textureID.handle);
+		TextureHandle textureID = CreateTexture2D(static_cast<uint32_t>(width), static_cast<uint32_t>(height), internalFormat, pixelFormat, PixelType::UnsignedByte, pixels);
 		glBindTexture(GL_TEXTURE_2D, textureID.handle);
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, pixels);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -310,40 +303,40 @@ Texture2D textures::CreateTextureFromData(std::string_view name, aiTexture* embT
 	{
 		stbi_set_flip_vertically_on_load(flipVertical);
 
-		int width, height, channels;
+		int width, height, nrComponents;
 		stbi_uc* data{ nullptr };
 		if (embTex->mHeight == 0)
-			data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(embTex->pcData), static_cast<int>(embTex->mWidth), &width, &height, &channels, 0);
+			data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(embTex->pcData), static_cast<int>(embTex->mWidth), &width, &height, &nrComponents, 0);
 		else
-			data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(embTex->pcData), static_cast<int>(embTex->mWidth * embTex->mHeight), &width, &height, &channels, 0);
-		if (!data || channels < 1 || channels > 4 || width < 0 || height < 0)
+			data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(embTex->pcData), static_cast<int>(embTex->mWidth * embTex->mHeight), &width, &height, &nrComponents, 0);
+		if (!data || nrComponents < 1 || nrComponents > 4 || width <= 0 || height <= 0)
 		{
 			stbi_image_free(data);
 			Error("Error while trying to load embedded texture!");
 			return GetDefaultDiffuse2D();
 		}
 
-		GLint internalFormat{ 0 };
-		GLenum dataFormat{ 0 };
-		if (channels == 1)
+		InternalFormat internalFormat{};
+		PixelFormat pixelFormat{ PixelFormat::None };
+		if (nrComponents == 1)
 		{
-			internalFormat = GL_RED;
-			dataFormat = GL_RED;
+			internalFormat = InternalFormat::R8;
+			pixelFormat = PixelFormat::Red;
 		}
-		else if (channels == 2)
+		else if (nrComponents == 2)
 		{
-			internalFormat = GL_RG;
-			dataFormat = GL_RG;
+			internalFormat = InternalFormat::RG8;
+			pixelFormat = PixelFormat::Rg;
 		}
-		else if (channels == 3)
+		else if (nrComponents == 3)
 		{
-			internalFormat = colorSpace == ColorSpace::sRGB ? GL_SRGB8 : GL_RGB8;
-			dataFormat = GL_RGB;
+			internalFormat = (colorSpace == ColorSpace::sRGB) ? InternalFormat::SRGB8 : InternalFormat::RGB8;
+			pixelFormat = PixelFormat::Rgb;
 		}
-		else if (channels == 4)
+		else if (nrComponents == 4)
 		{
-			internalFormat = colorSpace == ColorSpace::sRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
-			dataFormat = GL_RGBA;
+			internalFormat = (colorSpace == ColorSpace::sRGB) ? InternalFormat::SRGB8_ALPHA8 : InternalFormat::RGBA8;
+			pixelFormat = PixelFormat::Rgba;
 		}
 		else
 		{
@@ -352,12 +345,9 @@ Texture2D textures::CreateTextureFromData(std::string_view name, aiTexture* embT
 
 		GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
 
-		GLuint textureID{ 0 };
-		glGenTextures(1, &textureID);
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+		TextureHandle textureID = CreateTexture2D(static_cast<uint32_t>(width), static_cast<uint32_t>(height), internalFormat, pixelFormat, PixelType::UnsignedByte, data);
+		glBindTexture(GL_TEXTURE_2D, textureID.handle);
 		glGenerateMipmap(GL_TEXTURE_2D);
-
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

@@ -108,19 +108,19 @@ void Mesh::tDraw(GLenum mode, ProgramHandle program, bool bindMaterial, bool ins
 		if (!m_material->diffuseTextures.empty())
 		{
 			hasDiffuseTexture = true;
-			BindTexture2DOLD(0, m_material->diffuseTextures[0].id);
+			BindTexture2D(0, m_material->diffuseTextures[0].id);
 			nbTextures++;
 		}
 		if (!m_material->specularTextures.empty())
 		{
 			hasSpecularTexture = true;
-			BindTexture2DOLD(1, m_material->specularTextures[0].id);
+			BindTexture2D(1, m_material->specularTextures[0].id);
 			nbTextures++;
 		}
 		if (!m_material->normalTextures.empty())
 		{
 			hasNormalTexture = true;
-			BindTexture2DOLD(2, m_material->normalTextures[0].id);
+			BindTexture2D(2, m_material->normalTextures[0].id);
 			nbTextures++;
 		}
 

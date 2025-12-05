@@ -102,7 +102,7 @@ void RPDirectionalLightsShadowMap::drawScene(const glm::mat4& lightSpaceMatrix, 
 			}
 
 			SetUniform((GLuint)m_hasAlbedoMapId, hasAlbedoMap);
-			BindTexture2DOLD(0, albedoTex);
+			BindTexture2D(0, albedoTex);
 
 			mesh.Draw(GL_TRIANGLES);
 		}

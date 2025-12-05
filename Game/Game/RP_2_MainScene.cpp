@@ -117,11 +117,11 @@ void RPMainScene::drawScene(const GameWorldDataO& gameData)
 			SetUniform(m_hasAOMapId, IsValid(aoTex));
 			SetUniform(m_hasEmissiveMapId, IsValid(emissiveTex));
 
-			BindTexture2DOLD(0, albedoTex);
-			BindTexture2DOLD(1, normalTex);
-			BindTexture2DOLD(2, metallicRoughnessTex);
-			BindTexture2DOLD(3, aoTex);
-			BindTexture2DOLD(4, emissiveTex);
+			BindTexture2D(0, albedoTex);
+			BindTexture2D(1, normalTex);
+			BindTexture2D(2, metallicRoughnessTex);
+			BindTexture2D(3, aoTex);
+			BindTexture2D(4, emissiveTex);
 
 			mesh.Draw(GL_TRIANGLES);
 		}

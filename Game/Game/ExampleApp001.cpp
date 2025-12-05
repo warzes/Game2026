@@ -126,18 +126,18 @@ void ExampleApp001()
 			SetUniform(GetUniformLocation(shader, "projectionMatrix"), perspective);
 			SetUniform(GetUniformLocation(shader, "viewMatrix"), camera.GetViewMatrix());
 			
-			BindTexture2DOLD(0, texturePlane.id);
+			BindTexture2D(0, texturePlane.id);
 			SetUniform(GetUniformLocation(shader, "modelMatrix"), glm::mat4(1.0f));
 			modelPlane.tDraw();
 
 			//SetUniform(GetUniformLocation(shader, "modelMatrix"), glm::scale(glm::mat4(1.0f), glm::vec3(0.6f)));
 			//modelTest.Draw();
 
-			BindTexture2DOLD(0, texturePlane.id);
+			BindTexture2D(0, texturePlane.id);
 			SetUniform(GetUniformLocation(shader, "modelMatrix"), glm::translate(glm::mat4(1.0f), glm::vec3(-3.0f, 1.0f, 0.0f)));
 			modelSphere.tDraw();
 
-			BindTexture2DOLD(0, textureBox.id);
+			BindTexture2D(0, textureBox.id);
 			SetUniform(GetUniformLocation(shader, "modelMatrix"), glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, 0.5f, 0.0f)));
 			modelBox.tDraw();
 
