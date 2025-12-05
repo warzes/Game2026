@@ -115,6 +115,18 @@
     <ClInclude Include="RenderPass6.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\bin\data\shaders2\BlinnPhong.shader" />
+    <None Include="..\..\bin\data\shaders2\BlinnPhong\fragment.shader" />
+    <None Include="..\..\bin\data\shaders2\BlinnPhong\vertex.shader" />
+    <None Include="..\..\bin\data\shaders2\composite\fragment.shader" />
+    <None Include="..\..\bin\data\shaders2\composite\vertex.shader" />
+    <None Include="..\..\bin\data\shaders2\DirLightShadow\fragment.shader" />
+    <None Include="..\..\bin\data\shaders2\DirLightShadow\vertex.shader" />
+    <None Include="..\..\bin\data\shaders2\shadow.shader" />
+    <None Include="..\..\bin\data\shaders2\tonemap.shader" />
+    <None Include="..\..\bin\data\shaders2\utils.shader" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

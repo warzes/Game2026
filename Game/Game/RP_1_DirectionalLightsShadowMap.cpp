@@ -94,7 +94,7 @@ void RPDirectionalLightsShadowMap::drawScene(const glm::mat4& lightSpaceMatrix, 
 		{
 			const auto& material = mesh.GetPbrMaterial();
 			bool hasAlbedoMap = false;
-			TextureHandle albedoTex{ 0 };
+			Texture2DHandle albedoTex{ 0 };
 			if (material)
 			{
 				hasAlbedoMap = IsValid(material->albedoTexture);

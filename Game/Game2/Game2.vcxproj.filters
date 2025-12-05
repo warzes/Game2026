@@ -4,19 +4,19 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="GameApp.cpp">
-      <Filter>NewGameApp</Filter>
+      <Filter>GameApp</Filter>
     </ClCompile>
     <ClCompile Include="GameScene.cpp">
-      <Filter>NewGameApp</Filter>
+      <Filter>GameApp</Filter>
     </ClCompile>
     <ClCompile Include="RenderPass1.cpp">
-      <Filter>NewGameApp\RenderPass</Filter>
+      <Filter>GameApp\RenderPass</Filter>
     </ClCompile>
     <ClCompile Include="RenderPass2.cpp">
-      <Filter>NewGameApp\RenderPass</Filter>
+      <Filter>GameApp\RenderPass</Filter>
     </ClCompile>
     <ClCompile Include="RenderPass6.cpp">
-      <Filter>NewGameApp\RenderPass</Filter>
+      <Filter>GameApp\RenderPass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -24,27 +24,71 @@
     <ClInclude Include="GameApp.h" />
     <ClInclude Include="GameConfig.h" />
     <ClInclude Include="GameWorldData.h">
-      <Filter>NewGameApp</Filter>
+      <Filter>GameApp</Filter>
     </ClInclude>
     <ClInclude Include="GameScene.h">
-      <Filter>NewGameApp</Filter>
+      <Filter>GameApp</Filter>
     </ClInclude>
     <ClInclude Include="RenderPass1.h">
-      <Filter>NewGameApp\RenderPass</Filter>
+      <Filter>GameApp\RenderPass</Filter>
     </ClInclude>
     <ClInclude Include="RenderPass2.h">
-      <Filter>NewGameApp\RenderPass</Filter>
+      <Filter>GameApp\RenderPass</Filter>
     </ClInclude>
     <ClInclude Include="RenderPass6.h">
-      <Filter>NewGameApp\RenderPass</Filter>
+      <Filter>GameApp\RenderPass</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="NewGameApp">
+    <Filter Include="GameApp">
       <UniqueIdentifier>{445caf56-c388-42dd-aab5-f5d3bf9002fe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="NewGameApp\RenderPass">
+    <Filter Include="GameApp\RenderPass">
       <UniqueIdentifier>{f716966d-b81c-404a-80e4-7f597da31584}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameApp\Shaders">
+      <UniqueIdentifier>{8ae63649-f986-4388-bd4e-a519148ffbab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameApp\Shaders\DirLightShadow">
+      <UniqueIdentifier>{1e761f62-8192-48e3-a467-36bb1a86966d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameApp\Shaders\BlinnPhong">
+      <UniqueIdentifier>{088e5d20-47ab-40ff-b117-771204f7fd86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameApp\Shaders\composite">
+      <UniqueIdentifier>{cde3807f-7ab2-4b78-917a-c1ae2e34eb13}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\bin\data\shaders2\DirLightShadow\fragment.shader">
+      <Filter>GameApp\Shaders\DirLightShadow</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\DirLightShadow\vertex.shader">
+      <Filter>GameApp\Shaders\DirLightShadow</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\BlinnPhong\fragment.shader">
+      <Filter>GameApp\Shaders\BlinnPhong</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\BlinnPhong\vertex.shader">
+      <Filter>GameApp\Shaders\BlinnPhong</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\composite\fragment.shader">
+      <Filter>GameApp\Shaders\composite</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\composite\vertex.shader">
+      <Filter>GameApp\Shaders\composite</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\BlinnPhong.shader">
+      <Filter>GameApp\Shaders</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\shadow.shader">
+      <Filter>GameApp\Shaders</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\tonemap.shader">
+      <Filter>GameApp\Shaders</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\utils.shader">
+      <Filter>GameApp\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

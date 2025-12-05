@@ -94,7 +94,7 @@ void RenderPass1::drawScene(const glm::mat4& lightSpaceMatrix, const GameWorldDa
 		{
 			const auto& material = mesh.GetMaterial();
 			bool hasDiffuseMap = false;
-			TextureHandle diffuseTex{ 0 };
+			Texture2DHandle diffuseTex{ 0 };
 			if (material)
 			{
 				if (!material->diffuseTextures.empty())

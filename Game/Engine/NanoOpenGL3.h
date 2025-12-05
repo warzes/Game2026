@@ -6,16 +6,6 @@
 // Enums
 //=============================================================================
 
-
-
-enum class TextureTarget : uint8_t
-{ 
-	Texture1D,
-	Texture2D,
-	Texture3D,
-	CubeMap
-};
-
 enum class BufferUsage : uint8_t
 {
 	StaticDraw,
@@ -122,7 +112,12 @@ GLenum GetDataTypeGL(DataType dataType) noexcept;
 struct ProgramHandle final { GLuint handle{ 0u }; };
 struct BufferHandle final { GLuint handle{ 0u }; };
 struct VertexArrayHandle final { GLuint handle{ 0u }; };
-struct TextureHandle final { GLuint handle{ 0u }; };
+struct Texture1DHandle final { GLuint handle{ 0u }; };
+struct Texture2DHandle final { GLuint handle{ 0u }; };
+struct Texture3DHandle final { GLuint handle{ 0u }; };
+struct TextureCubeHandle final { GLuint handle{ 0u }; };
+struct Texture1DArrayHandle final { GLuint handle{ 0u }; };
+struct Texture2DArrayHandle final { GLuint handle{ 0u }; };
 struct SamplerHandle final { GLuint handle{ 0u }; };
 
 struct RenderBufferHandle { GLuint handle{ 0u }; };
@@ -227,25 +222,50 @@ void BufferSubData(BufferHandle bufferId, BufferTarget target, GLintptr offset, 
 //=============================================================================
 
 // Функции для создания текстур
-TextureHandle CreateTexture1D(unsigned width, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels = nullptr);
-TextureHandle CreateTexture2D(unsigned width, unsigned height, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels = nullptr);
-TextureHandle CreateTexture3D(unsigned width, unsigned height, unsigned depth, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels = nullptr);
-TextureHandle CreateTexture1DArray(InternalFormat internalformat, unsigned width, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels = nullptr);
-TextureHandle CreateTexture2DArray(InternalFormat internalformat, unsigned width, unsigned height, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels = nullptr);
-TextureHandle CreateCubeTexture(InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* posX, const void* negX, const void* posY, const void* negY, const void* posZ, const void* negZ);
+Texture1DHandle CreateTexture1D(unsigned width, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels = nullptr);
+Texture2DHandle CreateTexture2D(unsigned width, unsigned height, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels = nullptr);
+Texture3DHandle CreateTexture3D(unsigned width, unsigned height, unsigned depth, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels = nullptr);
+Texture1DArrayHandle CreateTexture1DArray(InternalFormat internalformat, unsigned width, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels = nullptr);
+Texture2DArrayHandle CreateTexture2DArray(InternalFormat internalformat, unsigned width, unsigned height, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels = nullptr);
+TextureCubeHandle CreateCubeTexture(InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* posX, const void* negX, const void* posY, const void* negY, const void* posZ, const void* negZ);
 
 // Функции для подгрузки данных в текстуры
-void SetTexture1DData(TextureHandle texture, InternalFormat internalformat, unsigned width, PixelFormat format, PixelType type, const void* pixels);
-void SetTexture2DData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* pixels);
-void SetTexture3DData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned height, unsigned depth, PixelFormat format, PixelType type, const void* pixels);
-void SetTexture1DArrayData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels);
-void SetTexture2DArrayData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned height, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels);
-void SetCubeTextureData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* posX, const void* negX, const void* posY, const void* negY, const void* posZ, const void* negZ);
+void SetTextureData(Texture1DHandle texture, InternalFormat internalformat, unsigned width, PixelFormat format, PixelType type, const void* pixels);
+void SetTextureData(Texture2DHandle texture, InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* pixels);
+void SetTextureData(Texture3DHandle texture, InternalFormat internalformat, unsigned width, unsigned height, unsigned depth, PixelFormat format, PixelType type, const void* pixels);
+void SetTextureData(Texture1DArrayHandle texture, InternalFormat internalformat, unsigned width, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels);
+void SetTextureData(Texture2DArrayHandle texture, InternalFormat internalformat, unsigned width, unsigned height, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels);
+void SetTextureData(TextureCubeHandle texture, InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* posX, const void* negX, const void* posY, const void* negY, const void* posZ, const void* negZ);
 
-void BindTexture2D(GLenum id, TextureHandle texture);
+void BindTexture2D(GLenum id, Texture2DHandle texture);
 
-bool IsValid(TextureHandle id);
-void Destroy(TextureHandle& id);
+bool IsValid(Texture1DHandle id);
+bool IsValid(Texture2DHandle id);
+bool IsValid(Texture3DHandle id);
+bool IsValid(TextureCubeHandle id);
+bool IsValid(Texture1DArrayHandle id);
+bool IsValid(Texture2DArrayHandle id);
+
+void Destroy(Texture1DHandle& id);
+void Destroy(Texture2DHandle& id);
+void Destroy(Texture3DHandle& id);
+void Destroy(TextureCubeHandle& id);
+void Destroy(Texture1DArrayHandle& id);
+void Destroy(Texture2DArrayHandle& id);
+
+struct TextureConfig final
+{
+	TextureFilter minFilter{ TextureFilter::LinearMipmapLinear };
+	TextureFilter magFilter{ TextureFilter::Linear };
+	TextureWrap   wrapS{ TextureWrap::Repeat };
+	TextureWrap   wrapT{ TextureWrap::Repeat };
+	TextureWrap   wrapR{ TextureWrap::Repeat };
+	bool          generateMipmaps{ true };
+};
+void SetTextureParameters(Texture1DHandle texture, const TextureConfig& config);
+void SetTextureParameters(Texture2DHandle texture, const TextureConfig& config);
+void SetTextureParameters(Texture3DHandle texture, const TextureConfig& config);
+void SetTextureParameters(TextureCubeHandle texture, const TextureConfig& config);
 
 //=============================================================================
 // Sampler

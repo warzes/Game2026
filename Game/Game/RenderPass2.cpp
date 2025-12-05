@@ -126,10 +126,10 @@ void RenderPass2::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 //=============================================================================
 void RenderPass2::drawScene(const GameWorldData& gameData)
 {
-	TextureHandle diffuseTex{ 0 };
-	TextureHandle specularTex{ 0 };
-	TextureHandle heightMapTex = textures::GetWhiteTexture2D().id;
-	TextureHandle normalTex{ 0 };
+	Texture2DHandle diffuseTex{ 0 };
+	Texture2DHandle specularTex{ 0 };
+	Texture2DHandle heightMapTex = textures::GetWhiteTexture2D().id;
+	Texture2DHandle normalTex{ 0 };
 
 	// TODO: heightmap textuere
 

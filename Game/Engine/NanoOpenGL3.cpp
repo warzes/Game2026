@@ -658,7 +658,7 @@ void BufferSubData(BufferHandle bufferId, BufferTarget target, GLintptr offset, 
 	glBindBuffer(GetGLEnum(target), currentBuffer);
 }
 //=============================================================================
-TextureHandle CreateTexture1D(unsigned width, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels)
+Texture1DHandle CreateTexture1D(unsigned width, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels)
 {
 	if (width == 0 || format == PixelFormat::None)
 	{
@@ -667,7 +667,7 @@ TextureHandle CreateTexture1D(unsigned width, InternalFormat internalformat, Pix
 	}
 	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_1D);
 	
-	TextureHandle texture;
+	Texture1DHandle texture;
 	glGenTextures(1, &texture.handle);
 	glBindTexture(GL_TEXTURE_1D, texture.handle);
 	glTexImage1D(GL_TEXTURE_1D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), 0, GetGLEnum(format), GetGLEnum(type), pixels);
@@ -676,7 +676,7 @@ TextureHandle CreateTexture1D(unsigned width, InternalFormat internalformat, Pix
 	return texture;
 }
 //=============================================================================
-TextureHandle CreateTexture2D(unsigned width, unsigned height, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels)
+Texture2DHandle CreateTexture2D(unsigned width, unsigned height, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels)
 {
 	if (width == 0 || height == 0 || format == PixelFormat::None)
 	{
@@ -686,7 +686,7 @@ TextureHandle CreateTexture2D(unsigned width, unsigned height, InternalFormat in
 
 	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
 
-	TextureHandle texture;
+	Texture2DHandle texture;
 	glGenTextures(1, &texture.handle);
 	glBindTexture(GL_TEXTURE_2D, texture.handle);
 	glTexImage2D(GL_TEXTURE_2D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), pixels);
@@ -695,7 +695,7 @@ TextureHandle CreateTexture2D(unsigned width, unsigned height, InternalFormat in
 	return texture;
 }
 //=============================================================================
-TextureHandle CreateTexture3D(unsigned width, unsigned height, unsigned depth, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels)
+Texture3DHandle CreateTexture3D(unsigned width, unsigned height, unsigned depth, InternalFormat internalformat, PixelFormat format, PixelType type, const void* pixels)
 {
 	if (width == 0 || height == 0 || depth == 0 || format == PixelFormat::None)
 	{
@@ -704,7 +704,7 @@ TextureHandle CreateTexture3D(unsigned width, unsigned height, unsigned depth, I
 	}
 	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_3D);
 	
-	TextureHandle texture;
+	Texture3DHandle texture;
 	glGenTextures(1, &texture.handle);
 	glBindTexture(GL_TEXTURE_3D, texture.handle);
 	glTexImage3D(GL_TEXTURE_3D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(depth), 0, GetGLEnum(format), GetGLEnum(type), pixels);
@@ -713,7 +713,7 @@ TextureHandle CreateTexture3D(unsigned width, unsigned height, unsigned depth, I
 	return texture;
 }
 //=============================================================================
-TextureHandle CreateTexture1DArray(InternalFormat internalformat, unsigned width, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels)
+Texture1DArrayHandle CreateTexture1DArray(InternalFormat internalformat, unsigned width, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels)
 {
 	if (width == 0 || arraySize == 0 || format == PixelFormat::None)
 	{
@@ -721,7 +721,7 @@ TextureHandle CreateTexture1DArray(InternalFormat internalformat, unsigned width
 		return {};
 	}
 	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_1D_ARRAY);
-	TextureHandle texture;
+	Texture1DArrayHandle texture;
 	glGenTextures(1, &texture.handle);
 	glBindTexture(GL_TEXTURE_1D_ARRAY, texture.handle);
 	glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(arraySize), 0, GetGLEnum(format), GetGLEnum(type), pixels);
@@ -729,7 +729,7 @@ TextureHandle CreateTexture1DArray(InternalFormat internalformat, unsigned width
 	return texture;
 }
 //=============================================================================
-TextureHandle CreateTexture2DArray(InternalFormat internalformat, unsigned width, unsigned height, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels)
+Texture2DArrayHandle CreateTexture2DArray(InternalFormat internalformat, unsigned width, unsigned height, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels)
 {
 	if (width == 0 || height == 0 || arraySize == 0 || format == PixelFormat::None)
 	{
@@ -737,7 +737,7 @@ TextureHandle CreateTexture2DArray(InternalFormat internalformat, unsigned width
 		return {};
 	}
 	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D_ARRAY);
-	TextureHandle texture;
+	Texture2DArrayHandle texture;
 	glGenTextures(1, &texture.handle);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texture.handle);
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(arraySize), 0, GetGLEnum(format), GetGLEnum(type), pixels);
@@ -745,7 +745,7 @@ TextureHandle CreateTexture2DArray(InternalFormat internalformat, unsigned width
 	return texture;
 }
 //=============================================================================
-TextureHandle CreateCubeTexture(InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* posX, const void* negX, const void* posY, const void* negY, const void* posZ, const void* negZ)
+TextureCubeHandle CreateCubeTexture(InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* posX, const void* negX, const void* posY, const void* negY, const void* posZ, const void* negZ)
 {
 	if (width == 0 || height == 0 || format == PixelFormat::None)
 	{
@@ -753,7 +753,7 @@ TextureHandle CreateCubeTexture(InternalFormat internalformat, unsigned width, u
 		return {};
 	}
 	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_CUBE_MAP);
-	TextureHandle texture;
+	TextureCubeHandle texture;
 	glGenTextures(1, &texture.handle);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texture.handle);
 
@@ -768,7 +768,7 @@ TextureHandle CreateCubeTexture(InternalFormat internalformat, unsigned width, u
 	return texture;
 }
 //=============================================================================
-void SetTexture1DData(TextureHandle texture, InternalFormat internalformat, unsigned width, PixelFormat format, PixelType type, const void* pixels)
+void SetTextureData(Texture1DHandle texture, InternalFormat internalformat, unsigned width, PixelFormat format, PixelType type, const void* pixels)
 {
 	if (width == 0 || format == PixelFormat::None || !pixels)
 	{
@@ -782,7 +782,7 @@ void SetTexture1DData(TextureHandle texture, InternalFormat internalformat, unsi
 	glBindTexture(GL_TEXTURE_1D, currentTexture);
 }
 //=============================================================================
-void SetTexture2DData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* pixels)
+void SetTextureData(Texture2DHandle texture, InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* pixels)
 {
 	if (width == 0 || height == 0 || format == PixelFormat::None || !pixels)
 	{
@@ -797,7 +797,7 @@ void SetTexture2DData(TextureHandle texture, InternalFormat internalformat, unsi
 	glBindTexture(GL_TEXTURE_2D, currentTexture);
 }
 //=============================================================================
-void SetTexture3DData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned height, unsigned depth, PixelFormat format, PixelType type, const void* pixels)
+void SetTextureData(Texture3DHandle texture, InternalFormat internalformat, unsigned width, unsigned height, unsigned depth, PixelFormat format, PixelType type, const void* pixels)
 {
 	if (width == 0 || height == 0 || depth == 0 || format == PixelFormat::None || !pixels)
 	{
@@ -812,7 +812,7 @@ void SetTexture3DData(TextureHandle texture, InternalFormat internalformat, unsi
 	glBindTexture(GL_TEXTURE_3D, currentTexture);
 }
 //=============================================================================
-void SetTexture1DArrayData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels)
+void SetTextureData(Texture1DArrayHandle texture, InternalFormat internalformat, unsigned width, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels)
 {
 	if (width == 0 || arraySize == 0 || format == PixelFormat::None)
 	{
@@ -826,7 +826,7 @@ void SetTexture1DArrayData(TextureHandle texture, InternalFormat internalformat,
 	glBindTexture(GL_TEXTURE_1D_ARRAY, currentTexture);
 }
 //=============================================================================
-void SetTexture2DArrayData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned height, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels)
+void SetTextureData(Texture2DArrayHandle texture, InternalFormat internalformat, unsigned width, unsigned height, unsigned arraySize, PixelFormat format, PixelType type, const void* pixels)
 {
 	if (width == 0 || height == 0 || arraySize == 0 || format == PixelFormat::None)
 	{
@@ -840,7 +840,7 @@ void SetTexture2DArrayData(TextureHandle texture, InternalFormat internalformat,
 	glBindTexture(GL_TEXTURE_2D_ARRAY, currentTexture);
 }
 //=============================================================================
-void SetCubeTextureData(TextureHandle texture, InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* posX, const void* negX, const void* posY, const void* negY, const void* posZ, const void* negZ)
+void SetTextureData(TextureCubeHandle texture, InternalFormat internalformat, unsigned width, unsigned height, PixelFormat format, PixelType type, const void* posX, const void* negX, const void* posY, const void* negY, const void* posZ, const void* negZ)
 {
 	if (width == 0 || height == 0 || format == PixelFormat::None)
 	{
@@ -861,21 +861,119 @@ void SetCubeTextureData(TextureHandle texture, InternalFormat internalformat, un
 	glBindTexture(GL_TEXTURE_CUBE_MAP, currentTexture);
 }
 //=============================================================================
-void BindTexture2D(GLenum id, TextureHandle texture)
+void BindTexture2D(GLenum id, Texture2DHandle texture)
 {
 	glActiveTexture(GL_TEXTURE0 + id);
 	glBindTexture(GL_TEXTURE_2D, texture.handle);
 }
 //=============================================================================
-bool IsValid(TextureHandle id)
+bool IsValid(Texture1DHandle id)
 {
 	return id.handle > 0;
 }
 //=============================================================================
-void Destroy(TextureHandle& id)
+bool IsValid(Texture2DHandle id)
+{
+	return id.handle > 0;
+}
+//=============================================================================
+bool IsValid(Texture3DHandle id)
+{
+	return id.handle > 0;
+}
+//=============================================================================
+bool IsValid(Texture1DArrayHandle id)
+{
+	return id.handle > 0;
+}
+//=============================================================================
+bool IsValid(Texture2DArrayHandle id)
+{
+	return id.handle > 0;
+}
+//=============================================================================
+bool IsValid(TextureCubeHandle id)
+{
+	return id.handle > 0;
+}
+//=============================================================================
+void Destroy(Texture1DHandle& id)
 {
 	glDeleteTextures(1, &id.handle);
 	id.handle = 0;
+}
+//=============================================================================
+void Destroy(Texture2DHandle& id)
+{
+	glDeleteTextures(1, &id.handle);
+	id.handle = 0;
+}
+//=============================================================================
+void Destroy(Texture3DHandle& id)
+{
+	glDeleteTextures(1, &id.handle);
+	id.handle = 0;
+}
+//=============================================================================
+void Destroy(Texture1DArrayHandle& id)
+{
+	glDeleteTextures(1, &id.handle);
+	id.handle = 0;
+}
+//=============================================================================
+void Destroy(Texture2DArrayHandle& id)
+{
+	glDeleteTextures(1, &id.handle);
+	id.handle = 0;
+}
+//=============================================================================
+void Destroy(TextureCubeHandle& id)
+{
+	glDeleteTextures(1, &id.handle);
+	id.handle = 0;
+}
+//=============================================================================
+inline void setTextureParameters(GLenum target, GLuint texture, const TextureConfig& config)
+{
+	if (texture == 0)
+	{
+		Error("Invalid texture handle");
+		return;
+	}
+
+	const GLuint currentTexture = GetCurrentTexture(target);
+	glBindTexture(target, texture);
+
+	if (config.generateMipmaps)
+		glGenerateMipmap(target);
+
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GetGLEnum(config.minFilter));
+	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GetGLEnum(config.magFilter));
+	glTexParameteri(target, GL_TEXTURE_WRAP_T, GetGLEnum(config.wrapT));
+	glTexParameteri(target, GL_TEXTURE_WRAP_S, GetGLEnum(config.wrapS));
+	glTexParameteri(target, GL_TEXTURE_WRAP_R, GetGLEnum(config.wrapR));
+
+	glBindTexture(target, currentTexture);
+}
+//=============================================================================
+void SetTextureParameters(Texture1DHandle texture, const TextureConfig& config)
+{
+	setTextureParameters(GL_TEXTURE_1D, texture.handle, config);
+}
+//=============================================================================
+void SetTextureParameters(Texture2DHandle texture, const TextureConfig& config)
+{
+	setTextureParameters(GL_TEXTURE_2D, texture.handle, config);
+}
+//=============================================================================
+void SetTextureParameters(Texture3DHandle texture, const TextureConfig& config)
+{
+	setTextureParameters(GL_TEXTURE_3D, texture.handle, config);
+}
+//=============================================================================
+void SetTextureParameters(TextureCubeHandle texture, const TextureConfig& config)
+{
+	setTextureParameters(GL_TEXTURE_CUBE_MAP, texture.handle, config);
 }
 //=============================================================================
 std::size_t std::hash<SamplerStateInfo>::operator()(const SamplerStateInfo& k) const noexcept

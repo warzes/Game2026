@@ -82,11 +82,11 @@ void RPMainScene::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 //=============================================================================
 void RPMainScene::drawScene(const GameWorldDataO& gameData)
 {
-	TextureHandle albedoTex{ 0 };
-	TextureHandle normalTex{ 0 };
-	TextureHandle metallicRoughnessTex{ 0 };
-	TextureHandle aoTex{ 0 };
-	TextureHandle emissiveTex{ 0 };
+	Texture2DHandle albedoTex{ 0 };
+	Texture2DHandle normalTex{ 0 };
+	Texture2DHandle metallicRoughnessTex{ 0 };
+	Texture2DHandle aoTex{ 0 };
+	Texture2DHandle emissiveTex{ 0 };
 
 	for (size_t i = 0; i < gameData.numGameObject; i++)
 	{

@@ -13,7 +13,7 @@ struct Texture2D final
 	}
 	bool operator!=(const Texture2D& rhs) const { return !(*this == rhs); }
 
-	TextureHandle id{ 0 };
+	Texture2DHandle id{ 0 };
 	PixelFormat   pixelFormat{ PixelFormat::None };
 	uint32_t      width{ 0 };
 	uint32_t      height{ 0 };

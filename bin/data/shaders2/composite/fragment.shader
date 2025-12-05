@@ -1,6 +1,6 @@
-#version 330 core
+﻿#version 330 core
 
-#include "../tonemap.glsl"
+#include "../tonemap.shader"
 
 uniform sampler2D colorInput;
 uniform sampler2D brightInput;

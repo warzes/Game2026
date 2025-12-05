@@ -94,7 +94,7 @@ void RenderPass1::drawScene(const glm::mat4& lightSpaceMatrix, const GameWorldDa
 		{
 			const auto& material = mesh.GetMaterial();
 			bool hasDiffuseMap = false;
-			TextureHandle diffuseTex{ 0 };
+			Texture2DHandle diffuseTex{ 0 };
 			if (material)
 			{
 				if (!material->diffuseTextures.empty())
@@ -119,7 +119,7 @@ void RenderPass1::BindDepthTexture(size_t id, unsigned slot) const
 //=============================================================================
 bool RenderPass1::initProgram()
 {
-	m_program = LoadShaderProgram("data/shaders2/DirLightShadow/vertex.glsl", "data/shaders2/DirLightShadow/fragment.glsl");
+	m_program = LoadShaderProgram("data/shaders2/DirLightShadow/vertex.shader", "data/shaders2/DirLightShadow/fragment.shader");
 	if (!m_program.handle)
 	{
 		Fatal("Scene Shadow Mapping Shader failed!");

@@ -10,7 +10,7 @@ bool RenderPass6::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_framebufferWidth = framebufferWidth;
 	m_framebufferHeight = framebufferHeight;
 
-	m_program = LoadShaderProgram("data/shaders2/composite/vertex.glsl", "data/shaders2/composite/fragment.glsl"/*, std::vector<std::string>{"GAMMA_CORRECT"}*/);
+	m_program = LoadShaderProgram("data/shaders2/composite/vertex.shader", "data/shaders2/composite/fragment.shader"/*, std::vector<std::string>{"GAMMA_CORRECT"}*/);
 	if (!m_program.handle)
 	{
 		Fatal("Scene Composite RenderPass Shader failed!");

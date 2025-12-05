@@ -1,7 +1,8 @@
-#version 330 core
+﻿#version 330 core
 
-#include "../utils.glsl"
-#include "../BlinnPhong.glsl"
+#include "../utils.shader"
+#include "../shadow.shader"
+#include "../BlinnPhong.shader"
 
 in VS_OUT {
 	vec3 VertColor;

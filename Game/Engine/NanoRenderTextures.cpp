@@ -264,18 +264,16 @@ Texture2D textures::LoadTexture2D(const std::string& fileName, ColorSpace colorS
 		{
 			std::unreachable();
 		}
-		GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
 
-		TextureHandle textureID = CreateTexture2D(static_cast<uint32_t>(width), static_cast<uint32_t>(height), internalFormat, pixelFormat, PixelType::UnsignedByte, pixels);
-		glBindTexture(GL_TEXTURE_2D, textureID.handle);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glBindTexture(GL_TEXTURE_2D, currentTexture);
+		Texture2DHandle textureID = CreateTexture2D(static_cast<uint32_t>(width), static_cast<uint32_t>(height), internalFormat, pixelFormat, PixelType::UnsignedByte, pixels);
+		TextureConfig texConfig{
+			.minFilter = TextureFilter::LinearMipmapLinear,
+			.magFilter = TextureFilter::Linear,
+			.wrapS = TextureWrap::Repeat,
+			.wrapT = TextureWrap::Repeat,
+			.generateMipmaps = true
+		};
+		SetTextureParameters(textureID, texConfig);
 
 		stbi_image_free(pixels);
 
@@ -343,17 +341,16 @@ Texture2D textures::CreateTextureFromData(std::string_view name, aiTexture* embT
 			std::unreachable();
 		}
 
-		GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
-
-		TextureHandle textureID = CreateTexture2D(static_cast<uint32_t>(width), static_cast<uint32_t>(height), internalFormat, pixelFormat, PixelType::UnsignedByte, data);
-		glBindTexture(GL_TEXTURE_2D, textureID.handle);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glBindTexture(GL_TEXTURE_2D, currentTexture);
+		Texture2DHandle textureID = CreateTexture2D(static_cast<uint32_t>(width), static_cast<uint32_t>(height), internalFormat, pixelFormat, PixelType::UnsignedByte, data);
+		TextureConfig texConfig{
+			.minFilter = TextureFilter::LinearMipmapLinear,
+			.magFilter = TextureFilter::Linear,
+			.wrapS = TextureWrap::Repeat,
+			.wrapT = TextureWrap::Repeat,
+			.generateMipmaps = true
+		};
+		SetTextureParameters(textureID, texConfig);
+		
 		stbi_image_free(data);
 
 		Debug("Load Texture: " + std::string(name));
