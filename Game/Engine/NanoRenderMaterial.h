@@ -12,6 +12,7 @@ struct MaterialShaderSlot final
 	int diffuseColor{ -1 };
 };
 
+// TODO: в движке не нужно материал. А только массив текстур и возможно значения цветов
 struct Material final
 {
 	float     opacity{ 1.0f };
@@ -25,9 +26,10 @@ struct Material final
 	std::vector<Texture2D> diffuseTextures;
 	std::vector<Texture2D> specularTextures;
 	std::vector<Texture2D> normalTextures;
-	std::vector<Texture2D> metallicRoughTextures;
+	std::vector<Texture2D> shininessTextures;
+	std::vector<Texture2D> emissionTextures;
+	std::vector<Texture2D> opacityTextures;
 	//std::vector<Texture2D> depthTextures;
-	//std::vector<Texture2D> emissionTextures;
 
 	bool noLighing{ false };
 };

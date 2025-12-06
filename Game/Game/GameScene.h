@@ -7,7 +7,7 @@
 #include "RenderPass2.h"
 #include "RenderPass6.h"
 
-struct GameObject final
+struct OldGameObject final
 {
 	const AABB& GetAABB() const noexcept { return model.GetAABB(); }
 
@@ -24,7 +24,7 @@ public:
 	void Draw();
 
 	void BindCamera(Camera* camera);
-	void BindGameObject(GameObject* go);
+	void BindGameObject(OldGameObject* go);
 	void BindLight(DirectionalLight* ent);
 	void BindLight(SpotLight* ent);
 	void BindLight(PointLight* ent);

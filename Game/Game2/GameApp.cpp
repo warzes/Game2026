@@ -32,18 +32,18 @@ namespace
 	OldGameScene scene;
 
 	Camera camera;
-	GameObject modelTest;
+	OldGameObject modelTest;
 	DirectionalLight dirLight;
 
 	PointLight pointLights[10];
 
 	AmbientSphereLight ambientSphereLight;
 
-	GameObject sphereEntity;
-	GameObject box1Entity;
-	GameObject box2Entity;
-	GameObject box3Entity;
-	GameObject box4Entity;
+	OldGameObject sphereEntity;
+	OldGameObject box1Entity;
+	OldGameObject box2Entity;
+	OldGameObject box3Entity;
+	OldGameObject box4Entity;
 }
 //=============================================================================
 void GameApp()

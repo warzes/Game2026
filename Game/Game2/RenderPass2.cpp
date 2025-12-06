@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "RenderPass2.h"
-#include "GameScene.h"
+#include "OldGameScene.h"
 //=============================================================================
 bool RenderPass2::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
@@ -160,7 +160,6 @@ void RenderPass2::drawScene(const GameWorldData& gameData)
 			BindTexture2D(1, specularTex);
 			BindTexture2D(2, heightMapTex);
 			BindTexture2D(3, normalTex);
-
 
 			mesh.Draw(GL_TRIANGLES);
 		}

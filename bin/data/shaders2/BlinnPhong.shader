@@ -1,4 +1,4 @@
-﻿struct DirLight
+struct DirLight
 {
 	vec3 direction;
 	vec3 color;

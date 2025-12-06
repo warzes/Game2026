@@ -95,8 +95,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GameApp.cpp" />
-    <ClCompile Include="GameMesh.cpp" />
-    <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="GameModel.cpp" />
     <ClCompile Include="OldGameScene.cpp" />
     <ClCompile Include="RenderPass1.cpp" />
     <ClCompile Include="RenderPass2.cpp" />
@@ -113,9 +112,8 @@
     <ClInclude Include="GameConfig.h" />
     <ClInclude Include="GameDirectionalLight.h" />
     <ClInclude Include="GameLight.h" />
-    <ClInclude Include="GameMesh.h" />
+    <ClInclude Include="GameModel.h" />
     <ClInclude Include="GamePointLight.h" />
-    <ClInclude Include="GameScene.h" />
     <ClInclude Include="OldGameScene.h" />
     <ClInclude Include="GameWorldData.h" />
     <ClInclude Include="RenderPass1.h" />

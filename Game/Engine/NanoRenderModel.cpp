@@ -188,23 +188,7 @@ Mesh Model::processMesh(const aiScene* scene, struct aiMesh* mesh, std::string_v
 		float metallic{ 0.0f };
 		//mesh_material->Get(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLIC_FACTOR, metallic);
 
-		std::vector<Texture2D> diffuse = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_DIFFUSE, ColorSpace::sRGB);
-		std::vector<Texture2D> specular = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_SPECULAR, ColorSpace::Linear);
-		std::vector<Texture2D> normal = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_NORMALS, ColorSpace::Linear);
-		if (normal.size() == 0) normal = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_HEIGHT, ColorSpace::Linear);
-		std::vector<Texture2D> metallicRoughMaps = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_UNKNOWN, ColorSpace::Linear);
-
-		if (diffuse.size() > 1) Warning("More than one diffuse texture loaded. Engine does not support multiple diffuse textures");
-		if (specular.size() > 1) Warning("More than one specular texture loaded. Engine does not support multiple specular textures");
-		if (normal.size() > 1) Warning("More than one normal texture loaded. Engine does not support multiple normal textures");
-		if (metallicRoughMaps.size() > 1) Warning("More than one normal texture loaded. Engine does not support multiple metallicRoughMaps textures");
-
 		material = Material();
-		material->diffuseTextures = diffuse;
-		material->specularTextures = specular;
-		material->normalTextures = normal;
-		material->metallicRoughTextures = metallicRoughMaps;
-
 		material->diffuseColor = glm::vec3(colorDiffuse.r, colorDiffuse.g, colorDiffuse.b);
 		material->specularColor = glm::vec3(colorSpecular.r, colorSpecular.g, colorSpecular.b);
 		material->ambientColor = glm::vec3(colorAmbient.r, colorAmbient.g, colorAmbient.b);
@@ -213,6 +197,38 @@ Mesh Model::processMesh(const aiScene* scene, struct aiMesh* mesh, std::string_v
 		//material.shininess = shininess; // TODO: не работает
 		material->roughness = roughness;
 		material->metallic = metallic;
+
+		// DIFFUSE TEXTURES
+		material->diffuseTextures = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_DIFFUSE, ColorSpace::sRGB);
+		if (material->diffuseTextures.size() > 1)
+			Warning("More than one diffuse texture loaded. Engine does not support multiple diffuse textures");
+
+		// SPECULAR TEXTURES
+		material->specularTextures = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_SPECULAR, ColorSpace::Linear);
+		if (material->specularTextures.size() > 1)
+			Warning("More than one specular texture loaded. Engine does not support multiple specular textures");
+
+		// NORMAL TEXTURES
+		material->normalTextures = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_NORMALS, ColorSpace::Linear);
+		if (material->normalTextures.empty())
+			material->normalTextures = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_HEIGHT, ColorSpace::Linear);
+		if (material->normalTextures.size() > 1)
+			Warning("More than one normal texture loaded. Engine does not support multiple normal textures");
+
+		// SHININESS TEXTURES
+		material->shininessTextures = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_SHININESS, ColorSpace::Linear);
+		if (material->shininessTextures.size() > 1)
+			Warning("More than one shininess texture loaded. Engine does not support multiple shininessMaps textures");
+
+		// EMISSIVE TEXTURES
+		material->emissionTextures = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_EMISSIVE, ColorSpace::Linear);
+		if (material->emissionTextures.size() > 1)
+			Warning("More than one emission texture loaded. Engine does not support multiple emissionMaps textures");
+
+		// OPACITY TEXTURES
+		material->opacityTextures = loadMaterialTextures(directory, scene, mesh_material, aiTextureType_OPACITY, ColorSpace::Linear);
+		if (material->opacityTextures.size() > 1)
+			Warning("More than one opacity texture loaded. Engine does not support multiple opacityMaps textures");
 	}
 	else if (m_materialType == ModelMaterialType::PBR)
 	{

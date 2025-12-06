@@ -6,9 +6,6 @@
     <ClCompile Include="GameApp.cpp">
       <Filter>GameApp</Filter>
     </ClCompile>
-    <ClCompile Include="OldGameScene.cpp">
-      <Filter>GameApp</Filter>
-    </ClCompile>
     <ClCompile Include="RenderPass1.cpp">
       <Filter>GameApp\RenderPass</Filter>
     </ClCompile>
@@ -18,23 +15,17 @@
     <ClCompile Include="RenderPass6.cpp">
       <Filter>GameApp\RenderPass</Filter>
     </ClCompile>
-    <ClCompile Include="GameScene.cpp">
-      <Filter>GameApp\GameScene</Filter>
-    </ClCompile>
-    <ClCompile Include="GameMesh.cpp">
+    <ClCompile Include="GameModel.cpp">
       <Filter>GameApp\GameScene\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="OldGameScene.cpp">
+      <Filter>GameApp\GameScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="GameApp.h" />
     <ClInclude Include="GameConfig.h" />
-    <ClInclude Include="GameWorldData.h">
-      <Filter>GameApp</Filter>
-    </ClInclude>
-    <ClInclude Include="OldGameScene.h">
-      <Filter>GameApp</Filter>
-    </ClInclude>
     <ClInclude Include="RenderPass1.h">
       <Filter>GameApp\RenderPass</Filter>
     </ClInclude>
@@ -43,9 +34,6 @@
     </ClInclude>
     <ClInclude Include="RenderPass6.h">
       <Filter>GameApp\RenderPass</Filter>
-    </ClInclude>
-    <ClInclude Include="GameScene.h">
-      <Filter>GameApp\GameScene</Filter>
     </ClInclude>
     <ClInclude Include="GameCamera.h">
       <Filter>GameApp\GameScene\Object</Filter>
@@ -62,8 +50,14 @@
     <ClInclude Include="SceneObject.h">
       <Filter>GameApp\GameScene\Object</Filter>
     </ClInclude>
-    <ClInclude Include="GameMesh.h">
+    <ClInclude Include="GameModel.h">
       <Filter>GameApp\GameScene\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="OldGameScene.h">
+      <Filter>GameApp\GameScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameWorldData.h">
+      <Filter>GameApp\GameScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

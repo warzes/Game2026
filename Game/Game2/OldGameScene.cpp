@@ -31,7 +31,7 @@ void OldGameScene::BindCamera(Camera* camera)
 	m_data.camera = camera;
 }
 //=============================================================================
-void OldGameScene::BindGameObject(GameObject* go)
+void OldGameScene::BindGameObject(OldGameObject* go)
 {
 	if (m_data.numGameObject >= m_data.gameObjects.size())
 		m_data.gameObjects.push_back(go);
