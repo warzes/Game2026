@@ -1,5 +1,10 @@
 ﻿#pragma once
 
+class GameCamera;
+class GameModel;
+class GameDirectionalLight;
+class GamePointLight;
+
 class Camera;
 struct OldGameObject;
 struct DirectionalLight;
@@ -8,11 +13,12 @@ struct SpotLight;
 struct AmbientBoxLight;
 struct AmbientSphereLight;
 
-struct GameWorldData final // TODO;
+struct GameWorldData final
 {
 	void Init()
 	{
-		gameObjects.reserve(10000);
+		oldGameObjects.reserve(10000);
+		gameModels.reserve(10000);
 		dirLights.resize(MaxDirectionalLight);
 		spotLights.resize(MaxSpotLight);
 		pointLights.resize(MaxPointLight);
@@ -22,8 +28,13 @@ struct GameWorldData final // TODO;
 
 	void ResetFrame()
 	{
-		camera = nullptr;
-		numGameObject = 0;
+		activeCamera = nullptr;
+		countGameModels = 0;
+		countGameDirectionalLights = 0;
+		countGamePointLights = 0;
+
+		oldCamera = nullptr;
+		numOldGameObject = 0;
 		numDirLights = 0;
 		numSpotLights = 0;
 		numPointLights = 0;
@@ -31,9 +42,49 @@ struct GameWorldData final // TODO;
 		numSphereLights = 0;
 	}
 
-	Camera*                          camera{ nullptr };
-	std::vector<OldGameObject*>         gameObjects;
-	size_t                           numGameObject{ 0 };
+	void Bind(GameModel* go)
+	{
+		if (countGameModels >= gameModels.size())
+			gameModels.push_back(go);
+		else
+			gameModels[countGameModels] = go;
+
+		countGameModels++;
+	}
+
+	void Bind(GameDirectionalLight* go)
+	{
+		if (countGameDirectionalLights >= gameDirectionalLights.size())
+			gameDirectionalLights.push_back(go);
+		else
+			gameDirectionalLights[countGameDirectionalLights] = go;
+
+		countGameDirectionalLights++;
+	}
+
+	void Bind(GamePointLight* go)
+	{
+		if (countGamePointLights >= gamePointLights.size())
+			gamePointLights.push_back(go);
+		else
+			gamePointLights[countGamePointLights] = go;
+
+		countGamePointLights++;
+	}
+
+
+	GameCamera*                        activeCamera{ nullptr };
+	std::vector<GameModel*>            gameModels;
+	size_t                             countGameModels{ 0 };
+	std::vector<GameDirectionalLight*> gameDirectionalLights;
+	size_t                             countGameDirectionalLights{ 0 };
+	std::vector<GamePointLight*>       gamePointLights;
+	size_t                             countGamePointLights{ 0 };
+
+	// old
+	Camera*                          oldCamera{ nullptr };
+	std::vector<OldGameObject*>      oldGameObjects;
+	size_t                           numOldGameObject{ 0 };
 	std::vector<DirectionalLight*>   dirLights;
 	size_t                           numDirLights{ 0 };
 	std::vector<SpotLight*>          spotLights;
@@ -44,6 +95,4 @@ struct GameWorldData final // TODO;
 	size_t                           numBoxLights{ 0 };
 	std::vector<AmbientSphereLight*> sphereLights;
 	size_t                           numSphereLights{ 0 };
-
-
 };

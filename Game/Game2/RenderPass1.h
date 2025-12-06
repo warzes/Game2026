@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-// Render Pass DirectionalLightsShadowMap
+class GameDirectionalLight;
+class GamePointLight;
 
 enum class ShadowQuality
 {
@@ -16,6 +17,51 @@ enum class ShadowQuality
 struct GameWorldData;
 
 class RenderPass1 final
+{
+public:
+	bool Init(ShadowQuality shadowQuality);
+	void Close();
+
+	void RenderShadows(const GameWorldData& worldData);
+
+	void SetShadowQuality(ShadowQuality quality);
+
+	const auto& GetDepthFBO() const { return m_depthFBODirLights; }
+	const auto& GetProjection() const { return m_orthoProjection; }
+
+	void BindDepthTexture(size_t id, unsigned slot) const;
+	const glm::mat4& GetLightSpaceMatrix(size_t id) const { return m_lightSpaceMatrix[id]; }
+
+private:
+	bool initProgram();
+	bool initFBO();
+	void drawScene(GameDirectionalLight* currentLight, const GameWorldData& worldData);
+	void drawScene(GamePointLight* currentLight, const GameWorldData& worldData);
+	void drawMesh(const Mesh& mesh, int hasDiffuseMapId);
+
+	ShadowQuality                                m_shadowQuality;
+	float                                        m_orthoDimension;
+	glm::mat4                                    m_orthoProjection; // for directional lights
+	float                                        m_shadowFarPlane{ 100.0f };
+
+	ProgramHandle                                m_programDirLight{ 0 };
+	int                                          m_dirLightMvpMatrixId{ -1 };
+	int                                          m_dirLightHasDiffuseMapId{ -1 };
+
+	ProgramHandle                                m_programPointLight{ 0 };
+	int                                          m_pointLightModelMatrixId{ -1 };
+	int                                          m_pointLightCubeMatricesId[6] = { -1 };
+	int                                          m_pointLightLightPosId{ -1 };
+	int                                          m_pointLightFarPlaneId{ -1 };
+	int                                          m_pointLightHasDiffuseMapId{ -1 };
+
+	std::array<Framebuffer, MaxDirectionalLight> m_depthFBODirLights;
+	std::array<glm::mat4, MaxDirectionalLight>   m_lightSpaceMatrix;
+
+	std::array<Framebuffer, MaxPointLight>       m_depthFBOPointLights;
+};
+
+class OldRenderPass1 final
 {
 public:
 	bool Init(ShadowQuality shadowQuality);

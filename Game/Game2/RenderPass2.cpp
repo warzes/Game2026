@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "RenderPass2.h"
-#include "OldGameScene.h"
+#include "GameScene.h"
 //=============================================================================
 bool RenderPass2::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
@@ -25,7 +25,7 @@ void RenderPass2::Close()
 	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
-void RenderPass2::Draw(const RenderPass1& rpShadowMap, const GameWorldData& gameData)
+void RenderPass2::Draw(const OldRenderPass1& rpShadowMap, const GameWorldData& gameData)
 {
 	m_fbo.Bind();
 	glEnable(GL_DEPTH_TEST);
@@ -35,9 +35,9 @@ void RenderPass2::Draw(const RenderPass1& rpShadowMap, const GameWorldData& game
 
 	glUseProgram(m_program.handle);
 	SetUniform(m_projectionMatrixId, m_perspective);
-	SetUniform(m_viewMatrixId, gameData.camera->GetViewMatrix());
+	SetUniform(m_viewMatrixId, gameData.oldCamera->GetViewMatrix());
 
-	SetUniform(m_viewPosId, gameData.camera->Position);
+	SetUniform(m_viewPosId, gameData.oldCamera->Position);
 
 	int textureOffset{ 4 };
 	for (int i = 0; i < gameData.numDirLights; ++i)
@@ -131,14 +131,14 @@ void RenderPass2::drawScene(const GameWorldData& gameData)
 
 	// TODO: heightmap textuere
 
-	for (size_t i = 0; i < gameData.numGameObject; i++)
+	for (size_t i = 0; i < gameData.numOldGameObject; i++)
 	{
-		if (!gameData.gameObjects[i] || !gameData.gameObjects[i]->visible)
+		if (!gameData.oldGameObjects[i] || !gameData.oldGameObjects[i]->visible)
 			continue;
 
-		SetUniform(m_modelMatrixId, gameData.gameObjects[i]->modelMat);
+		SetUniform(m_modelMatrixId, gameData.oldGameObjects[i]->modelMat);
 
-		const auto& meshes = gameData.gameObjects[i]->model.GetMeshes();
+		const auto& meshes = gameData.oldGameObjects[i]->model.GetMeshes();
 		for (const auto& mesh : meshes)
 		{
 			const auto& material = mesh.GetMaterial();

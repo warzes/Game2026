@@ -18,7 +18,6 @@ enum class FaceVisibility : uint8_t
 struct GameModelData final
 {
 	Model          model;
-	glm::mat4      modelMat{ glm::mat4(1.0f) };
 
 	glm::vec3      diffuseColor{ 1.0f };
 	float          specularity{ 1.0f };
@@ -38,11 +37,16 @@ struct GameModelData final
 	FaceVisibility faceVisibility{ FaceVisibility::Front };
 };
 
+/*
+* надо переделать логику - модель должна быть обща€, а тут должен быть экземпл€р модели. модель грузитс€ один раз, а экземпл€ров указывающих на нее много. и можно реализовать инстансом
+*/
+
 class GameModel : public SceneObject
 {
 public:
+	GameModel() : SceneObject(ObjectType::Model) {}
+
 	bool LoadModel(const std::string& fileName);
-	void SetWorldTransform(const glm::mat4& mat) { m_data.modelMat = mat; }
 
 	void SetupParameters(ProgramHandle program);
 

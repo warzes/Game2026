@@ -16,7 +16,7 @@ struct OldGameObject final
 	bool      visible{ true };
 };
 
-class OldGameScene final
+class GameScene final
 {
 public:
 	bool Init();
@@ -39,7 +39,7 @@ private:
 	void blittingToScreen(GLuint fbo, uint16_t srcWidth, uint16_t srcHeight);
 
 	GameWorldData m_data;
-	RenderPass1   m_rpDirShadowMap;
+	OldRenderPass1   m_rpDirShadowMap;
 	RenderPass2   m_rpMainScene;
 	// SSAO
 	//RenderPass3   m_rpGeometry;

@@ -4,7 +4,7 @@
 #include "NanoIO.h"
 #include "NanoLog.h"
 //=============================================================================
-bool RenderPass1::Init(ShadowQuality shadowQuality)
+bool OldRenderPass1::Init(ShadowQuality shadowQuality)
 {
 	m_shadowQuality = shadowQuality;
 	m_orthoDimension = 10.0f;
@@ -19,7 +19,7 @@ bool RenderPass1::Init(ShadowQuality shadowQuality)
 	return true;
 }
 //=============================================================================
-void RenderPass1::Close()
+void OldRenderPass1::Close()
 {
 	if (m_program.handle)
 		glDeleteProgram(m_program.handle);
@@ -30,7 +30,7 @@ void RenderPass1::Close()
 	}
 }
 //=============================================================================
-void RenderPass1::Draw(const GameWorldData& worldData)
+void OldRenderPass1::Draw(const GameWorldData& worldData)
 {
 	if (m_shadowQuality == ShadowQuality::Off) return;
 	if (worldData.numDirLights == 0) return;
@@ -68,7 +68,7 @@ void RenderPass1::Draw(const GameWorldData& worldData)
 	}
 }
 //=============================================================================
-void RenderPass1::SetShadowQuality(ShadowQuality quality)
+void OldRenderPass1::SetShadowQuality(ShadowQuality quality)
 {
 	if (m_shadowQuality == quality) return;
 
@@ -80,16 +80,16 @@ void RenderPass1::SetShadowQuality(ShadowQuality quality)
 	}
 }
 //=============================================================================
-void RenderPass1::drawScene(const glm::mat4& lightSpaceMatrix, const GameWorldData& worldData)
+void OldRenderPass1::drawScene(const glm::mat4& lightSpaceMatrix, const GameWorldData& worldData)
 {
-	for (size_t i = 0; i < worldData.numGameObject; i++)
+	for (size_t i = 0; i < worldData.numOldGameObject; i++)
 	{
-		if (!worldData.gameObjects[i] || !worldData.gameObjects[i]->visible)
+		if (!worldData.oldGameObjects[i] || !worldData.oldGameObjects[i]->visible)
 			continue;
 
-		SetUniform(m_mvpMatrixId, lightSpaceMatrix * worldData.gameObjects[i]->modelMat);
+		SetUniform(m_mvpMatrixId, lightSpaceMatrix * worldData.oldGameObjects[i]->modelMat);
 
-		const auto& meshes = worldData.gameObjects[i]->model.GetMeshes();
+		const auto& meshes = worldData.oldGameObjects[i]->model.GetMeshes();
 		for (const auto& mesh : meshes)
 		{
 			const auto& material = mesh.GetMaterial();
@@ -112,12 +112,12 @@ void RenderPass1::drawScene(const glm::mat4& lightSpaceMatrix, const GameWorldDa
 	}
 }
 //=============================================================================
-void RenderPass1::BindDepthTexture(size_t id, unsigned slot) const
+void OldRenderPass1::BindDepthTexture(size_t id, unsigned slot) const
 {
 	m_depthFBO[id].BindDepthTexture(slot);
 }
 //=============================================================================
-bool RenderPass1::initProgram()
+bool OldRenderPass1::initProgram()
 {
 	m_program = LoadShaderProgram("data/shaders/shadowMapping/vertex.glsl", "data/shaders/shadowMapping/fragment.glsl");
 	if (!m_program.handle)
@@ -141,7 +141,7 @@ bool RenderPass1::initProgram()
 	return true;
 }
 //=============================================================================
-bool RenderPass1::initFBO()
+bool OldRenderPass1::initFBO()
 {
 	FramebufferInfo depthFboInfo;
 	depthFboInfo.depthAttachment = DepthAttachment{ .type = AttachmentType::Texture };

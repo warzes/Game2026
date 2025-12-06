@@ -96,7 +96,7 @@
   <ItemGroup>
     <ClCompile Include="GameApp.cpp" />
     <ClCompile Include="GameModel.cpp" />
-    <ClCompile Include="OldGameScene.cpp" />
+    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="RenderPass1.cpp" />
     <ClCompile Include="RenderPass2.cpp" />
     <ClCompile Include="RenderPass6.cpp" />
@@ -114,7 +114,7 @@
     <ClInclude Include="GameLight.h" />
     <ClInclude Include="GameModel.h" />
     <ClInclude Include="GamePointLight.h" />
-    <ClInclude Include="OldGameScene.h" />
+    <ClInclude Include="GameScene.h" />
     <ClInclude Include="GameWorldData.h" />
     <ClInclude Include="RenderPass1.h" />
     <ClInclude Include="RenderPass2.h" />
@@ -128,8 +128,13 @@
     <None Include="..\..\bin\data\shaders2\BlinnPhong\vertex.shader" />
     <None Include="..\..\bin\data\shaders2\composite\fragment.shader" />
     <None Include="..\..\bin\data\shaders2\composite\vertex.shader" />
+    <None Include="..\..\bin\data\shaders2\DirLightShadowFrag.shader" />
+    <None Include="..\..\bin\data\shaders2\DirLightShadowVert.shader" />
     <None Include="..\..\bin\data\shaders2\DirLightShadow\fragment.shader" />
     <None Include="..\..\bin\data\shaders2\DirLightShadow\vertex.shader" />
+    <None Include="..\..\bin\data\shaders2\PointLightShadowFrag.shader" />
+    <None Include="..\..\bin\data\shaders2\PointLightShadowGeom.shader" />
+    <None Include="..\..\bin\data\shaders2\PointLightShadowVert.shader" />
     <None Include="..\..\bin\data\shaders2\shadow.shader" />
     <None Include="..\..\bin\data\shaders2\tonemap.shader" />
     <None Include="..\..\bin\data\shaders2\utils.shader" />

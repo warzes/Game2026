@@ -1,9 +1,12 @@
 ﻿#include "stdafx.h"
 #include "GameApp.h"
-#include "OldGameScene.h"
+#include "GameScene.h"
 
 /*
-вот такое
+
+arthurian legends
+
+
 https://www.youtube.com/shorts/ksffC38Jg_o
 https://www.youtube.com/@retro-dev2798/videos
 http://www.3dcpptutorials.sk/index.php?id=46
@@ -29,7 +32,15 @@ idea:
 //=============================================================================
 namespace
 {
-	OldGameScene scene;
+	GameScene scene;
+
+	GameCamera cameraGame;
+	GameModel modelLevel;
+	GameDirectionalLight* directionalLight;
+	GamePointLight* pointLight1;
+	GamePointLight* pointLight2;
+
+
 
 	Camera camera;
 	OldGameObject modelTest;
@@ -54,6 +65,18 @@ void GameApp()
 			return;
 
 		scene.Init();
+
+		cameraGame.SetFOV(60.0f);
+		cameraGame.SetFar(150);
+
+		modelLevel.LoadModel("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj");
+		modelLevel.SetPosition(glm::vec3(-30.0f, 0.0f, 15.0f));
+
+		directionalLight = new GameDirectionalLight(glm::vec3(-5.0f, -5.0f, 5.0f), glm::vec3(1.0f, 0.8f, 0.8f), 2.0f);
+		directionalLight->SetPosition(glm::vec3(10.0f));
+
+		pointLight1 = new GamePointLight(glm::vec3(18.0f, 3.0f, 3.5f), glm::vec3(1.0f, 0.7f, 0.5f), 0.6f, 10);
+		pointLight2 = new GamePointLight(glm::vec3(-18.0f, 3.0f, 3.5f), glm::vec3(1.0f, 0.7f, 0.5f), 0.4f, 10);
 
 		camera.SetPosition(glm::vec3(0.0f, 0.5f, 4.5f));
 
@@ -112,8 +135,18 @@ void GameApp()
 				}
 			}
 
+			scene.Bind(&cameraGame);
+			scene.Bind(&modelLevel);
+			scene.Bind(directionalLight);
+			scene.Bind(pointLight1);
+			scene.Bind(pointLight2);
+
+
+
+
+
 			scene.BindCamera(&camera);
-			scene.BindGameObject(&modelTest);
+
 			scene.BindGameObject(&sphereEntity);
 			scene.BindGameObject(&box1Entity);
 			scene.BindGameObject(&box2Entity);

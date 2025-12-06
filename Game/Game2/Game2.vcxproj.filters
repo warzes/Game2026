@@ -18,7 +18,7 @@
     <ClCompile Include="GameModel.cpp">
       <Filter>GameApp\GameScene\Object</Filter>
     </ClCompile>
-    <ClCompile Include="OldGameScene.cpp">
+    <ClCompile Include="GameScene.cpp">
       <Filter>GameApp\GameScene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,7 +53,7 @@
     <ClInclude Include="GameModel.h">
       <Filter>GameApp\GameScene\Object</Filter>
     </ClInclude>
-    <ClInclude Include="OldGameScene.h">
+    <ClInclude Include="GameScene.h">
       <Filter>GameApp\GameScene</Filter>
     </ClInclude>
     <ClInclude Include="GameWorldData.h">
@@ -115,6 +115,21 @@
       <Filter>GameApp\_Shaders</Filter>
     </None>
     <None Include="..\..\bin\data\shaders2\utils.shader">
+      <Filter>GameApp\_Shaders</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\DirLightShadowFrag.shader">
+      <Filter>GameApp\_Shaders</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\DirLightShadowVert.shader">
+      <Filter>GameApp\_Shaders</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\PointLightShadowFrag.shader">
+      <Filter>GameApp\_Shaders</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\PointLightShadowVert.shader">
+      <Filter>GameApp\_Shaders</Filter>
+    </None>
+    <None Include="..\..\bin\data\shaders2\PointLightShadowGeom.shader">
       <Filter>GameApp\_Shaders</Filter>
     </None>
   </ItemGroup>

@@ -5,6 +5,11 @@
 #include "RenderPass2.h"
 #include "RenderPass6.h"
 
+#include "GameCamera.h"
+#include "GameDirectionalLight.h"
+#include "GamePointLight.h"
+#include "GameModel.h"
+
 struct OldGameObject final
 {
 	const AABB& GetAABB() const noexcept { return model.GetAABB(); }
@@ -14,13 +19,21 @@ struct OldGameObject final
 	bool      visible{ true };
 };
 
-class OldGameScene final
+class GameScene final
 {
 public:
 	bool Init();
 	void Close();
 	void Draw();
 
+	void Bind(GameCamera* camera);
+	void Bind(GameModel* go);
+	void Bind(GameDirectionalLight* go);
+	void Bind(GamePointLight* go);
+
+
+
+	// OLD
 	void BindCamera(Camera* camera);
 	void BindGameObject(OldGameObject* go);
 	void BindLight(DirectionalLight* ent);
@@ -28,6 +41,12 @@ public:
 	void BindLight(PointLight* ent);
 	void BindLight(AmbientBoxLight* ent);
 	void BindLight(AmbientSphereLight* ent);
+
+
+	// temp
+	bool Fog{ false };
+	float AmbientStrength{ 0.1f };
+	glm::vec3 AmbientColor{ 1.0f };
 
 private:
 	void beginDraw();
@@ -37,7 +56,9 @@ private:
 	void blittingToScreen(GLuint fbo, uint16_t srcWidth, uint16_t srcHeight);
 
 	GameWorldData m_data;
-	RenderPass1   m_rpDirShadowMap;
+	RenderPass1   m_shadowMap;
+
+	OldRenderPass1   m_rpDirShadowMap;
 	RenderPass2   m_rpMainScene;
 	// SSAO
 	//RenderPass3   m_rpGeometry;

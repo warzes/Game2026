@@ -12,7 +12,7 @@ struct GameWorldData final // TODO;
 {
 	void Init()
 	{
-		gameObjects.reserve(10000);
+		oldGameObjects.reserve(10000);
 		dirLights.resize(MaxDirectionalLight);
 		spotLights.resize(MaxSpotLight);
 		pointLights.resize(MaxPointLight);
@@ -22,8 +22,8 @@ struct GameWorldData final // TODO;
 
 	void ResetFrame()
 	{
-		camera = nullptr;
-		numGameObject = 0;
+		oldCamera = nullptr;
+		numOldGameObject = 0;
 		numDirLights = 0;
 		numSpotLights = 0;
 		numPointLights = 0;
@@ -31,9 +31,9 @@ struct GameWorldData final // TODO;
 		numSphereLights = 0;
 	}
 
-	Camera*                          camera{ nullptr };
-	std::vector<OldGameObject*>         gameObjects;
-	size_t                           numGameObject{ 0 };
+	Camera*                          oldCamera{ nullptr };
+	std::vector<OldGameObject*>         oldGameObjects;
+	size_t                           numOldGameObject{ 0 };
 	std::vector<DirectionalLight*>   dirLights;
 	size_t                           numDirLights{ 0 };
 	std::vector<SpotLight*>          spotLights;

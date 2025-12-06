@@ -4,7 +4,7 @@
 #include "NanoIO.h"
 #include "NanoLog.h"
 //=============================================================================
-bool OldGameScene::Init()
+bool GameScene::Init()
 {
 	m_data.Init();
 
@@ -22,29 +22,29 @@ bool OldGameScene::Init()
 	return true;
 }
 //=============================================================================
-void OldGameScene::Close()
+void GameScene::Close()
 {
 	m_rpComposite.Close();
 	m_rpMainScene.Close();
 	m_rpDirShadowMap.Close();
 }
 //=============================================================================
-void OldGameScene::BindCamera(Camera* camera)
+void GameScene::BindCamera(Camera* camera)
 {
-	m_data.camera = camera;
+	m_data.oldCamera = camera;
 }
 //=============================================================================
-void OldGameScene::BindGameObject(OldGameObject* go)
+void GameScene::BindGameObject(OldGameObject* go)
 {
-	if (m_data.numGameObject >= m_data.gameObjects.size())
-		m_data.gameObjects.push_back(go);
+	if (m_data.numOldGameObject >= m_data.oldGameObjects.size())
+		m_data.oldGameObjects.push_back(go);
 	else
-		m_data.gameObjects[m_data.numGameObject] = go;
+		m_data.oldGameObjects[m_data.numOldGameObject] = go;
 
-	m_data.numGameObject++;
+	m_data.numOldGameObject++;
 }
 //=============================================================================
-void OldGameScene::BindLight(DirectionalLight* ent)
+void GameScene::BindLight(DirectionalLight* ent)
 {
 	if (m_data.numDirLights >= MaxDirectionalLight)
 	{
@@ -55,7 +55,7 @@ void OldGameScene::BindLight(DirectionalLight* ent)
 	m_data.numDirLights++;
 }
 //=============================================================================
-void OldGameScene::BindLight(SpotLight* ent)
+void GameScene::BindLight(SpotLight* ent)
 {
 	if (m_data.numSpotLights >= MaxSpotLight)
 	{
@@ -66,7 +66,7 @@ void OldGameScene::BindLight(SpotLight* ent)
 	m_data.numSpotLights++;
 }
 //=============================================================================
-void OldGameScene::BindLight(PointLight* ent)
+void GameScene::BindLight(PointLight* ent)
 {
 	if (m_data.numPointLights >= MaxPointLight)
 	{
@@ -77,7 +77,7 @@ void OldGameScene::BindLight(PointLight* ent)
 	m_data.numPointLights++;
 }
 //=============================================================================
-void OldGameScene::BindLight(AmbientBoxLight* ent)
+void GameScene::BindLight(AmbientBoxLight* ent)
 {
 	if (m_data.numBoxLights >= MaxAmbientBoxLight)
 	{
@@ -88,7 +88,7 @@ void OldGameScene::BindLight(AmbientBoxLight* ent)
 	m_data.numBoxLights++;
 }
 //=============================================================================
-void OldGameScene::BindLight(AmbientSphereLight* ent)
+void GameScene::BindLight(AmbientSphereLight* ent)
 {
 	if (m_data.numSphereLights >= MaxAmbientSphereLight)
 	{
@@ -99,14 +99,14 @@ void OldGameScene::BindLight(AmbientSphereLight* ent)
 	m_data.numSphereLights++;
 }
 //=============================================================================
-void OldGameScene::Draw()
+void GameScene::Draw()
 {
-	if (!m_data.camera)
+	if (!m_data.oldCamera)
 	{
 		Warning("Not active camera");
 		return;
 	}
-	if (!m_data.numGameObject)
+	if (!m_data.numOldGameObject)
 	{
 		Warning("Not active entities");
 		return;
@@ -117,7 +117,7 @@ void OldGameScene::Draw()
 	endDraw();
 }
 //=============================================================================
-void OldGameScene::beginDraw()
+void GameScene::beginDraw()
 {
 	const auto wndWidth = window::GetWidth();
 	const auto wndHeight = window::GetHeight();
@@ -126,7 +126,7 @@ void OldGameScene::beginDraw()
 	m_rpComposite.Resize(wndWidth * ScaleScreen, wndHeight * ScaleScreen);
 }
 //=============================================================================
-void OldGameScene::draw()
+void GameScene::draw()
 {
 	//================================================================================
 	// 1.) Render Pass: render depth of scene to texture (from light's perspective)
@@ -167,12 +167,12 @@ void OldGameScene::draw()
 	blittingToScreen(m_rpComposite.GetFBOId(), m_rpComposite.GetWidth(), m_rpComposite.GetHeight());
 }
 //=============================================================================
-void OldGameScene::endDraw()
+void GameScene::endDraw()
 {
 	m_data.ResetFrame();
 }
 //=============================================================================
-void OldGameScene::blittingToScreen(GLuint fbo, uint16_t srcWidth, uint16_t srcHeight)
+void GameScene::blittingToScreen(GLuint fbo, uint16_t srcWidth, uint16_t srcHeight)
 {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);

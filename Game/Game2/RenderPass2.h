@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-class RenderPass1;
+class OldRenderPass1;
 struct GameWorldData;
 
 class RenderPass2 final
@@ -11,7 +11,7 @@ public:
 
 	void Resize(uint16_t framebufferWidth, uint16_t framebufferHeight);
 
-	void Draw(const RenderPass1& rpShadowMap, const GameWorldData& gameData);
+	void Draw(const OldRenderPass1& rpShadowMap, const GameWorldData& gameData);
 
 	const Framebuffer& GetFBO() const { return m_fbo; }
 	GLuint GetFBOId() const { return m_fbo.GetId(); }

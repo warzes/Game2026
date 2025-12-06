@@ -17,7 +17,7 @@ enum class ShadowQuality
 
 struct GameWorldData;
 
-class RenderPass1 final
+class OldRenderPass1 final
 {
 public:
 	bool Init(ShadowQuality shadowQuality);
