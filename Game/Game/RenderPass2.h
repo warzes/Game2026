@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #include "Framebuffer.h"
 
 class OldRenderPass1;
 struct GameWorldData;
 
-class RenderPass2 final
+class OldRenderPass2 final
 {
 public:
 	bool Init(uint16_t framebufferWidth, uint16_t framebufferHeight);
@@ -43,5 +43,5 @@ private:
 
 	Framebuffer   m_fbo;
 
-	GLuint        m_sampler{ 0 };
+	SamplerHandle m_sampler{ 0 };
 };

@@ -4,7 +4,7 @@
 #include "NanoLog.h"
 #include "NanoWindow.h"
 //=============================================================================
-bool RenderPass2::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
+bool OldRenderPass2::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
 	setSize(framebufferWidth, framebufferHeight);
 	if (!initProgram())
@@ -20,14 +20,13 @@ bool RenderPass2::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	return true;
 }
 //=============================================================================
-void RenderPass2::Close()
+void OldRenderPass2::Close()
 {
 	m_fbo.Destroy();
 	glDeleteProgram(m_program.handle);
-	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
-void RenderPass2::Draw(const OldRenderPass1& rpShadowMap, const GameWorldData& gameData)
+void OldRenderPass2::Draw(const OldRenderPass1& rpShadowMap, const GameWorldData& gameData)
 {
 	m_fbo.Bind();
 	glEnable(GL_DEPTH_TEST);
@@ -111,12 +110,12 @@ void RenderPass2::Draw(const OldRenderPass1& rpShadowMap, const GameWorldData& g
 	}
 	SetUniform(GetUniformLocation(m_program, "ambientSphereLightCount"), (int)gameData.numSphereLights);
 
-	glBindSampler(0, m_sampler);
+	glBindSampler(0, m_sampler.handle);
 	drawScene(gameData);
 	glBindSampler(0, 0);
 }
 //=============================================================================
-void RenderPass2::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
+void OldRenderPass2::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
 	if (m_framebufferWidth == framebufferWidth && m_framebufferHeight == framebufferHeight)
 		return;
@@ -124,7 +123,7 @@ void RenderPass2::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	m_fbo.Resize(m_framebufferWidth, m_framebufferHeight);
 }
 //=============================================================================
-void RenderPass2::drawScene(const GameWorldData& gameData)
+void OldRenderPass2::drawScene(const GameWorldData& gameData)
 {
 	Texture2DHandle diffuseTex{ 0 };
 	Texture2DHandle specularTex{ 0 };
@@ -169,7 +168,7 @@ void RenderPass2::drawScene(const GameWorldData& gameData)
 	}
 }
 //=============================================================================
-bool RenderPass2::initProgram()
+bool OldRenderPass2::initProgram()
 {
 	const std::vector<std::string> defines = {
 		"PARALLAX_MAPPING",
@@ -223,7 +222,7 @@ bool RenderPass2::initProgram()
 	return true;
 }
 //=============================================================================
-bool RenderPass2::initFBO()
+bool OldRenderPass2::initFBO()
 {
 	FramebufferInfo fboInfo;
 
@@ -244,7 +243,7 @@ bool RenderPass2::initFBO()
 	return true;
 }
 //=============================================================================
-void RenderPass2::setSize(uint16_t framebufferWidth, uint16_t framebufferHeight)
+void OldRenderPass2::setSize(uint16_t framebufferWidth, uint16_t framebufferHeight)
 {
 	m_framebufferWidth = framebufferWidth;
 	m_framebufferHeight = framebufferHeight;

@@ -16,6 +16,12 @@ enum class ShadowQuality
 
 struct GameWorldData;
 
+/*
+TODO: под каждую карту теней свой FBO. это возможно не эффективно.
+попробовать один FBO c атачем нужных текстур
+или попробовать атачитить массив текстур и выбирать нужное через glFramebufferTextureLayer или glFramebufferTexture с параметром layer 
+*/
+
 class RenderPass1 final
 {
 public:
@@ -27,9 +33,8 @@ public:
 	void SetShadowQuality(ShadowQuality quality);
 
 	const auto& GetDepthFBO() const { return m_depthFBODirLights; }
-	const auto& GetProjection() const { return m_orthoProjection; }
 
-	void BindDepthTexture(size_t id, unsigned slot) const;
+	void BindDirLightDepthTexture(size_t id, unsigned slot) const;
 	const glm::mat4& GetLightSpaceMatrix(size_t id) const { return m_lightSpaceMatrix[id]; }
 
 private:
@@ -40,8 +45,7 @@ private:
 	void drawMesh(const Mesh& mesh, int hasDiffuseMapId);
 
 	ShadowQuality                                m_shadowQuality;
-	float                                        m_orthoDimension;
-	glm::mat4                                    m_orthoProjection; // for directional lights
+	glm::mat4                                    m_pointLightProj;  // for point lights
 	float                                        m_shadowFarPlane{ 100.0f };
 
 	ProgramHandle                                m_programDirLight{ 0 };

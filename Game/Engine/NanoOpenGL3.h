@@ -296,7 +296,7 @@ struct std::hash<SamplerStateInfo>
 	std::size_t operator()(const SamplerStateInfo& k) const noexcept;
 };
 
-GLuint CreateSamplerState(const SamplerStateInfo& info);
+SamplerHandle CreateSamplerState(const SamplerStateInfo& info);
 
 //=============================================================================
 // Framebuffer

@@ -54,7 +54,6 @@ void RPBlinnPhong::Close()
 {
 	m_fbo.Destroy();
 	glDeleteProgram(m_program.handle);
-	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
 void RPBlinnPhong::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const std::vector<DirectionalLight*>& dirLights, size_t numDirLights, const std::vector<GameObjectO*>& gameObject, size_t numGameObject, Camera* camera)
@@ -101,7 +100,7 @@ void RPBlinnPhong::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const s
 
 	SetUniform(GetUniformLocation(m_program, "lightCount"), lightCount);
 
-	glBindSampler(0, m_sampler);
+	glBindSampler(0, m_sampler.handle);
 	drawScene(gameObject, numGameObject);
 	glBindSampler(0, 0);
 }

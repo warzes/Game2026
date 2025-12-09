@@ -99,5 +99,5 @@ private:
 	GLuint m_pbr;
 	GLuint m_postProcessing;
 
-	GLuint m_sampler{ 0 };
+	SamplerHandle m_sampler{ 0 };
 };

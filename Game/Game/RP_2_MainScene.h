@@ -46,5 +46,5 @@ private:
 
 	Framebuffer m_fbo;
 
-	GLuint    m_sampler{ 0 };
+	SamplerHandle m_sampler{ 0 };
 };

@@ -24,7 +24,6 @@ void RPMainScene::Close()
 {
 	m_fbo.Destroy();
 	glDeleteProgram(m_program.handle);
-	glDeleteSamplers(1, &m_sampler);
 }
 //=============================================================================
 void RPMainScene::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const GameWorldDataO& gameData)
@@ -67,7 +66,7 @@ void RPMainScene::Draw(const RPDirectionalLightsShadowMap& rpShadowMap, const Ga
 	}
 	SetUniform(GetUniformLocation(m_program, "pointLightCount"), (int)gameData.numPointLights);
 
-	glBindSampler(0, m_sampler);
+	glBindSampler(0, m_sampler.handle);
 	drawScene(gameData);
 	glBindSampler(0, 0);
 }

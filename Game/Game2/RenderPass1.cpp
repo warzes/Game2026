@@ -5,8 +5,7 @@
 bool RenderPass1::Init(ShadowQuality shadowQuality)
 {
 	m_shadowQuality = shadowQuality;
-	m_orthoDimension = 10.0f;
-	m_orthoProjection = glm::ortho(-m_orthoDimension, m_orthoDimension, -m_orthoDimension, m_orthoDimension, 1.0f, 50.0f);
+	m_pointLightProj = glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, m_shadowFarPlane);
 
 	if (!initProgram())
 		return false;
@@ -54,15 +53,14 @@ void RenderPass1::RenderShadows(const GameWorldData& worldData)
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-
-	glUseProgram(m_programDirLight.handle);
+	glCullFace(GL_BACK);
 	glViewport(0, 0, static_cast<int>(m_shadowQuality), static_cast<int>(m_shadowQuality));
 
+	glUseProgram(m_programDirLight.handle);
 	for (size_t i = 0; i < numDirLights; i++)
 	{
 		auto* light = worldData.gameDirectionalLights[i];
-		if (!light) continue;
-		if (!light->GetCastShadows()) continue;
+		if (!light || !light->GetCastShadows() || !light->IsActive()) continue;
 
 		m_depthFBODirLights[i].Bind();
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -74,8 +72,7 @@ void RenderPass1::RenderShadows(const GameWorldData& worldData)
 	for (size_t i = 0; i < numPointLights; i++)
 	{
 		auto* light = worldData.gamePointLights[i];
-		if (!light) continue;
-		if (!light->GetCastShadows()) continue;
+		if (!light || !light->GetCastShadows() || !light->IsActive()) continue;
 
 		m_depthFBOPointLights[i].Bind();
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -124,16 +121,16 @@ void RenderPass1::drawScene(GameDirectionalLight* currentLight, const GameWorldD
 //=============================================================================
 void RenderPass1::drawScene(GamePointLight* currentLight, const GameWorldData& worldData)
 {
-	glm::mat4 lightProj = glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, m_shadowFarPlane);
-
 	const auto& lpos = currentLight->GetPosition();
-	glm::mat4 shadowTransforms[6];
-	shadowTransforms[0] = lightProj * glm::lookAt(lpos, lpos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-	shadowTransforms[1] = lightProj * glm::lookAt(lpos, lpos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-	shadowTransforms[2] = lightProj * glm::lookAt(lpos, lpos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	shadowTransforms[3] = lightProj * glm::lookAt(lpos, lpos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-	shadowTransforms[4] = lightProj * glm::lookAt(lpos, lpos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-	shadowTransforms[5] = lightProj * glm::lookAt(lpos, lpos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+	glm::mat4 shadowTransforms[] =
+	{
+		m_pointLightProj * glm::lookAt(lpos, lpos + glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		m_pointLightProj * glm::lookAt(lpos, lpos + glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		m_pointLightProj * glm::lookAt(lpos, lpos + glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+		m_pointLightProj * glm::lookAt(lpos, lpos + glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+		m_pointLightProj * glm::lookAt(lpos, lpos + glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		m_pointLightProj * glm::lookAt(lpos, lpos + glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+	};
 
 	for (size_t i = 0; i < 6; i++)
 	{
@@ -181,8 +178,13 @@ void RenderPass1::drawMesh(const Mesh& mesh, int hasDiffuseMapId)
 	mesh.Draw(GL_TRIANGLES);
 }
 //=============================================================================
-void RenderPass1::BindDepthTexture(size_t id, unsigned slot) const
+void RenderPass1::BindDirLightDepthTexture(size_t id, unsigned slot) const
 {
+	if (id >= m_depthFBODirLights.size())
+	{
+		Error("Invalid directional light ID");
+		return;
+	}
 	m_depthFBODirLights[id].BindDepthTexture(slot);
 }
 //=============================================================================

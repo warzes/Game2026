@@ -3,7 +3,7 @@
 #include "NanoLog.h"
 #include "NanoCore.h"
 //=============================================================================
-std::unordered_map<SamplerStateInfo, GLuint> SamplerCache;
+std::unordered_map<SamplerStateInfo, SamplerHandle> SamplerCache;
 //=============================================================================
 //#if defined(_DEBUG)
 namespace
@@ -997,45 +997,45 @@ std::size_t std::hash<SamplerStateInfo>::operator()(const SamplerStateInfo& k) c
 	return Hash<decltype(rtup)>{}(rtup);
 }
 //=============================================================================
-GLuint CreateSamplerState(const SamplerStateInfo& info)
+SamplerHandle CreateSamplerState(const SamplerStateInfo& info)
 {
 	if (auto it = SamplerCache.find(info); it != SamplerCache.end())
 	{
 		return it->second;
 	}
 
-	GLuint sampler{ 0 };
-	glGenSamplers(1, &sampler);
-	assert(sampler);
+	SamplerHandle sampler{ 0 };
+	glGenSamplers(1, &sampler.handle);
+	assert(sampler.handle);
 
-	glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GetGLEnum(info.minFilter));
-	glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GetGLEnum(info.magFilter));
+	glSamplerParameteri(sampler.handle, GL_TEXTURE_MIN_FILTER, GetGLEnum(info.minFilter));
+	glSamplerParameteri(sampler.handle, GL_TEXTURE_MAG_FILTER, GetGLEnum(info.magFilter));
 
-	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GetGLEnum(info.wrapS));
-	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GetGLEnum(info.wrapT));
-	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_R, GetGLEnum(info.wrapR));
+	glSamplerParameteri(sampler.handle, GL_TEXTURE_WRAP_S, GetGLEnum(info.wrapS));
+	glSamplerParameteri(sampler.handle, GL_TEXTURE_WRAP_T, GetGLEnum(info.wrapT));
+	glSamplerParameteri(sampler.handle, GL_TEXTURE_WRAP_R, GetGLEnum(info.wrapR));
 
 	if (info.maxAnisotropy > 1.0f && (GLAD_GL_ARB_texture_filter_anisotropic == 1))
 	{
 		// TODO: clamp maxAnisotropy(1, getCapabilities().maximumAnisotropy)
-		glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY, info.maxAnisotropy);
+		glSamplerParameterf(sampler.handle, GL_TEXTURE_MAX_ANISOTROPY, info.maxAnisotropy);
 	}
 
-	glSamplerParameterf(sampler, GL_TEXTURE_MIN_LOD, info.minLod);
-	glSamplerParameterf(sampler, GL_TEXTURE_MAX_LOD, info.maxLod);
-	glSamplerParameterf(sampler, GL_TEXTURE_LOD_BIAS, info.mipLodBias);
+	glSamplerParameterf(sampler.handle, GL_TEXTURE_MIN_LOD, info.minLod);
+	glSamplerParameterf(sampler.handle, GL_TEXTURE_MAX_LOD, info.maxLod);
+	glSamplerParameterf(sampler.handle, GL_TEXTURE_LOD_BIAS, info.mipLodBias);
 
 	if (info.compareEnabled)
 	{
-		glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-		glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_FUNC, static_cast<GLint>(GetGLEnum(info.comparisonFunc)));
+		glSamplerParameteri(sampler.handle, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+		glSamplerParameteri(sampler.handle, GL_TEXTURE_COMPARE_FUNC, static_cast<GLint>(GetGLEnum(info.comparisonFunc)));
 	}
 	else
 	{
-		glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+		glSamplerParameteri(sampler.handle, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 	}
 
-	glSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR, info.borderColor);
+	glSamplerParameterfv(sampler.handle, GL_TEXTURE_BORDER_COLOR, info.borderColor);
 
 	return SamplerCache.insert({ info, sampler }).first->second;
 }
@@ -1361,7 +1361,7 @@ void oglSystem::Close()
 {
 	for (const auto& [_, sampler] : SamplerCache)
 	{
-		glDeleteSamplers(1, &sampler);
+		glDeleteSamplers(1, &sampler.handle);
 	}
 	SamplerCache.clear();
 }
