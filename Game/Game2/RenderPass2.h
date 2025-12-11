@@ -30,15 +30,11 @@ private:
 	glm::mat4     m_perspective{ 1.0f };
 
 	ProgramHandle m_program{ 0 };
-	int           m_projectionMatrixId{ -1 };
-	int           m_viewMatrixId{ -1 };
 	int           m_modelMatrixId{ -1 };
-	int           m_viewPosId{ -1 };
-
-	int           m_hasDiffuseMapId{ -1 };
-	int           m_hasSpecularMapId{ -1 };
-	int           m_hasNormalMapId{ -1 };
-
+	int           m_modelViewMatrixId{ -1 };
+	int           m_modelViewProjMatrixId{ -1 };
+	int           m_TileUId{ -1 };
+	int           m_TileVId{ -1 };
 
 	Framebuffer   m_fbo;
 

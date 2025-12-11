@@ -7,47 +7,40 @@ layout(location = 3) in vec2 vertexTexCoord;
 layout(location = 4) in vec3 vertexTangent;
 layout(location = 5) in vec3 vertexBitangent;
 
-uniform mat4 projectionMatrix;
-uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
-uniform vec3 viewPos;
+uniform mat4 modelViewMatrix;
+uniform mat4 modelViewProjMatrix;
+
+uniform float TileU;
+uniform float TileV;
 
 out VS_OUT {
-	vec3 VertColor;
+	vec3 vertColor;
 	vec3 pos;
 	vec3 modelPos;
-
-	vec3 FragPos;
-	vec2 TexCoords;
-	vec3 Normal;
+	vec2 texCoords;
 	mat3 TBN;
-#if defined(PARALLAX_MAPPING)
-	vec3 TangentViewPos;
-	vec3 TangentFragPos;
-#endif
+	vec3 normal;
 } vs_out;
-
-mat3 ConstructTBN(mat4 model, vec3 normal, vec3 tangent, vec3 bitangent)
-{
-   return mat3(
-        normalize(vec3(model * vec4(tangent,   0.0))),
-        normalize(vec3(model * vec4(bitangent, 0.0))),
-        normalize(vec3(model * vec4(normal,    0.0)))
-    );
-}
 
 void main()
 {
-	vs_out.VertColor = vertexColor;
-	vs_out.FragPos   = vec3(modelMatrix * vec4(vertexPosition, 1.0));
-	vs_out.TexCoords = vertexTexCoord;	
-	vs_out.Normal    = normalize(mat3(transpose(inverse(modelMatrix))) * vertexNormal);
-	vs_out.TBN       = ConstructTBN(modelMatrix, vertexNormal, vertexTangent, vertexBitangent);
+	vs_out.vertColor = vertexColor;
 
-#if defined(PARALLAX_MAPPING)
-	vs_out.TangentViewPos = transpose(vs_out.TBN) * viewPos;
-	vs_out.TangentFragPos = transpose(vs_out.TBN) * vs_out.FragPos;
-#endif
+	vs_out.texCoords = vertexTexCoord;
+	vs_out.texCoords.x *= TileU;
+	vs_out.texCoords.y *= TileV;
 
-	gl_Position = projectionMatrix * viewMatrix * vec4(vs_out.FragPos, 1.0);
+	vs_out.pos = (modelViewMatrix * vec4(vertexPosition, 1.0)).xyz;
+	vs_out.modelPos = (modelMatrix * vec4(vertexPosition, 1.0)).xyz;
+
+	vec3 T = -normalize(vec3(modelViewMatrix * vec4(vertexTangent, 0.0)));
+	vec3 N = normalize(vec3(modelViewMatrix * vec4(vertexNormal, 0.0)));
+	vec3 B = cross(N, T);
+
+	vs_out.TBN = mat3(T, B, N);
+
+	vs_out.normal = mat3(transpose(inverse(modelViewMatrix))) * vertexNormal;
+
+	gl_Position = modelViewProjMatrix * vec4(vertexPosition, 1.0f);
 }
