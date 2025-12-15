@@ -70,7 +70,8 @@ void Framebuffer::BindColorTexture(size_t colorAttachment, size_t slot) const
 		}
 		else
 		{
-			// TODO:
+			glActiveTexture(GL_TEXTURE0 + slot);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_colorAttachmentsId[colorAttachment].id);
 		}
 	}
 	else
@@ -90,7 +91,8 @@ void Framebuffer::BindDepthTexture(size_t slot) const
 		}
 		else
 		{
-			// TODO:
+			glActiveTexture(GL_TEXTURE0 + slot);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthAttachmentId->id);
 		}
 	}
 	else
@@ -330,6 +332,8 @@ void Framebuffer::createDepthCubeMapTextureAttachment(const DepthAttachment& cfg
 
 	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X, tex, 0);// TODO: error?
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tex, 0);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 	m_depthAttachmentId = DepthAttachmentId{ .id = tex, .type = cfg.type };
 }

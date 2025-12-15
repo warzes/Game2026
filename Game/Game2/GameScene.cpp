@@ -10,16 +10,10 @@ bool GameScene::Init()
 
 	if (!m_shadowMap.Init(ShadowQuality::High))
 		return false;
-	if (!m_rpMainScene.Init(wndWidth, wndHeight))
+	if (!m_rpMainScene.Init(wndWidth * ScaleScreen, wndHeight * ScaleScreen))
 		return false;
 
-
-	if (!m_rpDirShadowMap.Init(ShadowQuality::High))
-		return false;
-	if (!m_oldrpMainScene.Init(wndWidth, wndHeight))
-		return false;
-
-	if (!m_rpComposite.Init(wndWidth * ScaleScreen, wndHeight * ScaleScreen))
+	if (!m_rpComposite.Init(wndWidth, wndHeight))
 		return false;
 
 	return true;
@@ -28,8 +22,6 @@ bool GameScene::Init()
 void GameScene::Close()
 {
 	m_rpComposite.Close();
-	m_oldrpMainScene.Close();
-	m_rpDirShadowMap.Close();
 
 	m_rpMainScene.Close();
 	m_shadowMap.Close();
@@ -137,9 +129,8 @@ void GameScene::beginDraw()
 	const auto wndWidth = window::GetWidth();
 	const auto wndHeight = window::GetHeight();
 
-	m_rpMainScene.Resize(wndWidth, wndHeight);
-	m_oldrpMainScene.Resize(wndWidth, wndHeight);
-	m_rpComposite.Resize(wndWidth * ScaleScreen, wndHeight * ScaleScreen);
+	m_rpMainScene.Resize(wndWidth * ScaleScreen, wndHeight * ScaleScreen);
+	m_rpComposite.Resize(wndWidth, wndHeight);
 }
 //=============================================================================
 void GameScene::draw()
@@ -151,32 +142,16 @@ void GameScene::draw()
 		return;
 	}
 
-	// Shadow mapping pass
+	//================================================================================
+	// 1.) Render Pass: render depth of scene to texture (from light's perspective)
 	if (m_data.countGameDirectionalLights > 0 || m_data.countGamePointLights > 0)
 	{
 		m_shadowMap.RenderShadows(m_data);
 	}
 
-	// Render scene
-	m_rpMainScene.Draw(m_shadowMap, m_data);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	return;
-
-
-
-
-
-	//================================================================================
-	// 1.) Render Pass: render depth of scene to texture (from light's perspective)
-	m_rpDirShadowMap.Draw(m_data);
-	//m_rpSpotShadowMap.Draw(m_data);
-	//m_rpPointShadowMap.Draw(m_data);
-
 	//================================================================================
 	// 2.) Render Pass: render Scene as normal using the generated depth / shadow map
-	m_oldrpMainScene.Draw(m_rpDirShadowMap, m_data);
+	m_rpMainScene.Draw(m_shadowMap, m_data);
 
 	//================================================================================
 	// 3.) Render Pass: SSAO
@@ -198,9 +173,7 @@ void GameScene::draw()
 
 	//================================================================================
 	// 4 Render Pass: post frame
-	//		Set state: glDisable(GL_DEPTH_TEST);
-	//m_rpComposite.Draw(&m_rpBlinnPhong.GetFBO(), EnableSSAO ? &m_rpSSAOBlur.GetFBO() : nullptr);
-	m_rpComposite.Draw(&m_oldrpMainScene.GetFBO(), /*EnableSSAO ? &m_rpSSAOBlur.GetFBO() :*/ nullptr);
+	m_rpComposite.Draw(&m_rpMainScene.GetFBO(), /*EnableSSAO ? &m_rpSSAOBlur.GetFBO() :*/ nullptr);
 
 	//================================================================================
 	// 5 Render Pass: blitting main fbo

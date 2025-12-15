@@ -40,8 +40,6 @@ namespace
 	GamePointLight* pointLight1;
 	GamePointLight* pointLight2;
 
-
-
 	Camera camera;
 	OldGameObject modelTest;
 	DirectionalLight dirLight;
@@ -68,17 +66,18 @@ void GameApp()
 
 		cameraGame.SetFOV(60.0f);
 		cameraGame.SetFar(150);
+		cameraGame.SetPosition(glm::vec3(0.0f, 0.5f, 4.5f));
 
 		modelLevel.LoadModel("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj");
 		modelLevel.SetPosition(glm::vec3(-30.0f, 0.0f, 15.0f));
 
 		directionalLight = new GameDirectionalLight(glm::vec3(-5.0f, -5.0f, 5.0f), glm::vec3(1.0f, 0.8f, 0.8f), 2.0f);
-		directionalLight->SetPosition(glm::vec3(10.0f));
+		directionalLight->SetPosition(glm::vec3(-5.0f, -5.0f, 5.0f));
 
-		pointLight1 = new GamePointLight(glm::vec3(18.0f, 3.0f, 3.5f), glm::vec3(1.0f, 0.7f, 0.5f), 0.6f, 10);
-		pointLight2 = new GamePointLight(glm::vec3(-18.0f, 3.0f, 3.5f), glm::vec3(1.0f, 0.7f, 0.5f), 0.4f, 10);
+		pointLight1 = new GamePointLight(glm::vec3(-2.0f, 5.0f, 3.5f), glm::vec3(1.0f, 0.2f, 0.3f), 0.6f, 10);
+		pointLight2 = new GamePointLight(glm::vec3(2.0f, 5.0f, 3.5f), glm::vec3(0.0f, 0.3f, 1.5f), 0.4f, 10);
 
-		camera.SetPosition(glm::vec3(0.0f, 0.5f, 4.5f));
+		camera.SetPosition(glm::vec3(0.0f, 0.5f, 0.5f));
 
 		modelTest.model.Load("data/models/ForgottenPlains/Forgotten_Plains_Demo.obj", ModelMaterialType::BlinnPhong);
 		modelTest.modelMat = glm::translate(glm::mat4(1.0f), glm::vec3(-30.0f, 0.0f, 15.0f));
@@ -140,10 +139,6 @@ void GameApp()
 			scene.Bind(directionalLight);
 			scene.Bind(pointLight1);
 			scene.Bind(pointLight2);
-
-
-
-
 
 			scene.BindCamera(&camera);
 

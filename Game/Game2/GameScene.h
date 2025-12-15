@@ -58,13 +58,9 @@ private:
 	GameWorldData m_data;
 	RenderPass1   m_shadowMap;
 	RenderPass2   m_rpMainScene;
-
-	OldRenderPass1   m_rpDirShadowMap;
-	OldRenderPass2   m_oldrpMainScene;
 	// SSAO
 	//RenderPass3   m_rpGeometry;
 	//RenderPass4   m_rpSSAO;
 	//RenderPass5   m_rpSSAOBlur;
-
 	RenderPass6   m_rpComposite;
 };

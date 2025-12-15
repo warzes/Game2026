@@ -2,6 +2,17 @@
 
 //==========================================
 // Lights
+struct DirectionalLight
+{
+	vec3 dir;
+	vec3 color;
+	float intensity;
+
+	bool castShadows;
+	sampler2D shadowMap;
+	mat4 lightViewProj;
+};
+
 struct PointLight
 {
 	vec3 pos;
@@ -15,18 +26,6 @@ struct PointLight
 
 	bool castShadows;
 	samplerCube shadowMap;
-	mat4 lightViewProj;
-};
-
-struct DirectionalLight
-{
-	vec3 dir;
-	vec3 color;
-	float intensity;
-
-	bool castShadows;
-	sampler2D shadowMap;
-	mat4 lightViewProj;
 };
 
 struct SpotLight
@@ -81,10 +80,10 @@ const float alphaClippingThreshold = 0.1;
 
 //Uniforms
 uniform Material material;
-uniform int pointsLightsNumber;
-uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform int directionalLightsNumber;
 uniform DirectionalLight directionalLights[MAX_DIR_LIGHTS];
+uniform int pointsLightsNumber;
+uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform int spotLightsNumber;
 uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
@@ -96,7 +95,7 @@ uniform bool alphaTest;
 
 //Surface properties
 vec3 N;
-vec3 albedo;
+vec4 albedo;
 float specularity;
 float opacity;
 float shininess;
@@ -117,8 +116,8 @@ float computeAttenuation(vec3 lightPos, float att)
 	//return 1.0 / (constant + lin * d + quad * (d * d)); OLD METHOD
 }
 
-float computeShadow(sampler2D shadowMap, mat4 lightViewProj, vec3 lightDir) {
-
+float computeShadow(sampler2D shadowMap, mat4 lightViewProj, vec3 lightDir)
+{
 	vec4 pos_lightSpace = lightViewProj * vec4(fs_in.modelPos, 1.0);
 
 	// perform perspective divide
@@ -139,12 +138,8 @@ float computeShadow(sampler2D shadowMap, mat4 lightViewProj, vec3 lightDir) {
 	if (projCoords.z > 1.0)
 		shadow = 0.0;
 
-	
-
 	return shadow;
 	//return lightDir.x;
-
-
 }
 
 float computePointShadow(samplerCube shadowMap ,vec3 lightPos)
@@ -164,12 +159,11 @@ float computePointShadow(samplerCube shadowMap ,vec3 lightPos)
 	// discard shadowing fragments further away
 	if (currentDepth > shadowsFarPlane) shadow = 0.0;
 
-
 	return shadow;
 }
 
-vec3 shadePointLight(vec3 lightPos, vec3 color, float intensity,float att, samplerCube shadowMap, vec3 worldPos, bool castShadows) {
-
+vec3 shadePointLight(vec3 lightPos, vec3 color, float intensity,float att, samplerCube shadowMap, vec3 worldPos, bool castShadows)
+{
 	//Diffuse
 	vec3 L = normalize(lightPos - fs_in.pos);
 	vec3 diffuse = max(dot(L, N), 0.0) * color;
@@ -186,16 +180,18 @@ vec3 shadePointLight(vec3 lightPos, vec3 color, float intensity,float att, sampl
 	specular *= attenuation;
 
 	//Shadow 
-	float shadow;
-	material.receiveShadows ? shadow = computePointShadow(shadowMap, worldPos) : shadow = 0.0;
+	float shadow = computePointShadow(shadowMap, worldPos);
+	//(material.receiveShadows && castShadows) 
+	//	? shadow = computePointShadow(shadowMap, worldPos) 
+	//	: shadow = 0.0;
 
-	vec3 result = (1.0 - shadow) * (diffuse + specular) * albedo;
+	vec3 result = (1.0 - shadow) * (diffuse + specular) * albedo.rgb;
 	result *= intensity;
 	return result;
-
 }
-vec3 shadeDirectionalLight(vec3 lightDir, vec3 color, float intensity, sampler2D shadowMap, mat4 lightViewProj, bool castShadows) {
 
+vec3 shadeDirectionalLight(vec3 lightDir, vec3 color, float intensity, sampler2D shadowMap, mat4 lightViewProj, bool castShadows)
+{
 	//Diffuse
 	vec3 L = normalize(lightDir);
 	vec3 diffuse = max(dot(L, N), 0.0) * color;
@@ -206,56 +202,60 @@ vec3 shadeDirectionalLight(vec3 lightDir, vec3 color, float intensity, sampler2D
 	float factor = max(dot(R, V), 0.0);
 	vec3 specular = pow(factor, shininess) * specularity *color;
 
-
 	//Shadow 
 	float shadow;
-	material.receiveShadows ? shadow = computeShadow(shadowMap, lightViewProj, L) : shadow = 0.0;
+	(material.receiveShadows && castShadows) 
+		? shadow = computeShadow(shadowMap, lightViewProj, L) 
+		: shadow = 0.0;
 
-	vec3 result = (1.0 - shadow) * (diffuse + specular) * albedo;
+	vec3 result = (1.0 - shadow) * (diffuse + specular) * albedo.rgb;
 	result *= intensity;
 	return result;
-
-}
-vec3 shadeAmbientLight() {
-	return albedo * ambientColor * ambientStrength;
 }
 
-vec3 shade() {
+vec3 shadeAmbientLight()
+{
+	return albedo.rgb * ambientColor * ambientStrength;
+}
 
+vec3 shade()
+{
 	vec3 result = vec3(0.0);
 
 	//Just ambient
 	result += shadeAmbientLight();
 
-	for (int i = 0; i < pointsLightsNumber; i++) {
-        result += shadePointLight(pointLights[i].pos, pointLights[i].color, pointLights[i].intensity, pointLights[i].att, pointLights[i].shadowMap, pointLights[i].modelPos,
-			pointLights[i].castShadows);
+	for (int i = 0; i < directionalLightsNumber; i++)
+	{
+		result += shadeDirectionalLight(directionalLights[i].dir, directionalLights[i].color, directionalLights[i].intensity, directionalLights[i].shadowMap, directionalLights[i].lightViewProj, directionalLights[i].castShadows);
 	}
 
-	for (int i = 0; i < directionalLightsNumber; i++) {
-		result += shadeDirectionalLight(directionalLights[i].dir, directionalLights[i].color, directionalLights[i].intensity,
-			directionalLights[i].shadowMap, directionalLights[i].lightViewProj, directionalLights[i].castShadows);
+	for (int i = 0; i < pointsLightsNumber; i++)
+	{
+		result += shadePointLight(pointLights[i].pos, pointLights[i].color, pointLights[i].intensity, pointLights[i].att, pointLights[i].shadowMap, pointLights[i].modelPos, pointLights[i].castShadows);
 	}
+
 	//for (int i = 0; i < spotLightsNumber; i++) {
 	//	result += shadePointLight(spotLights[i].pos, spotLights[i].color, spotLights[i].intensity);
 	//}
 
 	return result;
-
 }
 
 void main()
 {
 	material.hasNormalTex ? N = normalize(fs_in.TBN * (texture(material.normalTex, fs_in.texCoords).rgb * 2.0 - 1.0)) : N = fs_in.normal;
-	material.hasColorTex ? albedo = texture(material.colorTex, fs_in.texCoords).rgb : albedo = material.baseColor;
+	material.hasColorTex ? albedo = texture(material.colorTex, fs_in.texCoords) : albedo = vec4(material.baseColor, 1.0);
 	material.hasSpecularTex ? specularity = texture(material.specularTex, fs_in.texCoords).r : specularity = material.specularity;
 	material.hasGlossTex ? shininess = texture(material.glossTex, fs_in.texCoords).r : shininess = material.shininess;
 	material.hasOpacityTex ? opacity = texture(material.opacityTex, fs_in.texCoords).r : opacity = material.opacity;
-	if (opacity <= 0.0 && alphaTest)discard;
+	if (alphaTest && (opacity <= 0.0 || albedo.a < alphaClippingThreshold)) discard;
 
 	vec3 r = normalize(reflect(normalize(fs_in.pos), N));
-	vec3 result = mix(shade(), vec3(texture(skybox, r).rgb), 0.0);
+	//vec3 result = mix(shade(), vec3(texture(skybox, r).rgb), 0.0);
+	vec3 result = mix(shade(), vec3(1.0), 0.0);
 
 	//result = pow(result, vec3(1.0 / 2.2));
 	FragColor = vec4(result, opacity);
+
 }

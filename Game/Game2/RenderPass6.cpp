@@ -53,6 +53,11 @@ bool RenderPass6::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 
 	glUseProgram(0);
 
+	SamplerStateInfo samperCI{};
+	samperCI.minFilter = TextureFilter::Nearest;
+	samperCI.magFilter = TextureFilter::Nearest;
+	m_sampler = CreateSamplerState(samperCI);
+
 	return true;
 }
 //=============================================================================
@@ -89,7 +94,9 @@ void RenderPass6::Draw(const Framebuffer* colorFBO, const Framebuffer* SSAOFBO)
 		SSAOFBO->BindColorTexture(0, 2);
 	}
 
+	glBindSampler(0, m_sampler.handle);
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindSampler(0, 0);
 }
 //=============================================================================
