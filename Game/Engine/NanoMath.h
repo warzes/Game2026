@@ -2,6 +2,38 @@
 
 glm::mat4 GetTransformMatrix(const glm::vec3& position, const glm::vec3& rotation, float scale = 1.0f);
 
+// Assuming you have a way to calculate normals, tangents, and bitangents.
+// Here's a common approach using Newell's method for face normal
+// and an arbitrary vector to calculate tangent and bitangent.
+inline glm::vec3 CalculateFaceNormal(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2)
+{
+	glm::vec3 edge1 = v1 - v0;
+	glm::vec3 edge2 = v2 - v0;
+	return glm::normalize(glm::cross(edge1, edge2));
+}
+
+inline void CalculateTangentBitangent(
+	const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
+	const glm::vec2& uv0, const glm::vec2& uv1, const glm::vec2& uv2,
+	glm::vec3& tangent, glm::vec3& bitangent)
+{
+
+	glm::vec3 edge1 = v1 - v0;
+	glm::vec3 edge2 = v2 - v0;
+
+	glm::vec2 deltaUV1 = uv1 - uv0;
+	glm::vec2 deltaUV2 = uv2 - uv0;
+
+	float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y + 1e-8f); // Epsilon to avoid division by zero
+
+	tangent = f * (deltaUV2.y * edge1 - deltaUV1.y * edge2);
+	bitangent = f * (-deltaUV2.x * edge1 + deltaUV1.x * edge2);
+
+	tangent = glm::normalize(tangent);
+	bitangent = glm::normalize(bitangent);
+}
+
+
 inline glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& m)
 {
 	glm::mat4 matrix;

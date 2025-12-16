@@ -98,6 +98,22 @@
     <ClCompile Include="imgui\imgui_impl_rgfw.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="meshoptimizer\allocator.cpp" />
+    <ClCompile Include="meshoptimizer\clusterizer.cpp" />
+    <ClCompile Include="meshoptimizer\indexanalyzer.cpp" />
+    <ClCompile Include="meshoptimizer\indexcodec.cpp" />
+    <ClCompile Include="meshoptimizer\indexgenerator.cpp" />
+    <ClCompile Include="meshoptimizer\overdrawoptimizer.cpp" />
+    <ClCompile Include="meshoptimizer\partition.cpp" />
+    <ClCompile Include="meshoptimizer\quantization.cpp" />
+    <ClCompile Include="meshoptimizer\rasterizer.cpp" />
+    <ClCompile Include="meshoptimizer\simplifier.cpp" />
+    <ClCompile Include="meshoptimizer\spatialorder.cpp" />
+    <ClCompile Include="meshoptimizer\stripifier.cpp" />
+    <ClCompile Include="meshoptimizer\vcacheoptimizer.cpp" />
+    <ClCompile Include="meshoptimizer\vertexcodec.cpp" />
+    <ClCompile Include="meshoptimizer\vertexfilter.cpp" />
+    <ClCompile Include="meshoptimizer\vfetchoptimizer.cpp" />
     <ClCompile Include="RGFW\RGFW.cpp" />
     <ClCompile Include="stb\stb.cpp" />
   </ItemGroup>
@@ -482,6 +498,7 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="KHR\khrplatform.h" />
+    <ClInclude Include="meshoptimizer\meshoptimizer.h" />
     <ClInclude Include="RGFW\RGFW.h" />
     <ClInclude Include="stb\stb_image.h" />
     <ClInclude Include="stb\stb_image_resize2.h" />

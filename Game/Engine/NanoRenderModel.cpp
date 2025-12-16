@@ -59,6 +59,8 @@ void Model::Create(const std::vector<MeshInfo>& meshes)
 	Free();
 	for (size_t i = 0; i < meshes.size(); i++)
 	{
+		if (meshes[i].vertices.empty()) continue;
+
 		m_meshes.emplace_back(Mesh(meshes[i].vertices, meshes[i].indices, meshes[i].material, meshes[i].pbrMaterial));
 	}
 	computeAABB();

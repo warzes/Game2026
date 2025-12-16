@@ -1,52 +1,48 @@
 ﻿#include "stdafx.h"
 #include "Map.h"
-#define MAPCHUNKSIZE 20
+#define MAPCHUNKSIZE 10
 int tempMap[MAPCHUNKSIZE][MAPCHUNKSIZE];
 //=============================================================================
-void addPlane(std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indices, float width = 1.0f, float depth = 1.0f, uint32_t subdivisions_width = 1, uint32_t subdivisions_depth = 1, glm::vec3 offset = { 0.0f, 0.0f, 0.0f })
+void AddCube(const glm::vec3& center, float size, std::vector<MeshVertex>& vertices, std::vector<unsigned int>& indices)
 {
-	const uint32_t startVertexIndex = static_cast<uint32_t>(vertices.size());
+	float halfSize = size / 2.0f;
 
-	// Генерация вершин
-	for (uint32_t z = 0; z <= subdivisions_depth; ++z) {
-		for (uint32_t x = 0; x <= subdivisions_width; ++x) {
-			float u = static_cast<float>(x) / subdivisions_width;
-			float v = static_cast<float>(z) / subdivisions_depth;
+	// Define the 8 corner points relative to the center
+	glm::vec3 p0 = center + glm::vec3(-halfSize, -halfSize, -halfSize); // 0: Left-Bottom-Front
+	glm::vec3 p1 = center + glm::vec3(halfSize, -halfSize, -halfSize); // 1: Right-Bottom-Front
+	glm::vec3 p2 = center + glm::vec3(halfSize, halfSize, -halfSize); // 2: Right-Top-Front
+	glm::vec3 p3 = center + glm::vec3(-halfSize, halfSize, -halfSize); // 3: Left-Top-Front
 
-			MeshVertex vertex;
-			vertex.position.x = (u - 0.5f) * width + offset.x;
-			vertex.position.y = offset.y;
-			vertex.position.z = (v - 0.5f) * depth + offset.z;
+	glm::vec3 p4 = center + glm::vec3(-halfSize, -halfSize, halfSize); // 4: Left-Bottom-Back
+	glm::vec3 p5 = center + glm::vec3(halfSize, -halfSize, halfSize); // 5: Right-Bottom-Back
+	glm::vec3 p6 = center + glm::vec3(halfSize, halfSize, halfSize); // 6: Right-Top-Back
+	glm::vec3 p7 = center + glm::vec3(-halfSize, halfSize, halfSize); // 7: Left-Top-Back
 
-			vertex.normal = { 0.0f, 1.0f, 0.0f };
-			vertex.color = { 1.0f, 1.0f, 1.0f }; // Можно изменить
-			vertex.texCoord = { u, v };
+	// Face Colors (optional, for visual distinction)
+	glm::vec3 red(1.0f, 0.0f, 0.0f);
+	glm::vec3 green(0.0f, 1.0f, 0.0f);
+	glm::vec3 blue(0.0f, 0.0f, 1.0f);
+	glm::vec3 yellow(1.0f, 1.0f, 0.0f);
+	glm::vec3 cyan(0.0f, 1.0f, 1.0f);
+	glm::vec3 magenta(1.0f, 0.0f, 1.0f);
 
-			// Пример вычисления касательных (упрощённо)
-			vertex.tangent = { 1.0f, 0.0f, 0.0f };
-			vertex.bitangent = { 0.0f, 0.0f, 1.0f };
+	// Front Face Z = center.z - halfSize (p0, p1, p2, p3) - CCW order for outward facing normal
+	GeometryGenerator::AddPlane(p0, p3, p2, p1, vertices, indices, blue, glm::vec2(0, 0), glm::vec2(0, 1), glm::vec2(1, 1), glm::vec2(1, 0));
 
-			vertices.push_back(vertex);
-		}
-	}
+	// Back Face Z = center.z + halfSize (p5, p4, p7, p6) - CCW order for outward facing normal
+	GeometryGenerator::AddPlane(p5, p6, p7, p4, vertices, indices, red, glm::vec2(0, 0), glm::vec2(1, 0), glm::vec2(1, 1), glm::vec2(0, 1));
 
-	// Генерация индексов (треугольники)
-	for (uint32_t z = 0; z < subdivisions_depth; ++z) {
-		for (uint32_t x = 0; x < subdivisions_width; ++x) {
-			uint32_t a = startVertexIndex + (z * (subdivisions_width + 1)) + x;
-			uint32_t b = a + 1;
-			uint32_t c = a + (subdivisions_width + 1);
-			uint32_t d = c + 1;
+	// Top Face Y = center.y + halfSize (p3, p2, p6, p7) - CCW order for outward facing normal
+	GeometryGenerator::AddPlane(p3, p7, p6, p2, vertices, indices, green, glm::vec2(0, 0), glm::vec2(0, 1), glm::vec2(1, 1), glm::vec2(1, 0));
 
-			indices.push_back(a);
-			indices.push_back(c);
-			indices.push_back(b);
+	// Bottom Face Y = center.y - halfSize (p4, p5, p1, p0) - CCW order for outward facing normal
+	GeometryGenerator::AddPlane(p4, p0, p1, p5, vertices, indices, yellow, glm::vec2(0, 0), glm::vec2(1, 0), glm::vec2(1, 1), glm::vec2(0, 1));
 
-			indices.push_back(b);
-			indices.push_back(c);
-			indices.push_back(d);
-		}
-	}
+	// Right Face X = center.x + halfSize (p1, p5, p6, p2) - CCW order for outward facing normal
+	GeometryGenerator::AddPlane(p1, p2, p6, p5, vertices, indices, cyan, glm::vec2(0, 0), glm::vec2(0, 1), glm::vec2(1, 1), glm::vec2(1, 0));
+
+	// Left Face X = center.x - halfSize (p4, p0, p3, p7) - CCW order for outward facing normal
+	GeometryGenerator::AddPlane(p4, p7, p3, p0, vertices, indices, magenta, glm::vec2(0, 0), glm::vec2(0, 1), glm::vec2(1, 1), glm::vec2(1, 0));
 }
 //=============================================================================
 bool MapChunk::Init()
@@ -59,26 +55,52 @@ bool MapChunk::Init()
 		}
 	}
 
-	MeshInfo meshInfo[10];
-	meshInfo[0].material = Material();
-	meshInfo[0].material->diffuseTextures.push_back(textures::LoadTexture2D("data/textures/grass_diffuse.png"));
+	tempMap[5][6] = 1;
+	tempMap[4][5] = 1;
+	tempMap[5][5] = 1;
+	tempMap[5][4] = 1;
+	tempMap[6][5] = 1;
 
-	for (size_t y = 0; y < MAPCHUNKSIZE; y++)
-	{
-		for (size_t x = 0; x < MAPCHUNKSIZE; x++)
-		{
-			if (tempMap[x][y] == 0)
-			{
-				addPlane(meshInfo[0].vertices, meshInfo[0].indices, 1.0f, 1.0f, 1, 1, {x*2, 0.0f, y*2});
-			}
-		}
-	}
-	m_model.model.Create(meshInfo[0]);
+	generateBufferMap();
 
 	return true;
 }
 //=============================================================================
 void MapChunk::Close()
 {
+}
+//=============================================================================
+void MapChunk::generateBufferMap()
+{
+	std::vector<MeshInfo> meshInfo(10);
+	meshInfo[0].material = Material();
+	meshInfo[0].material->diffuseTextures.push_back(textures::LoadTexture2D("data/pics/wall1.png"));
+	meshInfo[1].material = Material();
+	meshInfo[1].material->diffuseTextures.push_back(textures::LoadTexture2D("data/pics/tile1.png"));
+
+	const float mapOffset = MAPCHUNKSIZE / 2;
+	for (size_t iy = 0; iy < MAPCHUNKSIZE; iy++)
+	{
+		for (size_t ix = 0; ix < MAPCHUNKSIZE; ix++)
+		{
+			size_t id = tempMap[ix][iy];
+			if (id == 99) continue;
+
+			float x = float(ix) - mapOffset;
+			float y = float(iy) - mapOffset;
+
+			AddCube(glm::vec3(x, 0.5f, y), 1.0f, meshInfo[id].vertices, meshInfo[id].indices);
+
+			//GeometryGenerator::AddPlane(meshInfo[id].vertices, meshInfo[id].indices, glm::vec3(x, 0.5f, y), 1.0f, 1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+			//GeometryGenerator::AddPlane(meshInfo[id].vertices, meshInfo[id].indices, glm::vec3(x, -0.5f, y), 1.0f, 1.0f, glm::vec3(0.0f, -1.0f, 0.0f));
+
+			//GeometryGenerator::AddPlane(meshInfo[id].vertices, meshInfo[id].indices, glm::vec3(x + 0.5f, 0.0f, y), 1.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+			//GeometryGenerator::AddPlane(meshInfo[id].vertices, meshInfo[id].indices, glm::vec3(x - 0.5f, 0.0f, y), 1.0f, 1.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+
+			//GeometryGenerator::AddPlane(meshInfo[id].vertices, meshInfo[id].indices, glm::vec3(x, 0.0f, y + 0.5f), 1.0f, 1.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+			//GeometryGenerator::AddPlane(meshInfo[id].vertices, meshInfo[id].indices, glm::vec3(x, 0.0f, y - 0.5f), 1.0f, 1.0f, glm::vec3(0.0f, 0.0f, -1.0f));
+		}
+	}
+	m_model.model.Create(meshInfo);
 }
 //=============================================================================

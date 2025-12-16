@@ -81,6 +81,8 @@
 #include <assimp/GltfMaterial.h>
 #include <assimp/config.h>
 
+#include <meshoptimizer/meshoptimizer.h>
+
 #if defined(_MSC_VER)
 #	pragma warning(pop)
 #endif

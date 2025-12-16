@@ -10,5 +10,6 @@ public:
 
 	GameModel* GetModel() noexcept { return &m_model; }
 private:
+	void generateBufferMap();
 	GameModel m_model;
 };

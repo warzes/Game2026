@@ -29,6 +29,54 @@
     <ClCompile Include="RGFW\RGFW.cpp">
       <Filter>RGFW</Filter>
     </ClCompile>
+    <ClCompile Include="meshoptimizer\allocator.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\clusterizer.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\indexanalyzer.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\indexcodec.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\indexgenerator.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\overdrawoptimizer.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\partition.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\quantization.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\rasterizer.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\simplifier.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\spatialorder.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\stripifier.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\vcacheoptimizer.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\vertexcodec.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\vertexfilter.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\vfetchoptimizer.cpp">
+      <Filter>meshoptimizer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="stb">
@@ -63,6 +111,9 @@
     </Filter>
     <Filter Include="RGFW">
       <UniqueIdentifier>{6b0adba2-5e16-4a28-81b0-ba2213442fcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="meshoptimizer">
+      <UniqueIdentifier>{5a416f3a-6bb4-4784-a43d-1d619c248fe9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1221,6 +1272,9 @@
     </ClInclude>
     <ClInclude Include="RGFW\RGFW.h">
       <Filter>RGFW</Filter>
+    </ClInclude>
+    <ClInclude Include="meshoptimizer\meshoptimizer.h">
+      <Filter>meshoptimizer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

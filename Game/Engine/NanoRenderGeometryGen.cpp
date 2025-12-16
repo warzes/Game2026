@@ -331,3 +331,158 @@ void GeometryGenerator::ComputeTangents(MeshInfo& meshInfo)
 	}
 }
 //=============================================================================
+void GeometryGenerator::AddPlane(std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indices, const glm::vec3& center, float width, float height, const glm::vec3& planeNormal)
+{
+	glm::vec3 right;
+	// Calculate a vector perpendicular to the normal (right)
+	if (std::abs(planeNormal.y) < 0.9f) {
+		right = glm::normalize(glm::cross(planeNormal, glm::vec3(0.0f, 1.0f, 0.0f)));
+	}
+	else {
+		// Avoid degeneracy if normal is close to (0,1,0)
+		right = glm::normalize(glm::cross(planeNormal, glm::vec3(1.0f, 0.0f, 0.0f)));
+	}
+
+	// Calculate the up vector for the plane (perpendicular to both normal and right)
+	glm::vec3 up = glm::normalize(glm::cross(right, planeNormal));
+
+	// Half sizes
+	float halfWidth = width * 0.5f;
+	float halfHeight = height * 0.5f;
+
+	// Calculate the four corners of the plane relative to its center
+	glm::vec3 topLeft = center - right * halfWidth + up * halfHeight;      // v1
+	glm::vec3 topRight = center + right * halfWidth + up * halfHeight;     // v0
+	glm::vec3 bottomLeft = center - right * halfWidth - up * halfHeight;   // v2
+	glm::vec3 bottomRight = center + right * halfWidth - up * halfHeight;  // v3
+
+	// Current vertex count before adding new ones
+	uint32_t indexOffset = static_cast<uint32_t>(vertices.size());
+
+	// Define vertices with their properties
+	// The normal is the provided planeNormal
+	// Tangent and bitangent need to be set according to the local coordinate system of the face.
+
+	MeshVertex v0;
+	v0.position = topRight;
+	v0.normal = planeNormal;
+	// Tangent points along the 'right' direction of the plane
+	v0.tangent = right;
+	// Bitangent should align with the 'up' direction of the plane texture and follow the right-hand rule
+	v0.bitangent = glm::cross(v0.normal, v0.tangent);
+	v0.texCoord = glm::vec2(1.0f, 1.0f); // Top-right UV
+
+	MeshVertex v1;
+	v1.position = topLeft;
+	v1.normal = planeNormal;
+	v1.tangent = right;
+	v1.bitangent = glm::cross(v1.normal, v1.tangent);
+	v1.texCoord = glm::vec2(0.0f, 1.0f); // Top-left UV
+
+	MeshVertex v2;
+	v2.position = bottomLeft;
+	v2.normal = planeNormal;
+	v2.tangent = right;
+	v2.bitangent = glm::cross(v2.normal, v2.tangent);
+	v2.texCoord = glm::vec2(0.0f, 0.0f); // Bottom-left UV
+
+	MeshVertex v3;
+	v3.position = bottomRight;
+	v3.normal = planeNormal;
+	v3.tangent = right;
+	v3.bitangent = glm::cross(v3.normal, v3.tangent);
+	v3.texCoord = glm::vec2(1.0f, 0.0f); // Bottom-right UV
+
+	// Add the 4 vertices to the array
+	vertices.push_back(v0); // Index: indexOffset + 0
+	vertices.push_back(v1); // Index: indexOffset + 1
+	vertices.push_back(v2); // Index: indexOffset + 2
+	vertices.push_back(v3); // Index: indexOffset + 3
+
+	// Define the two triangles using the new indices
+	// To make the side the normal points to the "front", reverse the winding order.
+	// Triangle 1: v0 (top-right), v2 (bottom-left), v1 (top-left) - Reversed
+	indices.push_back(indexOffset + 0);
+	indices.push_back(indexOffset + 2);
+	indices.push_back(indexOffset + 1);
+
+	// Triangle 2: v0 (top-right), v3 (bottom-right), v2 (bottom-left) - Reversed
+	indices.push_back(indexOffset + 0);
+	indices.push_back(indexOffset + 3);
+	indices.push_back(indexOffset + 2);
+}
+//=============================================================================
+void GeometryGenerator::AddPlane(const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, std::vector<MeshVertex>& vertices, std::vector<unsigned int>& indices, const glm::vec3& color, const glm::vec2& uv0, const glm::vec2& uv1, const glm::vec2& uv2, const glm::vec2& uv3)
+{
+	// Calculate the normal for the plane using 3 of the 4 points (assuming they are coplanar)
+	// Using points p0, p1, p2 to define the plane's orientation
+	glm::vec3 normal = CalculateFaceNormal(p0, p1, p2);
+
+	// Calculate tangent and bitangent based on the first triangle (p0, p1, p2)
+	glm::vec3 tangent, bitangent;
+	CalculateTangentBitangent(p0, p1, p2, uv0, uv1, uv2, tangent, bitangent);
+
+	unsigned int baseIndex = static_cast<unsigned int>(vertices.size());
+
+	// Create 4 unique vertices for the quad (using triangle strip or fan implicitly by duplicating)
+	// Triangle 1: p0, p1, p2
+	// Triangle 2: p0, p2, p3
+	// This requires 6 vertices total to handle potentially different UVs/normals/tangents per face corner if needed.
+	// For a simple planar quad where all corners share the same calculated normal/tangent, we can do 4 unique verts.
+
+	// However, to make two separate triangles that don't share edges incorrectly in a flat list,
+	// we duplicate vertices as needed by index buffer, but since UVs might differ per corner even for a flat quad,
+	// the safest is often to provide 6 vertices explicitly, one for each corner *for each triangle it belongs to*.
+	// But let's assume a simpler case where the quad lies on a plane and tangents/UVs are consistent enough
+	// or you want to average them per geometric vertex. The most common and expected behavior for "AddPlane"
+	// is to create 4 unique vertices (one for each corner) and use an index buffer.
+
+	MeshVertex v0;
+	v0.position = p0;
+	v0.color = color;
+	v0.normal = normal;
+	v0.texCoord = uv0;
+	v0.tangent = tangent;
+	v0.bitangent = bitangent;
+
+	MeshVertex v1;
+	v1.position = p1;
+	v1.color = color;
+	v1.normal = normal;
+	v1.texCoord = uv1;
+	v1.tangent = tangent;
+	v1.bitangent = bitangent;
+
+	MeshVertex v2;
+	v2.position = p2;
+	v2.color = color;
+	v2.normal = normal;
+	v2.texCoord = uv2;
+	v2.tangent = tangent;
+	v2.bitangent = bitangent;
+
+	MeshVertex v3;
+	v3.position = p3;
+	v3.color = color;
+	v3.normal = normal;
+	v3.texCoord = uv3;
+	v3.tangent = tangent;
+	v3.bitangent = bitangent;
+
+	// Add the 4 unique vertices
+	vertices.push_back(v0);
+	vertices.push_back(v1);
+	vertices.push_back(v2);
+	vertices.push_back(v3);
+
+	// Define indices for two triangles forming the quad: CCW winding
+	// Triangle 1: v0, v1, v2
+	// Triangle 2: v0, v2, v3
+	indices.push_back(baseIndex + 0); // v0
+	indices.push_back(baseIndex + 1); // v1
+	indices.push_back(baseIndex + 2); // v2
+	indices.push_back(baseIndex + 0); // v0
+	indices.push_back(baseIndex + 2); // v2
+	indices.push_back(baseIndex + 3); // v3
+}
+//=============================================================================
