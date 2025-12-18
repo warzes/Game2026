@@ -114,6 +114,7 @@
     <ClCompile Include="meshoptimizer\vertexcodec.cpp" />
     <ClCompile Include="meshoptimizer\vertexfilter.cpp" />
     <ClCompile Include="meshoptimizer\vfetchoptimizer.cpp" />
+    <ClCompile Include="picobench\picobench.cpp" />
     <ClCompile Include="RGFW\RGFW.cpp" />
     <ClCompile Include="stb\stb.cpp" />
   </ItemGroup>
@@ -499,6 +500,7 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="KHR\khrplatform.h" />
     <ClInclude Include="meshoptimizer\meshoptimizer.h" />
+    <ClInclude Include="picobench\picobench.hpp" />
     <ClInclude Include="RGFW\RGFW.h" />
     <ClInclude Include="stb\stb_image.h" />
     <ClInclude Include="stb\stb_image_resize2.h" />

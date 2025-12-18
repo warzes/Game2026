@@ -77,6 +77,9 @@
     <ClCompile Include="meshoptimizer\vfetchoptimizer.cpp">
       <Filter>meshoptimizer</Filter>
     </ClCompile>
+    <ClCompile Include="picobench\picobench.cpp">
+      <Filter>picobench</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="stb">
@@ -114,6 +117,9 @@
     </Filter>
     <Filter Include="meshoptimizer">
       <UniqueIdentifier>{5a416f3a-6bb4-4784-a43d-1d619c248fe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="picobench">
+      <UniqueIdentifier>{0775a6df-5d41-4c87-86c5-8009c4d23b88}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1275,6 +1281,9 @@
     </ClInclude>
     <ClInclude Include="meshoptimizer\meshoptimizer.h">
       <Filter>meshoptimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="picobench\picobench.hpp">
+      <Filter>picobench</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
