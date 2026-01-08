@@ -42,6 +42,8 @@ void GameApp()
 				if (input::IsKeyDown(RGFW_s)) camera.ProcessKeyboard(CameraBackward, engine::GetDeltaTime());
 				if (input::IsKeyDown(RGFW_a)) camera.ProcessKeyboard(CameraLeft, engine::GetDeltaTime());
 				if (input::IsKeyDown(RGFW_d)) camera.ProcessKeyboard(CameraRight, engine::GetDeltaTime());
+				if (input::IsKeyDown(RGFW_e)) camera.ProcessKeyboard(CameraUp, engine::GetDeltaTime());
+				if (input::IsKeyDown(RGFW_q)) camera.ProcessKeyboard(CameraDown, engine::GetDeltaTime());
 
 				if (input::IsMouseDown(RGFW_mouseRight))
 				{

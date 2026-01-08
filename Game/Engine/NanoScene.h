@@ -6,6 +6,8 @@ enum CameraMovement
 	CameraBackward,
 	CameraLeft,
 	CameraRight,
+	CameraUp,
+	CameraDown,
 };
 
 // Default camera values
