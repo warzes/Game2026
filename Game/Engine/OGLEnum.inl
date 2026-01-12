@@ -2,7 +2,7 @@
 // Implementation
 //=============================================================================
 
-[[nodiscard]] inline GLenum GetGLEnum(PixelFormat format) noexcept
+[[nodiscard]] inline GLenum EnumToValue(PixelFormat format) noexcept
 {
 	switch (format)
 	{
@@ -20,7 +20,7 @@
 	}
 }
 
-[[nodiscard]] inline GLint GetGLEnum(InternalFormat format) noexcept
+[[nodiscard]] inline GLint EnumToValue(InternalFormat format) noexcept
 {
 	switch (format)
 	{
@@ -65,7 +65,7 @@
 	}
 }
 
-[[nodiscard]] inline GLenum GetGLEnum(PixelType format) noexcept
+[[nodiscard]] inline GLenum EnumToValue(PixelType format) noexcept
 {
 	switch (format)
 	{
@@ -76,6 +76,36 @@
 	case PixelType::UnsignedInt:       return GL_UNSIGNED_INT;
 	case PixelType::Int:               return GL_INT;
 	case PixelType::Float:             return GL_FLOAT;
+	default: std::unreachable();
+	}
+}
+
+[[nodiscard]] inline GLenum GetGLEnum(PrimitiveMode mode) noexcept
+{
+	switch (mode)
+	{
+	case PrimitiveMode::Points:                 return GL_POINTS;
+	case PrimitiveMode::Lines:                  return GL_LINES;
+	case PrimitiveMode::LineLoop:               return GL_LINE_LOOP;
+	case PrimitiveMode::LineStrip:              return GL_LINE_STRIP;
+	case PrimitiveMode::Triangles:              return GL_TRIANGLES;
+	case PrimitiveMode::TriangleStrip:          return GL_TRIANGLE_STRIP;
+	case PrimitiveMode::TriangleFan:            return GL_TRIANGLE_FAN;
+	case PrimitiveMode::LinesAdjacency:         return GL_LINES_ADJACENCY;
+	case PrimitiveMode::LineStripAdjacency:     return GL_LINE_STRIP_ADJACENCY;
+	case PrimitiveMode::TrianglesAdjacency:     return GL_TRIANGLES_ADJACENCY;
+	case PrimitiveMode::TriangleStripAdjacency: return GL_TRIANGLE_STRIP_ADJACENCY;
+	default: std::unreachable();
+	}
+}
+
+inline GLenum EnumToValue(RasterizationMode mode) noexcept
+{
+	switch (mode)
+	{
+	case RasterizationMode::Point: return GL_POINT;
+	case RasterizationMode::Line:  return GL_LINE;
+	case RasterizationMode::Fill:  return GL_FILL;
 	default: std::unreachable();
 	}
 }

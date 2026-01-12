@@ -5,6 +5,9 @@
 #include "NanoLog.h"
 #include "OGLContext.h"
 //=============================================================================
+bool OGLContextInit();
+void OGLContextClose();
+//=============================================================================
 namespace
 {
 	// timing
@@ -25,7 +28,7 @@ bool engine::Init(uint16_t width, uint16_t height, std::string_view title)
 		return false;
 	input::Init();
 
-	if (!OGLContext::Init())
+	if (!OGLContextInit())
 		return false;
 
 	EnableSRGB(true);
@@ -60,7 +63,7 @@ void engine::Close() noexcept
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplRgfw_Shutdown();
 	ImGui::DestroyContext();
-	OGLContext::Close();
+	OGLContextClose();
 	window::Close();
 }
 //=============================================================================

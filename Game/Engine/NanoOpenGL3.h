@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "OpenGL3Enum.h"
+#include "OGLEnum.h"
 
 //=============================================================================
 // Enums

@@ -59,10 +59,10 @@
     <ClInclude Include="NanoOpenGL3Advance.h">
       <Filter>Engine\OpenGL\Old</Filter>
     </ClInclude>
-    <ClInclude Include="OpenGL3Enum.h">
-      <Filter>Engine\OpenGL\Old</Filter>
-    </ClInclude>
     <ClInclude Include="OGLContext.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="OGLEnum.h">
       <Filter>Engine\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
@@ -153,8 +153,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="OpenGL3Enum.inl">
-      <Filter>Engine\OpenGL\Old</Filter>
+    <None Include="OGLEnum.inl">
+      <Filter>Engine\OpenGL</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -605,7 +605,7 @@ Texture1DHandle CreateTexture1D(unsigned width, InternalFormat internalformat, P
 	Texture1DHandle texture;
 	glGenTextures(1, &texture.handle);
 	glBindTexture(GL_TEXTURE_1D, texture.handle);
-	glTexImage1D(GL_TEXTURE_1D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glTexImage1D(GL_TEXTURE_1D, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), 0, EnumToValue(format), EnumToValue(type), pixels);
 	
 	glBindTexture(GL_TEXTURE_1D, currentTexture);
 	return texture;
@@ -624,7 +624,7 @@ Texture2DHandle CreateTexture2D(unsigned width, unsigned height, InternalFormat 
 	Texture2DHandle texture;
 	glGenTextures(1, &texture.handle);
 	glBindTexture(GL_TEXTURE_2D, texture.handle);
-	glTexImage2D(GL_TEXTURE_2D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), pixels);
 
 	glBindTexture(GL_TEXTURE_2D, currentTexture);
 	return texture;
@@ -642,7 +642,7 @@ Texture3DHandle CreateTexture3D(unsigned width, unsigned height, unsigned depth,
 	Texture3DHandle texture;
 	glGenTextures(1, &texture.handle);
 	glBindTexture(GL_TEXTURE_3D, texture.handle);
-	glTexImage3D(GL_TEXTURE_3D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(depth), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glTexImage3D(GL_TEXTURE_3D, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(depth), 0, EnumToValue(format), EnumToValue(type), pixels);
 
 	glBindTexture(GL_TEXTURE_3D, currentTexture);
 	return texture;
@@ -659,7 +659,7 @@ Texture1DArrayHandle CreateTexture1DArray(InternalFormat internalformat, unsigne
 	Texture1DArrayHandle texture;
 	glGenTextures(1, &texture.handle);
 	glBindTexture(GL_TEXTURE_1D_ARRAY, texture.handle);
-	glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(arraySize), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(arraySize), 0, EnumToValue(format), EnumToValue(type), pixels);
 	glBindTexture(GL_TEXTURE_1D_ARRAY, currentTexture);
 	return texture;
 }
@@ -675,7 +675,7 @@ Texture2DArrayHandle CreateTexture2DArray(InternalFormat internalformat, unsigne
 	Texture2DArrayHandle texture;
 	glGenTextures(1, &texture.handle);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texture.handle);
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(arraySize), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(arraySize), 0, EnumToValue(format), EnumToValue(type), pixels);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, currentTexture);
 	return texture;
 }
@@ -692,12 +692,12 @@ TextureCubeHandle CreateCubeTexture(InternalFormat internalformat, unsigned widt
 	glGenTextures(1, &texture.handle);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texture.handle);
 
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), posX);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), negX);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), posY);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), negY);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), posZ);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), negZ);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), posX);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), negX);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), posY);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), negY);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), posZ);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), negZ);
 	
 	glBindTexture(GL_TEXTURE_CUBE_MAP, currentTexture);
 	return texture;
@@ -713,7 +713,7 @@ void SetTextureData(Texture1DHandle texture, InternalFormat internalformat, unsi
 	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_1D);
 
 	glBindTexture(GL_TEXTURE_1D, texture.handle);
-	glTexImage1D(GL_TEXTURE_1D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glTexImage1D(GL_TEXTURE_1D, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), 0, EnumToValue(format), EnumToValue(type), pixels);
 	glBindTexture(GL_TEXTURE_1D, currentTexture);
 }
 //=============================================================================
@@ -728,7 +728,7 @@ void SetTextureData(Texture2DHandle texture, InternalFormat internalformat, unsi
 	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, texture.handle);
-	glTexImage2D(GL_TEXTURE_2D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), pixels);
 	glBindTexture(GL_TEXTURE_2D, currentTexture);
 }
 //=============================================================================
@@ -743,7 +743,7 @@ void SetTextureData(Texture3DHandle texture, InternalFormat internalformat, unsi
 	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_3D);
 
 	glBindTexture(GL_TEXTURE_3D, texture.handle);
-	glTexImage3D(GL_TEXTURE_3D, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(depth), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glTexImage3D(GL_TEXTURE_3D, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(depth), 0, EnumToValue(format), EnumToValue(type), pixels);
 	glBindTexture(GL_TEXTURE_3D, currentTexture);
 }
 //=============================================================================
@@ -757,7 +757,7 @@ void SetTextureData(Texture1DArrayHandle texture, InternalFormat internalformat,
 	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_1D_ARRAY);
 
 	glBindTexture(GL_TEXTURE_1D_ARRAY, texture.handle);
-	glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(arraySize), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(arraySize), 0, EnumToValue(format), EnumToValue(type), pixels);
 	glBindTexture(GL_TEXTURE_1D_ARRAY, currentTexture);
 }
 //=============================================================================
@@ -771,7 +771,7 @@ void SetTextureData(Texture2DArrayHandle texture, InternalFormat internalformat,
 	const GLuint currentTexture = GetCurrentTexture(GL_TEXTURE_2D_ARRAY);
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texture.handle);
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(arraySize), 0, GetGLEnum(format), GetGLEnum(type), pixels);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), static_cast<GLsizei>(arraySize), 0, EnumToValue(format), EnumToValue(type), pixels);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, currentTexture);
 }
 //=============================================================================
@@ -786,12 +786,12 @@ void SetTextureData(TextureCubeHandle texture, InternalFormat internalformat, un
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texture.handle);
 
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), posX);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), negX);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), posY);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), negY);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), posZ);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GetGLEnum(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, GetGLEnum(format), GetGLEnum(type), negZ);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), posX);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), negX);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), posY);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), negY);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), posZ);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, EnumToValue(internalformat), static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, EnumToValue(format), EnumToValue(type), negZ);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, currentTexture);
 }

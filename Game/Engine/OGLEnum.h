@@ -52,14 +52,39 @@ enum class PixelType : uint8_t
 	Float,
 };
 
+enum class PrimitiveMode : uint8_t
+{
+	Points,
+	Lines,
+	LineLoop,
+	LineStrip,
+	Triangles,
+	TriangleStrip,
+	TriangleFan,
+	LinesAdjacency,
+	LineStripAdjacency,
+	TrianglesAdjacency,
+	TriangleStripAdjacency,
+};
+
+enum class RasterizationMode : uint8_t
+{
+	Point,
+	Line,
+	Fill
+};
+
 //=============================================================================
 // Function declarations
 //=============================================================================
-[[nodiscard]] inline GLenum GetGLEnum(PixelFormat format) noexcept;
-[[nodiscard]] inline GLint GetGLEnum(InternalFormat format) noexcept;
-[[nodiscard]] inline GLenum GetGLEnum(PixelType format) noexcept;
+[[nodiscard]] inline GLenum EnumToValue(PixelFormat format) noexcept;
+[[nodiscard]] inline GLint EnumToValue(InternalFormat format) noexcept;
+[[nodiscard]] inline GLenum EnumToValue(PixelType format) noexcept;
+
+[[nodiscard]] inline GLenum EnumToValue(PrimitiveMode mode) noexcept;
+[[nodiscard]] inline GLenum EnumToValue(RasterizationMode mode) noexcept;
 
 //=============================================================================
 // Implementation
 //=============================================================================
-#include "OpenGL3Enum.inl"
+#include "OGLEnum.inl"
