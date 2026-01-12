@@ -20,4 +20,5 @@
     <BuildDependency Project="3rdparty/3rdparty.vcxproj" />
     <BuildDependency Project="Engine/Engine.vcxproj" />
   </Project>
+  <Project Path="MinimalOGL/MinimalOGL.vcxproj" Id="d449feb4-cb4e-4f84-a2b5-c3c0bcd9b737" />
 </Solution>

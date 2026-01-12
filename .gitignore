@@ -17,3 +17,5 @@ Thumbs.db
 /bin/Game2_Release.*
 /bin/Game3_Debug.*
 /bin/Game3_Release.*
+/bin/MinimalOGL_Debug.*
+/bin/MinimalOGL_Release.*

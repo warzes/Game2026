@@ -388,12 +388,3 @@ void EnableSRGB(bool enable);
 //=============================================================================
 void DrawArrays(GLuint vao, GLenum mode, GLint first, GLsizei count);
 void DrawElements(GLuint vao, GLenum mode, GLsizei count, GLenum type, const void* indices = nullptr);
-
-//=============================================================================
-// OpenGL System
-//=============================================================================
-namespace oglSystem
-{
-	bool Init();
-	void Close();
-} // namespace oglSystem

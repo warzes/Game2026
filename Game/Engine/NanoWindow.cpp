@@ -4,14 +4,15 @@
 //=============================================================================
 namespace
 {
-	bool windowQuit{ true };
-	RGFW_event windowEvent;
-	uint16_t windowWidth, windowHeight;
-	float windowAspect{ 1.0f };
+	bool       windowQuit{ true };
+	RGFW_event windowEvent{};
+	uint16_t   windowWidth{ 0 };
+	uint16_t   windowHeight{ 0 };
+	float      windowAspect{ 1.0f };
 
-	glm::vec2 cursorPos{};
-	glm::vec2 cursorOffset{};
-	glm::vec2 scrollOffset{};
+	glm::vec2  cursorPos{};
+	glm::vec2  cursorOffset{};
+	glm::vec2  scrollOffset{};
 }
 //=============================================================================
 void errorFunc(RGFW_debugType type, RGFW_errorCode err, const char* msg) noexcept
@@ -99,7 +100,10 @@ bool window::Init(uint16_t width, uint16_t height, std::string_view title, bool 
 	}
 	RGFW_glHints* hints = RGFW_getGlobalHints_OpenGL();
 	hints->depth = 32;
+	hints->stencil = 8;
+#if ENABLE_SRGB
 	hints->sRGB = true;
+#endif
 #if defined(_DEBUG)
 	hints->debug = true;
 #else
@@ -137,7 +141,6 @@ bool window::Init(uint16_t width, uint16_t height, std::string_view title, bool 
 	//// Key callbacks
 	RGFW_setKeyCallback(keyFunc);
 
-
 	// Get buffer size information
 	int displayW, displayH;
 	RGFW_window_getSize(handle, &displayW, &displayH);
@@ -146,15 +149,7 @@ bool window::Init(uint16_t width, uint16_t height, std::string_view title, bool 
 	windowAspect = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
 
 	// Set the current context
-	RGFW_window_makeCurrentContext_OpenGL(handle);
-		
-	// glad: load all OpenGL function pointers
-	const int openGLVersion = gladLoadGL(RGFW_getProcAddress_OpenGL);
-	if (openGLVersion < GLAD_MAKE_VERSION(3, 3))
-	{
-		Fatal("Failed to initialize OpenGL context!");
-		return false;
-	}
+	RGFW_window_makeCurrentContext_OpenGL(handle);	
 
 	RGFW_window_swapInterval_OpenGL(handle, vsync ? 1 : 0);
 

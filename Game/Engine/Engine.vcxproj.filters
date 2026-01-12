@@ -26,12 +26,6 @@
     <ClInclude Include="NanoEngine.h">
       <Filter>Engine\App</Filter>
     </ClInclude>
-    <ClInclude Include="NanoOpenGL3.h">
-      <Filter>Engine\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="NanoOpenGL3Advance.h">
-      <Filter>Engine\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="NanoRenderTextures.h">
       <Filter>Engine\Render</Filter>
     </ClInclude>
@@ -56,11 +50,20 @@
     <ClInclude Include="EngineConfig.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="OpenGL3Enum.h">
-      <Filter>Engine\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="Transform.h">
       <Filter>Engine\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="NanoOpenGL3.h">
+      <Filter>Engine\OpenGL\Old</Filter>
+    </ClInclude>
+    <ClInclude Include="NanoOpenGL3Advance.h">
+      <Filter>Engine\OpenGL\Old</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGL3Enum.h">
+      <Filter>Engine\OpenGL\Old</Filter>
+    </ClInclude>
+    <ClInclude Include="OGLContext.h">
+      <Filter>Engine\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -89,12 +92,6 @@
     <ClCompile Include="NanoWindow.cpp">
       <Filter>Engine\App</Filter>
     </ClCompile>
-    <ClCompile Include="NanoOpenGL3.cpp">
-      <Filter>Engine\OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="NanoOpenGL3Advance.cpp">
-      <Filter>Engine\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="NanoRender.cpp">
       <Filter>Engine\Render</Filter>
     </ClCompile>
@@ -115,6 +112,15 @@
     </ClCompile>
     <ClCompile Include="NanoScene.cpp">
       <Filter>Engine\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="NanoOpenGL3.cpp">
+      <Filter>Engine\OpenGL\Old</Filter>
+    </ClCompile>
+    <ClCompile Include="NanoOpenGL3Advance.cpp">
+      <Filter>Engine\OpenGL\Old</Filter>
+    </ClCompile>
+    <ClCompile Include="OGLContext.cpp">
+      <Filter>Engine\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -142,10 +148,13 @@
     <Filter Include="Advance">
       <UniqueIdentifier>{c52ed9b7-9ca9-4a2a-b10f-984e6c656fc0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\OpenGL\Old">
+      <UniqueIdentifier>{06a273ab-36dd-475c-bf3a-cec2e1e3901e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="OpenGL3Enum.inl">
-      <Filter>Engine\OpenGL</Filter>
+      <Filter>Engine\OpenGL\Old</Filter>
     </None>
   </ItemGroup>
 </Project>

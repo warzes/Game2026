@@ -3,14 +3,7 @@
 #include "NanoWindow.h"
 #include "NanoRender.h"
 #include "NanoLog.h"
-//=============================================================================
-#if defined(_WIN32)
-extern "C"
-{
-	__declspec(dllexport) unsigned long NvOptimusEnablement = 1;
-	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
-}
-#endif
+#include "OGLContext.h"
 //=============================================================================
 namespace
 {
@@ -18,7 +11,6 @@ namespace
 	float       deltaTime{ 0.0f };
 	std::chrono::high_resolution_clock::time_point previousTime;
 	std::chrono::high_resolution_clock::time_point currentTime;
-
 
 	// fps
 	const float avgInterval{ 0.5f };
@@ -33,7 +25,7 @@ bool engine::Init(uint16_t width, uint16_t height, std::string_view title)
 		return false;
 	input::Init();
 
-	if (!oglSystem::Init())
+	if (!OGLContext::Init())
 		return false;
 
 	EnableSRGB(true);
@@ -68,7 +60,7 @@ void engine::Close() noexcept
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplRgfw_Shutdown();
 	ImGui::DestroyContext();
-	oglSystem::Close();
+	OGLContext::Close();
 	window::Close();
 }
 //=============================================================================
