@@ -236,7 +236,7 @@ void Framebuffer::createColorTextureAttachment(size_t index, const ColorAttachme
 	else
 	{
 		glBindTexture(GL_TEXTURE_2D, tex);
-		glTexImage2D(GL_TEXTURE_2D, 0, getInternalFormat(cfg.format, cfg.dataType, cfg.colorSpace), m_info.width, m_info.height, 0, GetColorFormatGL(cfg.format), GetDataTypeGL(cfg.dataType), nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, getInternalFormat(cfg.format, cfg.dataType, cfg.colorSpace), m_info.width, m_info.height, 0, GetColorFormatGL(cfg.format), EnumToValue(cfg.dataType), nullptr);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
@@ -257,7 +257,7 @@ void Framebuffer::createColorCubeMapTextureAttachment(size_t index, const ColorA
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 	for (int i = 0; i < 6; ++i)
 	{
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, getInternalFormat(cfg.format, cfg.dataType, cfg.colorSpace), m_info.width, m_info.height, 0, GetColorFormatGL(cfg.format), GetDataTypeGL(cfg.dataType), nullptr);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, getInternalFormat(cfg.format, cfg.dataType, cfg.colorSpace), m_info.width, m_info.height, 0, GetColorFormatGL(cfg.format), EnumToValue(cfg.dataType), nullptr);
 	}
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

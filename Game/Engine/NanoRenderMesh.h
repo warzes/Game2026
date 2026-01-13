@@ -3,6 +3,8 @@
 #include "NanoRenderMaterial.h"
 #include "NanoMath.h"
 #include "NanoOpenGL3.h"
+#include "OGLShader.h"
+#include "OGLVertexAttribute.h"
 
 struct MeshInfo final
 {

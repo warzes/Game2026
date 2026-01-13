@@ -65,6 +65,12 @@
     <ClInclude Include="OGLEnum.h">
       <Filter>Engine\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="OGLShader.h">
+      <Filter>Engine\OpenGL\OGLResources</Filter>
+    </ClInclude>
+    <ClInclude Include="OGLVertexAttribute.h">
+      <Filter>Engine\OpenGL\OGLResources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -122,6 +128,12 @@
     <ClCompile Include="OGLContext.cpp">
       <Filter>Engine\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="OGLShader.cpp">
+      <Filter>Engine\OpenGL\OGLResources</Filter>
+    </ClCompile>
+    <ClCompile Include="OGLVertexAttribute.cpp">
+      <Filter>Engine\OpenGL\OGLResources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -150,6 +162,9 @@
     </Filter>
     <Filter Include="Engine\OpenGL\Old">
       <UniqueIdentifier>{06a273ab-36dd-475c-bf3a-cec2e1e3901e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\OpenGL\OGLResources">
+      <UniqueIdentifier>{8512fdc1-3326-4780-98e6-6faf852185a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

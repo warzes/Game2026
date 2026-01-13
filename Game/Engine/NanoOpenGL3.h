@@ -66,17 +66,9 @@ enum class ColorFormat : uint8_t
 };
 GLenum GetColorFormatGL(ColorFormat format) noexcept;
 
-enum class DataType : uint8_t
-{
-	UnsignedByte,
-	Float
-};
-GLenum GetDataTypeGL(DataType dataType) noexcept;
-
 //=============================================================================
 // Object Handles
 //=============================================================================
-struct ProgramHandle final { GLuint handle{ 0u }; };
 struct BufferHandle final { GLuint handle{ 0u }; };
 struct VertexArrayHandle final { GLuint handle{ 0u }; };
 struct Texture1DHandle final { GLuint handle{ 0u }; };
@@ -89,92 +81,6 @@ struct SamplerHandle final { GLuint handle{ 0u }; };
 
 struct RenderBufferHandle { GLuint handle{ 0u }; };
 struct FrameBufferHandle { GLuint handle{ 0u }; };
-
-//=============================================================================
-// Shader Program
-//=============================================================================
-std::string LoadShaderCode(const std::string& filename, const std::vector<std::string>& defines = {});
-
-ProgramHandle CreateShaderProgram(std::string_view vertexShader);
-ProgramHandle CreateShaderProgram(std::string_view vertexShader, std::string_view fragmentShader);
-ProgramHandle CreateShaderProgram(std::string_view vertexShader, std::string_view geometryShader, std::string_view fragmentShader);
-
-ProgramHandle LoadShaderProgram(const std::string& vsFile, const std::vector<std::string>& defines = {});
-ProgramHandle LoadShaderProgram(const std::string& vsFile, const std::string& fsFile, const std::vector<std::string>& defines = {});
-ProgramHandle LoadShaderProgram(const std::string& vsFile, const std::string& gsFile, const std::string& fsFile, const std::vector<std::string>& defines = {});
-
-//=============================================================================
-// Shader Uniforms
-//=============================================================================
-int GetUniformLocation(ProgramHandle program, std::string_view name);
-
-void SetUniform(int id, bool b);
-void SetUniform(int id, float s);
-void SetUniform(int id, int s);
-void SetUniform(int id, unsigned s);
-void SetUniform(int id, const glm::vec2& v);
-void SetUniform(int id, std::span<const glm::vec2> v);
-void SetUniform(int id, const glm::vec3& v);
-void SetUniform(int id, std::span<const glm::vec3> v);
-void SetUniform(int id, const glm::vec4& v);
-void SetUniform(int id, std::span<const glm::vec4> v);
-void SetUniform(int id, const glm::quat& v);
-void SetUniform(int id, const glm::mat3& m);
-void SetUniform(int id, const glm::mat4& m);
-
-//=============================================================================
-// VertexAttribute
-//=============================================================================
-
-struct VertexAttribute final
-{
-	GLenum      type;
-	GLint       size;
-	const void* offset; //  EXAMPLE: (void*)offsetof(Vertex, uv)
-	bool        normalized{ false };
-	bool        perInstance{ false };
-};
-void SpecifyVertexAttributes(size_t vertexSize, std::span<const VertexAttribute> attributes);
-
-//=============================================================================
-// Vertex Formats
-//=============================================================================
-
-struct VertexP3 final
-{
-	glm::vec3 position;
-
-	static void SetVertexAttributes();
-};
-
-struct VertexPNT final
-{
-	glm::vec3 position;
-	glm::vec3 normal;
-	glm::vec2 texcoord;
-
-	static void SetVertexAttributes();
-};
-
-struct QuadVertex final
-{
-	glm::vec2 position{ 0.0f };
-	glm::vec2 texCoord{ 0.0f };
-
-	static void SetVertexAttributes();
-};
-
-struct MeshVertex final
-{
-	glm::vec3 position{ 0.0f };
-	glm::vec3 color{ 1.0f };
-	glm::vec3 normal{ 0.0f };
-	glm::vec2 texCoord{ 0.0f };
-	glm::vec3 tangent{ 0.0f };
-	glm::vec3 bitangent{ 0.0f };
-
-	static void SetVertexAttributes();
-};
 
 //=============================================================================
 // Buffer

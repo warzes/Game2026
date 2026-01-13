@@ -2,6 +2,21 @@
 // Implementation
 //=============================================================================
 
+inline GLenum EnumToValue(DataType type) noexcept
+{
+	switch (type) {
+	case DataType::Byte:          return GL_BYTE;
+	case DataType::UnsignedByte:  return GL_UNSIGNED_BYTE;
+	case DataType::Short:         return GL_SHORT;
+	case DataType::UnsignedShort: return GL_UNSIGNED_SHORT;
+	case DataType::Int:           return GL_INT;
+	case DataType::UnsignedInt:   return GL_UNSIGNED_INT;
+	case DataType::Float:         return GL_FLOAT;
+	case DataType::Double:        return GL_DOUBLE;
+	default: std::unreachable();
+	}
+}
+
 inline GLenum EnumToValue(PixelFormat format) noexcept
 {
 	switch (format) {

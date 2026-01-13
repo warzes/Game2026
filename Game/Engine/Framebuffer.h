@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "NanoOpenGL3Advance.h"
+#include "OGLShader.h"
 
 #pragma region [ NEW Framebuffer ]
 

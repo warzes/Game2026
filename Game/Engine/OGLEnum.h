@@ -3,6 +3,18 @@
 //=============================================================================
 // Enum
 //=============================================================================
+enum class DataType : uint8_t
+{
+	Byte,
+	UnsignedByte,
+	Short,
+	UnsignedShort,
+	Int,
+	UnsignedInt,
+	Float,
+	Double
+};
+
 enum class PixelFormat : uint8_t
 {
 	None,
@@ -141,6 +153,7 @@ enum class CullFace : uint8_t
 //=============================================================================
 // Function declarations
 //=============================================================================
+inline GLenum EnumToValue(DataType type) noexcept;
 inline GLenum EnumToValue(PixelFormat format) noexcept;
 inline GLint EnumToValue(InternalFormat format) noexcept;
 inline GLenum EnumToValue(PixelType format) noexcept;

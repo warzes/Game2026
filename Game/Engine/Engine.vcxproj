@@ -110,6 +110,8 @@
     <ClInclude Include="NanoWindow.h" />
     <ClInclude Include="OGLContext.h" />
     <ClInclude Include="OGLEnum.h" />
+    <ClInclude Include="OGLShader.h" />
+    <ClInclude Include="OGLVertexAttribute.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
@@ -132,6 +134,8 @@
     <ClCompile Include="NanoScene.cpp" />
     <ClCompile Include="NanoWindow.cpp" />
     <ClCompile Include="OGLContext.cpp" />
+    <ClCompile Include="OGLShader.cpp" />
+    <ClCompile Include="OGLVertexAttribute.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
