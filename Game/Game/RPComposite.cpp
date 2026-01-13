@@ -46,7 +46,7 @@ bool RPComposite::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 		{glm::vec2(-1.0f,  1.0f), glm::vec2(0.0f, 1.0f)},
 	};
 
-	GLuint currentVBO = GetCurrentBuffer(GL_ARRAY_BUFFER);
+	GLuint currentVBO = GetCurrentBuffer(BufferTarget::Array);
 	m_vbo = CreateBuffer(BufferTarget::Array, BufferUsage::StaticDraw, vertices.size() * sizeof(QuadVertex), vertices.data());
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);

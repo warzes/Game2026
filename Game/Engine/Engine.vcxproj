@@ -108,6 +108,7 @@
     <ClInclude Include="NanoRenderTextures.h" />
     <ClInclude Include="NanoScene.h" />
     <ClInclude Include="NanoWindow.h" />
+    <ClInclude Include="OGLBuffer.h" />
     <ClInclude Include="OGLContext.h" />
     <ClInclude Include="OGLEnum.h" />
     <ClInclude Include="OGLShader.h" />
@@ -133,6 +134,7 @@
     <ClCompile Include="NanoRenderTextures.cpp" />
     <ClCompile Include="NanoScene.cpp" />
     <ClCompile Include="NanoWindow.cpp" />
+    <ClCompile Include="OGLBuffer.cpp" />
     <ClCompile Include="OGLContext.cpp" />
     <ClCompile Include="OGLShader.cpp" />
     <ClCompile Include="OGLVertexAttribute.cpp" />

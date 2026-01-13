@@ -71,6 +71,9 @@
     <ClInclude Include="OGLVertexAttribute.h">
       <Filter>Engine\OpenGL\OGLResources</Filter>
     </ClInclude>
+    <ClInclude Include="OGLBuffer.h">
+      <Filter>Engine\OpenGL\OGLResources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -132,6 +135,9 @@
       <Filter>Engine\OpenGL\OGLResources</Filter>
     </ClCompile>
     <ClCompile Include="OGLVertexAttribute.cpp">
+      <Filter>Engine\OpenGL\OGLResources</Filter>
+    </ClCompile>
+    <ClCompile Include="OGLBuffer.cpp">
       <Filter>Engine\OpenGL\OGLResources</Filter>
     </ClCompile>
   </ItemGroup>

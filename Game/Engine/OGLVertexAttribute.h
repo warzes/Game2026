@@ -14,6 +14,7 @@ struct VertexAttribute final
 	bool        normalized{ false };
 	bool        perInstance{ false };
 };
+
 void SpecifyVertexAttributes(size_t vertexSize, std::span<const VertexAttribute> attributes);
 
 //=============================================================================

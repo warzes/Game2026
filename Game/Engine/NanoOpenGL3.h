@@ -6,26 +6,6 @@
 // Enums
 //=============================================================================
 
-enum class BufferUsage : uint8_t
-{
-	StaticDraw,
-	DynamicDraw,
-	StreamDraw,
-	StaticRead,
-	DynamicRead,
-	StreamRead,
-	StaticCopy,
-	DynamicCopy,
-	StreamCopy
-};
-
-enum class BufferTarget : uint8_t
-{
-	Array,
-	ElementArray,
-	Uniform
-};
-
 enum class PolygonMode : uint8_t
 {
 	Point = 0,
@@ -69,7 +49,6 @@ GLenum GetColorFormatGL(ColorFormat format) noexcept;
 //=============================================================================
 // Object Handles
 //=============================================================================
-struct BufferHandle final { GLuint handle{ 0u }; };
 struct VertexArrayHandle final { GLuint handle{ 0u }; };
 struct Texture1DHandle final { GLuint handle{ 0u }; };
 struct Texture2DHandle final { GLuint handle{ 0u }; };
@@ -81,14 +60,6 @@ struct SamplerHandle final { GLuint handle{ 0u }; };
 
 struct RenderBufferHandle { GLuint handle{ 0u }; };
 struct FrameBufferHandle { GLuint handle{ 0u }; };
-
-//=============================================================================
-// Buffer
-//=============================================================================
-
-BufferHandle CreateBuffer(BufferTarget target, BufferUsage usage, size_t size, const void* data);
-
-void BufferSubData(BufferHandle bufferId, BufferTarget target, GLintptr offset, GLsizeiptr size, const void* data);
 
 //=============================================================================
 // Textures
@@ -251,7 +222,7 @@ void BindState(const GLState& state);
 //=============================================================================
 // Get GL States
 //=============================================================================
-GLuint GetCurrentBuffer(GLenum target);
+
 GLuint GetCurrentTexture(GLenum target);
 
 void EnableSRGB(bool enable);

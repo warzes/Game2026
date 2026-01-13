@@ -157,7 +157,6 @@ inline GLenum EnumToValue(DataType type) noexcept;
 inline GLenum EnumToValue(PixelFormat format) noexcept;
 inline GLint EnumToValue(InternalFormat format) noexcept;
 inline GLenum EnumToValue(PixelType format) noexcept;
-
 inline GLenum EnumToValue(PrimitiveMode mode) noexcept;
 inline GLenum EnumToValue(RasterizationMode mode) noexcept;
 inline GLenum EnumToValue(ComparisonFunc func) noexcept;

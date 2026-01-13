@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "NanoOpenGL3.h"
+#include "OGLBuffer.h"
 
 //=============================================================================
 // GPU Buffer

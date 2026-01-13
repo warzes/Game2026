@@ -11,8 +11,8 @@ Mesh::Mesh(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>&
 	m_material = material;
 	m_pbrMaterial = pbrMaterial;
 
-	GLuint currentVBO = GetCurrentBuffer(GL_ARRAY_BUFFER);
-	GLuint currentEBO = GetCurrentBuffer(GL_ELEMENT_ARRAY_BUFFER);
+	GLuint currentVBO = GetCurrentBuffer(BufferTarget::Array);
+	GLuint currentEBO = GetCurrentBuffer(BufferTarget::ElementArray);
 
 	// Buffers
 	m_vbo = CreateBuffer(BufferTarget::Array, BufferUsage::StaticDraw, vertices.size() * sizeof(MeshVertex), vertices.data());
