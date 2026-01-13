@@ -1,30 +1,19 @@
 ﻿#pragma once
 
+enum class RotateAngleY : uint8_t
+{
+	Rotate0,
+	Rotate90,
+	Rotate180,
+	Rotate270,
+};
+
 enum class TileGeometryType
 {
 	None,
 
-	FullBox,
-
-	NewBox,
-	NewBox2,
-
-	DiagonalLeftForwardBox,
-	DiagonalLeftBackBox,
-	DiagonalRightForwardBox,
-	DiagonalRightBackBox,
-
-	SlopedBoxLeft,
-	SlopedBoxRight,
-	SlopedBoxForward,
-	SlopedBoxBack,
-
-	SlopedBoxLeftBack,
-	SlopedBoxBackRight,
-	SlopedBoxRightForward,
-	SlopedBoxForwardLeft,
-
-	// TODO: stairs
+	Block00,
+	Block01,
 };
 
 struct TileInfo final
@@ -32,11 +21,11 @@ struct TileInfo final
 	bool operator==(const TileInfo&) const noexcept = default;
 
 	TileGeometryType type{ TileGeometryType::None };
-	float     height{ 1.0f };
 	glm::vec4 color{ 1.0f };
 	Texture2D textureFloor;
 	Texture2D textureCeil;
 	Texture2D textureWall;
+	RotateAngleY rotate{ RotateAngleY::Rotate0 };
 };
 
 constexpr size_t NoTile = std::numeric_limits<size_t>::max();

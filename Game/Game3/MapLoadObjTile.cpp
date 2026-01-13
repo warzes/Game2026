@@ -148,8 +148,6 @@ void ProcessModelData(const ObjModelData& model_data, const BlockModelInfo& mode
 							attrib.vertices[3 * idx.vertex_index + 1],
 							attrib.vertices[3 * idx.vertex_index + 2]
 						);
-						// скалирование
-						pos *= modelInfo.size;
 
 						rotation_matrix = glm::mat4(1.0f);
 						if (modelInfo.rotate.x != 0.0f) // Вращение вокруг X (pitch)

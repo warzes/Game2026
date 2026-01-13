@@ -5,14 +5,6 @@
 #define MAPCHUNKSIZE 30
 size_t tempMap[MAPCHUNKSIZE][MAPCHUNKSIZE][MAPCHUNKSIZE] = { 0 };
 //=============================================================================
-void AddBox(
-	const glm::vec3& center, float width, float height, float depth, const glm::vec3& color, std::vector<MeshVertex>& verticesWall, std::vector<unsigned int>& indicesWall, std::vector<MeshVertex>& verticesCeil, std::vector<unsigned int>& indicesCeil, std::vector<MeshVertex>& verticesFloor, std::vector<unsigned int>& indicesFloor,
-	bool enablePlane[6]);
-//=============================================================================
-void AddDiagonalBox(
-	const glm::vec3& center, float width, float height, float depth, const glm::vec3& color, std::vector<MeshVertex>& verticesWall, std::vector<unsigned int>& indicesWall, std::vector<MeshVertex>& verticesCeil, std::vector<unsigned int>& indicesCeil, std::vector<MeshVertex>& verticesFloor, std::vector<unsigned int>& indicesFloor,
-	bool enablePlane[6]);
-//=============================================================================
 size_t addMeshInfo(std::vector<MeshInfo>& meshInfo, Texture2D texId)
 {
 	for (size_t i = 0; i < meshInfo.size(); i++)
@@ -70,7 +62,7 @@ void optimizeMesh(std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indi
 bool MapChunk::Init()
 {
 	TileInfo tempTile;
-	tempTile.type = TileGeometryType::FullBox;
+	tempTile.type = TileGeometryType::Block00;
 	tempTile.textureWall = textures::LoadTexture2D("data/tiles/grass01_wall.png", ColorSpace::Linear, true);
 	tempTile.textureCeil = textures::LoadTexture2D("data/tiles/grass01_ceil.png");
 	tempTile.textureFloor = textures::LoadTexture2D("data/tiles/grass01.png");
@@ -98,12 +90,24 @@ bool MapChunk::Init()
 	tempMap[16][14][0] = NoTile;
 	tempMap[16][15][0] = NoTile;
 
-	//tempTile.type = TileGeometryType::NewBox;
-	//tempTile.textureWall = textures::LoadTexture2D("data/tiles/grass01_wall.png", ColorSpace::Linear, true);
-	//tempTile.textureCeil = textures::LoadTexture2D("data/tiles/grass01_ceil.png");
-	//tempTile.textureFloor = textures::LoadTexture2D("data/tiles/grass01.png");
-	////tempTile.height = 1.5f;
-	//tempMap[15][15][0] = TileBank::AddTileInfo(tempTile);
+
+
+	tempTile.type = TileGeometryType::Block01;
+	tempTile.textureWall = textures::LoadTexture2D("data/tiles/grass01_wall.png", ColorSpace::Linear, true);
+	tempTile.textureCeil = textures::LoadTexture2D("data/tiles/grass01_ceil.png");
+	tempTile.textureFloor = textures::LoadTexture2D("data/tiles/grass01.png");
+	tempTile.rotate = RotateAngleY::Rotate270;
+	tempMap[16][17][1] = TileBank::AddTileInfo(tempTile);
+	tempTile.rotate = RotateAngleY::Rotate0;
+	tempMap[17][16][1] = TileBank::AddTileInfo(tempTile);
+	tempTile.rotate = RotateAngleY::Rotate180;
+	tempMap[17][18][1] = TileBank::AddTileInfo(tempTile);
+	tempTile.rotate = RotateAngleY::Rotate90;
+	tempMap[18][17][1] = TileBank::AddTileInfo(tempTile);
+
+	tempTile.type = TileGeometryType::Block00;
+	tempTile.rotate = RotateAngleY::Rotate0;
+	tempMap[17][17][1] = TileBank::AddTileInfo(tempTile);
 
 	//tempTile.type = TileGeometryType::NewBox2;
 	//tempTile.textureWall = textures::LoadTexture2D("data/tiles/grass01_wall.png", ColorSpace::Linear, true);
@@ -153,27 +157,29 @@ void MapChunk::generateBufferMap()
 				size_t idFloor = addMeshInfo(meshInfo, id.textureFloor);
 				size_t idCeil = addMeshInfo(meshInfo, id.textureCeil);
 
-				float heightBlock = id.height;
-
-				glm::vec3 center = glm::vec3(x, z + heightBlock / 2.0f, y);
+				glm::vec3 center = glm::vec3(x, z + 0.5f, y);
 
 				BlockModelInfo blockModelInfo{};
 				blockModelInfo.color = id.color;
 				blockModelInfo.center = center;
-				blockModelInfo.size = { 1.0f, heightBlock, 1.0f };
 				blockModelInfo.rotate = glm::vec3(0.0f);
+				if (id.rotate == RotateAngleY::Rotate0)
+					blockModelInfo.rotate.y = 0.0f;
+				else if (id.rotate == RotateAngleY::Rotate90)
+					blockModelInfo.rotate.y = glm::radians(90.0f);
+				else if (id.rotate == RotateAngleY::Rotate180)
+					blockModelInfo.rotate.y = glm::radians(180.0f);
+				else if (id.rotate == RotateAngleY::Rotate270)
+					blockModelInfo.rotate.y = glm::radians(270.0f);
+				
 				setVisibleBlock(id, blockModelInfo, ix, iy, iz);
-				if (id.type == TileGeometryType::FullBox)
+				if (id.type == TileGeometryType::Block00)
 				{
 					blockModelInfo.modelPath = "data/tiles/Block00.obj";
 				}
-				else if (id.type == TileGeometryType::NewBox)
+				else if (id.type == TileGeometryType::Block01)
 				{
-					blockModelInfo.modelPath = "data/tiles/test/222.obj";
-				}
-				else if (id.type == TileGeometryType::NewBox2)
-				{
-					blockModelInfo.modelPath = "data/tiles/test/333.obj";
+					blockModelInfo.modelPath = "data/tiles/Block01.obj";
 				}
 				AddObjModel(blockModelInfo,
 					meshInfo[idWall].vertices, meshInfo[idWall].indices,
@@ -200,7 +206,7 @@ bool testVisBlock(size_t x, size_t y, size_t z)
 	if (tempMap[x][y][z] == NoTile) return false;
 
 	const auto& b = *TileBank::GetTileInfo(tempMap[x][y][z]);
-	if (b.type == TileGeometryType::FullBox)
+	if (b.type == TileGeometryType::Block00)
 	{
 		return true;
 	}
@@ -213,7 +219,7 @@ bool testVisBlock(size_t x, size_t y, size_t z)
 //=============================================================================
 void MapChunk::setVisibleBlock(const TileInfo& ti, BlockModelInfo& blockModelInfo, size_t x, size_t y, size_t z)
 {
-	if (ti.type == TileGeometryType::FullBox)
+	if (ti.type == TileGeometryType::Block00)
 	{
 		if (x > 0) blockModelInfo.rightVisible = !testVisBlock(x - 1, y, z);
 		if (x < MAPCHUNKSIZE - 1) blockModelInfo.leftVisible = !testVisBlock(x + 1, y, z);
@@ -228,15 +234,5 @@ void MapChunk::setVisibleBlock(const TileInfo& ti, BlockModelInfo& blockModelInf
 	{
 		// TODO: другие варианты блоков
 	}
-
-	//if (ix > 0 && tempMap[ix-1][iy][iz] != NoTile)
-	//	blockModelInfo.enablePlane[3] = false; // left
-	//if (ix < MAPCHUNKSIZE-1 && tempMap[ix + 1][iy][iz] != NoTile)
-	//	blockModelInfo.enablePlane[1] = false; // right
-
-	//if (iy > 0 && tempMap[ix][iy - 1][iz] != NoTile)
-	//	blockModelInfo.enablePlane[0] = false; // forward
-	//if (iy < MAPCHUNKSIZE - 1 && tempMap[ix][iy + 1][iz] != NoTile)
-	//	blockModelInfo.enablePlane[2] = false; // back
 }
 //=============================================================================

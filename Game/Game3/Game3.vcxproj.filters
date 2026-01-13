@@ -16,9 +16,6 @@
     <ClCompile Include="Map.cpp">
       <Filter>World</Filter>
     </ClCompile>
-    <ClCompile Include="MapGenGeom.cpp">
-      <Filter>World</Filter>
-    </ClCompile>
     <ClCompile Include="TileMap.cpp">
       <Filter>World</Filter>
     </ClCompile>

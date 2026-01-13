@@ -6,7 +6,6 @@ struct BlockModelInfo final
 	glm::vec3 color{ 1.0f };
 
 	glm::vec3 center{ 0.0f };
-	glm::vec3 size{ 1.0f };
 	glm::vec3 rotate{ 0.0f }; // Порядок вращения: Z (roll), Y (yaw), X (pitch) в радианах
 
 	bool forwardVisible{ true };
