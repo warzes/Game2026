@@ -150,6 +150,56 @@ void OGLContext::SetRasterizationMode(RasterizationMode rasterizationMode)
 	glPolygonMode(GL_FRONT_AND_BACK, EnumToValue(rasterizationMode));
 }
 //=============================================================================
+void OGLContext::SetStencilAlgorithm(ComparisonFunc algorithm, int32_t reference, uint32_t mask)
+{
+	glStencilFunc(EnumToValue(algorithm), reference, mask);
+}
+//=============================================================================
+void OGLContext::SetDepthAlgorithm(ComparisonFunc algorithm)
+{
+	glDepthFunc(EnumToValue(algorithm));
+}
+//=============================================================================
+void OGLContext::SetStencilMask(uint32_t mask)
+{
+	glStencilMask(mask);
+}
+//=============================================================================
+void OGLContext::SetStencilOperations(Operation stencilFail, Operation depthFail, Operation bothPass)
+{
+	glStencilOp(EnumToValue(stencilFail), EnumToValue(depthFail), EnumToValue(bothPass));
+}
+//=============================================================================
+void OGLContext::SetBlendingFunction(BlendFactor sourceFactor, BlendFactor destinationFactor)
+{
+	glBlendFunc(EnumToValue(sourceFactor), EnumToValue(destinationFactor));
+}
+//=============================================================================
+void OGLContext::SetBlendingEquation(BlendEquation equation)
+{
+	glBlendEquation(EnumToValue(equation));
+}
+//=============================================================================
+void OGLContext::SetCullFace(CullFace cullFace)
+{
+	glCullFace(EnumToValue(cullFace));
+}
+//=============================================================================
+void OGLContext::SetDepthWriting(bool enable)
+{
+	glDepthMask(enable);
+}
+//=============================================================================
+void OGLContext::SetColorWriting(bool enableRed, bool enableGreen, bool enableBlue, bool enableAlpha)
+{
+	glColorMask(enableRed, enableGreen, enableBlue, enableAlpha);
+}
+//=============================================================================
+void OGLContext::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+{
+	glViewport(x, y, width, height);
+}
+//=============================================================================
 void OGLContext::DrawElements(PrimitiveMode primitiveMode, uint32_t indexCount)
 {
 	glDrawElements(EnumToValue(primitiveMode), indexCount, GL_UNSIGNED_INT, nullptr);
@@ -169,4 +219,14 @@ void OGLContext::DrawArraysInstanced(PrimitiveMode primitiveMode, uint32_t verte
 {
 	glDrawArraysInstanced(EnumToValue(primitiveMode), 0, vertexCount, instances);
 }
+//=============================================================================
+//void OGLContext::DispatchCompute(uint32_t x, uint32_t y, uint32_t z)
+//{
+//	glDispatchCompute(x, y, z);
+//}
+//=============================================================================
+//void MemoryBarrier(MemoryBarrierFlags barriers)
+//{
+//	glMemoryBarrier(EnumToValue(_barriers));
+//}
 //=============================================================================

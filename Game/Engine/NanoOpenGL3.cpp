@@ -22,48 +22,6 @@ GLenum GetDataTypeGL(DataType dataType) noexcept
 	return (dataType == DataType::Float) ? GL_FLOAT : GL_UNSIGNED_BYTE;
 }
 //=============================================================================
-[[nodiscard]] inline GLenum GetGLEnum(ComparisonFunc func) noexcept
-{
-	switch (func) {
-	case ComparisonFunc::Never:        return GL_NEVER;
-	case ComparisonFunc::Less:         return GL_LESS;
-	case ComparisonFunc::Equal:        return GL_EQUAL;
-	case ComparisonFunc::LessEqual:    return GL_LEQUAL;
-	case ComparisonFunc::Greater:      return GL_GREATER;
-	case ComparisonFunc::NotEqual:     return GL_NOTEQUAL;
-	case ComparisonFunc::GreaterEqual: return GL_GEQUAL;
-	case ComparisonFunc::Always:       return GL_ALWAYS;
-	default: std::unreachable();
-	}
-}
-//=============================================================================
-[[nodiscard]] inline GLenum GetGLEnum(BlendFactor factor) noexcept
-{
-	switch (factor) {
-	case BlendFactor::Zero:             return GL_ZERO;
-	case BlendFactor::One:              return GL_ONE;
-	case BlendFactor::SrcColor:         return GL_SRC_COLOR;
-	case BlendFactor::OneMinusSrcColor: return GL_ONE_MINUS_SRC_COLOR;
-	case BlendFactor::DstColor:         return GL_DST_COLOR;
-	case BlendFactor::OneMinusDstColor: return GL_ONE_MINUS_DST_COLOR;
-	case BlendFactor::SrcAlpha:         return GL_SRC_ALPHA;
-	case BlendFactor::OneMinusSrcAlpha: return GL_ONE_MINUS_SRC_ALPHA;
-	case BlendFactor::DstAlpha:         return GL_DST_ALPHA;
-	case BlendFactor::OneMinusDstAlpha: return GL_ONE_MINUS_DST_ALPHA;
-	default: std::unreachable();
-	}
-}
-//=============================================================================
-[[nodiscard]] inline GLenum GetGLEnum(CullFace cull) noexcept
-{
-	switch (cull) {
-	case CullFace::Front:        return GL_FRONT;
-	case CullFace::Back:         return GL_BACK;
-	case CullFace::FrontAndBack: return GL_FRONT_AND_BACK;
-	default: std::unreachable();
-	}
-}
-//=============================================================================
 [[nodiscard]] inline GLenum GetGLEnum(BufferTarget type) noexcept
 {
 	switch (type) {
@@ -963,7 +921,7 @@ SamplerHandle CreateSamplerState(const SamplerStateInfo& info)
 	if (info.compareEnabled)
 	{
 		glSamplerParameteri(sampler.handle, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-		glSamplerParameteri(sampler.handle, GL_TEXTURE_COMPARE_FUNC, static_cast<GLint>(GetGLEnum(info.comparisonFunc)));
+		glSamplerParameteri(sampler.handle, GL_TEXTURE_COMPARE_FUNC, static_cast<GLint>(EnumToValue(info.comparisonFunc)));
 	}
 	else
 	{
@@ -1095,7 +1053,7 @@ void BindState(const GLState& state)
 	}
 	if (cachedState.restoreDepth || cachedState.depthFunc != state.depthState.depthFunc)
 	{
-		glDepthFunc(GetGLEnum(state.depthState.depthFunc));
+		glDepthFunc(EnumToValue(state.depthState.depthFunc));
 		cachedState.depthFunc = state.depthState.depthFunc;
 	}
 	if (cachedState.restoreDepth || cachedState.depthMask != state.depthState.depthMask)
@@ -1117,8 +1075,8 @@ void BindState(const GLState& state)
 		cachedState.frontRef != state.stencilState.frontRef || cachedState.backRef != state.stencilState.backRef ||
 		cachedState.frontMask != state.stencilState.frontMask || cachedState.backMask != state.stencilState.backMask)
 	{
-		glStencilFuncSeparate(GL_FRONT, GetGLEnum(state.stencilState.frontFunc), state.stencilState.frontRef, state.stencilState.frontMask);
-		glStencilFuncSeparate(GL_BACK, GetGLEnum(state.stencilState.backFunc), state.stencilState.backRef, state.stencilState.backMask);
+		glStencilFuncSeparate(GL_FRONT, EnumToValue(state.stencilState.frontFunc), state.stencilState.frontRef, state.stencilState.frontMask);
+		glStencilFuncSeparate(GL_BACK, EnumToValue(state.stencilState.backFunc), state.stencilState.backRef, state.stencilState.backMask);
 		cachedState.frontFunc = state.stencilState.frontFunc;
 		cachedState.backFunc = state.stencilState.backFunc;
 		cachedState.frontRef = state.stencilState.frontRef;
@@ -1140,10 +1098,10 @@ void BindState(const GLState& state)
 		cachedState.srcAlpha != state.blendState.srcAlpha || cachedState.dstAlpha != state.blendState.dstAlpha)
 	{
 		glBlendFuncSeparate(
-			GetGLEnum(state.blendState.srcRGB),
-			GetGLEnum(state.blendState.dstRGB),
-			GetGLEnum(state.blendState.srcAlpha),
-			GetGLEnum(state.blendState.dstAlpha)
+			EnumToValue(state.blendState.srcRGB),
+			EnumToValue(state.blendState.dstRGB),
+			EnumToValue(state.blendState.srcAlpha),
+			EnumToValue(state.blendState.dstAlpha)
 		);
 		cachedState.srcRGB = state.blendState.srcRGB;
 		cachedState.dstRGB = state.blendState.dstRGB;
@@ -1186,7 +1144,7 @@ void BindState(const GLState& state)
 	}
 	if (cachedState.restoreCullState || cachedState.cullFace != state.cullState.cullFace)
 	{
-		glCullFace(GetGLEnum(state.cullState.cullFace));
+		glCullFace(EnumToValue(state.cullState.cullFace));
 		cachedState.cullFace = state.cullState.cullFace;
 	}
 	cachedState.restoreCullState = false;

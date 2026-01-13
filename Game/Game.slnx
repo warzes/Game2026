@@ -2,23 +2,26 @@
   <Configurations>
     <Platform Name="x64" />
   </Configurations>
-  <Folder Name="/Элементы решения/">
+  <Folder Name="/doc/">
     <File Path="ref.md" />
     <File Path="TODO.md" />
   </Folder>
+  <Folder Name="/other/">
+    <Project Path="Game/Game.vcxproj" Id="904b36c2-e631-4e7e-b7e4-7c12fffa894a">
+      <BuildDependency Project="3rdparty/3rdparty.vcxproj" />
+      <BuildDependency Project="Engine/Engine.vcxproj" />
+    </Project>
+    <Project Path="Game2/Game2.vcxproj" Id="b52491d5-3459-4686-86af-70e435db0ebd">
+      <BuildDependency Project="3rdparty/3rdparty.vcxproj" />
+      <BuildDependency Project="Engine/Engine.vcxproj" />
+    </Project>
+    <Project Path="MinimalOGL/MinimalOGL.vcxproj" Id="d449feb4-cb4e-4f84-a2b5-c3c0bcd9b737" />
+    <Project Path="Pico3D/Pico3D.vcxproj" />
+  </Folder>
   <Project Path="3rdparty/3rdparty.vcxproj" Id="09962266-edc2-47d4-9674-7962bbfd0cf1" />
   <Project Path="Engine/Engine.vcxproj" Id="c177f748-e629-4e4e-99f8-137feb5e1968" />
-  <Project Path="Game/Game.vcxproj" Id="904b36c2-e631-4e7e-b7e4-7c12fffa894a">
-    <BuildDependency Project="3rdparty/3rdparty.vcxproj" />
-    <BuildDependency Project="Engine/Engine.vcxproj" />
-  </Project>
-  <Project Path="Game2/Game2.vcxproj" Id="b52491d5-3459-4686-86af-70e435db0ebd">
-    <BuildDependency Project="3rdparty/3rdparty.vcxproj" />
-    <BuildDependency Project="Engine/Engine.vcxproj" />
-  </Project>
   <Project Path="Game3/Game3.vcxproj" Id="cc75424c-689c-4b3b-84ab-3642bd9b8c2a">
     <BuildDependency Project="3rdparty/3rdparty.vcxproj" />
     <BuildDependency Project="Engine/Engine.vcxproj" />
   </Project>
-  <Project Path="MinimalOGL/MinimalOGL.vcxproj" Id="d449feb4-cb4e-4f84-a2b5-c3c0bcd9b737" />
 </Solution>

@@ -26,39 +26,6 @@ enum class BufferTarget : uint8_t
 	Uniform
 };
 
-enum class ComparisonFunc : uint8_t
-{
-	Never,
-	Less,
-	Equal,
-	LessEqual,
-	Greater,
-	NotEqual,
-	GreaterEqual,
-	Always
-};
-
-enum class BlendFactor : uint8_t
-{
-	Zero = 0,
-	One,
-	SrcColor,
-	OneMinusSrcColor,
-	DstColor,
-	OneMinusDstColor,
-	SrcAlpha,
-	OneMinusSrcAlpha,
-	DstAlpha,
-	OneMinusDstAlpha
-};
-
-enum class CullFace : uint8_t
-{
-	Front = 0,
-	Back,
-	FrontAndBack
-};
-
 enum class PolygonMode : uint8_t
 {
 	Point = 0,
