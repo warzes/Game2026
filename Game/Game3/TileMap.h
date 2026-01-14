@@ -10,18 +10,24 @@ enum class RotateAngleY : uint8_t
 
 enum class TileGeometryType
 {
-	None,
-
 	Block00,
 	Block01,
 	Block02,
+	Block03,
+	Block04,
+	Block05,
+	Block06,
+	Block07,
+	Block08,
+	Block09,
+	Block10,
 };
 
 struct TileInfo final
 {
 	bool operator==(const TileInfo&) const noexcept = default;
 
-	TileGeometryType type{ TileGeometryType::None };
+	TileGeometryType type{};
 	glm::vec4 color{ 1.0f };
 	Texture2D textureFloor;
 	Texture2D textureCeil;
@@ -35,5 +41,5 @@ namespace TileBank
 {
 	size_t AddTileInfo(const TileInfo& temp);
 
-	TileInfo* GetTileInfo(size_t id);
+	const TileInfo& GetTileInfo(size_t id);
 } // namespace TileBank

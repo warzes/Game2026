@@ -98,6 +98,7 @@
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MapGrid.cpp" />
     <ClCompile Include="MapLoadObjTile.cpp" />
     <ClCompile Include="RenderPass2.cpp" />
     <ClCompile Include="RenderPassFinal.cpp" />
@@ -114,6 +115,7 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="GameWorldData.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MapGrid.h" />
     <ClInclude Include="MapLoadObjTile.h" />
     <ClInclude Include="RenderPass2.h" />
     <ClInclude Include="RenderPassFinal.h" />

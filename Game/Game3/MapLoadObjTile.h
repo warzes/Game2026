@@ -16,7 +16,4 @@ struct BlockModelInfo final
 	bool bottomVisible{ true };
 };
 
-void AddObjModel(const BlockModelInfo& modelInfo, 
-	std::vector<MeshVertex>& verticesWall, std::vector<unsigned int>& indicesWall,
-	std::vector<MeshVertex>& verticesCeil, std::vector<unsigned int>& indicesCeil,
-	std::vector<MeshVertex>& verticesFloor, std::vector<unsigned int>& indicesFloor);
+void AddObjModel(const BlockModelInfo& modelInfo, MeshInfo& meshWall, MeshInfo& meshCeil, MeshInfo& meshFloor);

@@ -16,9 +16,9 @@ size_t TileBank::AddTileInfo(const TileInfo& temp)
 	return TileInfoCache.size() - 1;
 }
 //=============================================================================
-TileInfo* TileBank::GetTileInfo(size_t id)
+const TileInfo& TileBank::GetTileInfo(size_t id)
 {
 	assert(id < TileInfoCache.size());
-	return &TileInfoCache[id];
+	return TileInfoCache[id];
 }
 //=============================================================================

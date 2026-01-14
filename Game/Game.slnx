@@ -3,6 +3,7 @@
     <Platform Name="x64" />
   </Configurations>
   <Folder Name="/doc/">
+    <File Path="../README.md" />
     <File Path="ref.md" />
     <File Path="TODO.md" />
   </Folder>

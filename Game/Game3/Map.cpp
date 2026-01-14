@@ -59,6 +59,35 @@ void optimizeMesh(std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indi
 	//vertices = optimizedVertices;
 }
 //=============================================================================
+inline std::string getFileNameBlock(TileGeometryType type)
+{
+	switch (type)
+	{
+	case TileGeometryType::Block00: return "data/tiles/Block00.obj";
+	case TileGeometryType::Block01: return "data/tiles/Block01.obj";
+	case TileGeometryType::Block02: return "data/tiles/Block02.obj";
+	case TileGeometryType::Block03: return "data/tiles/Block03.obj";
+	case TileGeometryType::Block04: return "data/tiles/Block04.obj";
+	case TileGeometryType::Block05: return "data/tiles/Block05.obj";
+	case TileGeometryType::Block06: return "data/tiles/Block06.obj";
+	case TileGeometryType::Block07: return "data/tiles/Block07.obj";
+	case TileGeometryType::Block08: return "data/tiles/Block08.obj";
+	case TileGeometryType::Block09: return "data/tiles/Block09.obj";
+	case TileGeometryType::Block10: return "data/tiles/Block10.obj";
+	default: std::unreachable();
+	}
+}
+//=============================================================================
+inline glm::vec3 getRotateAngle(RotateAngleY angle)
+{
+	glm::vec3 r(0.0f);
+	if (angle == RotateAngleY::Rotate0)        r.y = 0.0f;
+	else if (angle == RotateAngleY::Rotate90)  r.y = glm::radians(90.0f);
+	else if (angle == RotateAngleY::Rotate180) r.y = glm::radians(180.0f);
+	else if (angle == RotateAngleY::Rotate270) r.y = glm::radians(270.0f);
+	return r;
+}
+//=============================================================================
 bool MapChunk::Init()
 {
 	TileInfo tempTile;
@@ -66,7 +95,6 @@ bool MapChunk::Init()
 	tempTile.textureWall = textures::LoadTexture2D("data/tiles/grass01_wall.png", ColorSpace::Linear, true);
 	tempTile.textureCeil = textures::LoadTexture2D("data/tiles/grass01_ceil.png");
 	tempTile.textureFloor = textures::LoadTexture2D("data/tiles/grass01.png");
-
 	for (size_t y = 0; y < MAPCHUNKSIZE; y++)
 	{
 		for (size_t x = 0; x < MAPCHUNKSIZE; x++)
@@ -74,13 +102,11 @@ bool MapChunk::Init()
 			for (size_t z = 0; z < MAPCHUNKSIZE; z++)
 			{
 				tempMap[x][y][z] = NoTile;
-				
 			}
 
 			tempMap[x][y][0] = TileBank::AddTileInfo(tempTile);
 		}
 	}
-	tempTile.type = TileGeometryType::None;
 
 	tempMap[14][14][0] = NoTile;
 	tempMap[14][15][0] = NoTile;
@@ -89,8 +115,6 @@ bool MapChunk::Init()
 	tempMap[15][16][0] = NoTile;
 	tempMap[16][14][0] = NoTile;
 	tempMap[16][15][0] = NoTile;
-
-
 
 	tempTile.type = TileGeometryType::Block01;
 	tempTile.textureWall = textures::LoadTexture2D("data/tiles/grass01_wall.png", ColorSpace::Linear, true);
@@ -122,7 +146,7 @@ void MapChunk::generateBufferMap()
 {
 	std::vector<MeshInfo> meshInfo;
 
-	const float mapOffset = MAPCHUNKSIZE / 2;
+	const float mapOffset = MAPCHUNKSIZE / 2.0f;
 	for (size_t iy = 0; iy < MAPCHUNKSIZE; iy++)
 	{
 		for (size_t ix = 0; ix < MAPCHUNKSIZE; ix++)
@@ -131,49 +155,25 @@ void MapChunk::generateBufferMap()
 			{
 				if (tempMap[ix][iy][iz] == NoTile) continue;
 
-				auto id = *TileBank::GetTileInfo(tempMap[ix][iy][iz]);
-				if (id.type == TileGeometryType::None) continue;
+				const auto& id = TileBank::GetTileInfo(tempMap[ix][iy][iz]);
 
-				float x = float(ix) - mapOffset;
-				float y = float(iy) - mapOffset;
-				float z = float(iz);
-
-				size_t idWall = addMeshInfo(meshInfo, id.textureWall);
-				size_t idFloor = addMeshInfo(meshInfo, id.textureFloor);
-				size_t idCeil = addMeshInfo(meshInfo, id.textureCeil);
-
-				glm::vec3 center = glm::vec3(x, z + 0.5f, y);
+				const glm::vec3 center = glm::vec3(
+					float(ix) - mapOffset,
+					float(iz) + 0.5f,
+					float(iy) - mapOffset);
 
 				BlockModelInfo blockModelInfo{};
 				blockModelInfo.color = id.color;
 				blockModelInfo.center = center;
-				blockModelInfo.rotate = glm::vec3(0.0f);
-				if (id.rotate == RotateAngleY::Rotate0)
-					blockModelInfo.rotate.y = 0.0f;
-				else if (id.rotate == RotateAngleY::Rotate90)
-					blockModelInfo.rotate.y = glm::radians(90.0f);
-				else if (id.rotate == RotateAngleY::Rotate180)
-					blockModelInfo.rotate.y = glm::radians(180.0f);
-				else if (id.rotate == RotateAngleY::Rotate270)
-					blockModelInfo.rotate.y = glm::radians(270.0f);
-				
+				blockModelInfo.rotate = getRotateAngle(id.rotate);
 				setVisibleBlock(id, blockModelInfo, ix, iy, iz);
-				if (id.type == TileGeometryType::Block00)
-				{
-					blockModelInfo.modelPath = "data/tiles/Block00.obj";
-				}
-				else if (id.type == TileGeometryType::Block01)
-				{
-					blockModelInfo.modelPath = "data/tiles/Block01.obj";
-				}
-else if (id.type == TileGeometryType::Block02)
-				{
-					blockModelInfo.modelPath = "data/tiles/Block02.obj";
-				}
-				AddObjModel(blockModelInfo,
-					meshInfo[idWall].vertices, meshInfo[idWall].indices,
-					meshInfo[idCeil].vertices, meshInfo[idCeil].indices,
-					meshInfo[idFloor].vertices, meshInfo[idFloor].indices);
+				blockModelInfo.modelPath = getFileNameBlock(id.type);
+
+				size_t idWall  = addMeshInfo(meshInfo, id.textureWall);
+				size_t idFloor = addMeshInfo(meshInfo, id.textureFloor);
+				size_t idCeil  = addMeshInfo(meshInfo, id.textureCeil);
+
+				AddObjModel(blockModelInfo, meshInfo[idWall], meshInfo[idCeil], meshInfo[idFloor]);
 			}
 		}
 	}
@@ -189,39 +189,35 @@ else if (id.type == TileGeometryType::Block02)
 	m_model.model.Create(meshInfo);
 }
 //=============================================================================
-bool testVisBlock(size_t x, size_t y, size_t z)
+bool testVisBlock(TileGeometryType tile, size_t x, size_t y, size_t z)
 {
 	if ((x >= MAPCHUNKSIZE) || (y >= MAPCHUNKSIZE) || (z >= MAPCHUNKSIZE)) return false;
 	if (tempMap[x][y][z] == NoTile) return false;
 
-	const auto& b = *TileBank::GetTileInfo(tempMap[x][y][z]);
-	if (b.type == TileGeometryType::Block00)
+	if (tile == TileGeometryType::Block00)
 	{
-		return true;
-	}
-	else
-	{
-		// TODO: другие варианты блоков
+		const auto& b = TileBank::GetTileInfo(tempMap[x][y][z]);
+		if (b.type == TileGeometryType::Block00)
+		{
+			return true;
+		}
+		else
+		{
+			// TODO: другие варианты блоков
+		}
 	}
 	return false;
 }
 //=============================================================================
 void MapChunk::setVisibleBlock(const TileInfo& ti, BlockModelInfo& blockModelInfo, size_t x, size_t y, size_t z)
 {
-	if (ti.type == TileGeometryType::Block00)
-	{
-		if (x > 0) blockModelInfo.rightVisible = !testVisBlock(x - 1, y, z);
-		if (x < MAPCHUNKSIZE - 1) blockModelInfo.leftVisible = !testVisBlock(x + 1, y, z);
+	if (x > 0) blockModelInfo.rightVisible = !testVisBlock(ti.type, x - 1, y, z);
+	if (x < MAPCHUNKSIZE - 1) blockModelInfo.leftVisible = !testVisBlock(ti.type, x + 1, y, z);
 
-		if (y > 0) blockModelInfo.forwardVisible = !testVisBlock(x, y - 1, z);
-		if (y < MAPCHUNKSIZE - 1) blockModelInfo.backVisible = !testVisBlock(x, y + 1, z);
+	if (y > 0) blockModelInfo.forwardVisible = !testVisBlock(ti.type, x, y - 1, z);
+	if (y < MAPCHUNKSIZE - 1) blockModelInfo.backVisible = !testVisBlock(ti.type, x, y + 1, z);
 
-		if (z > 0) blockModelInfo.bottomVisible = !testVisBlock(x, y, z - 1);
-		if (z < MAPCHUNKSIZE - 1) blockModelInfo.topVisible = !testVisBlock(x, y, z + 1);
-	}
-	else
-	{
-		// TODO: другие варианты блоков
-	}
+	if (z > 0) blockModelInfo.bottomVisible = !testVisBlock(ti.type, x, y, z - 1);
+	if (z < MAPCHUNKSIZE - 1) blockModelInfo.topVisible = !testVisBlock(ti.type, x, y, z + 1);
 }
 //=============================================================================

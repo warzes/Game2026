@@ -14,13 +14,16 @@
       <Filter>RenderPass</Filter>
     </ClCompile>
     <ClCompile Include="Map.cpp">
-      <Filter>World</Filter>
-    </ClCompile>
-    <ClCompile Include="TileMap.cpp">
-      <Filter>World</Filter>
+      <Filter>World\Map</Filter>
     </ClCompile>
     <ClCompile Include="MapLoadObjTile.cpp">
-      <Filter>World</Filter>
+      <Filter>World\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="TileMap.cpp">
+      <Filter>World\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="MapGrid.cpp">
+      <Filter>World\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -39,17 +42,20 @@
     <ClInclude Include="RenderPassFinal.h">
       <Filter>RenderPass</Filter>
     </ClInclude>
-    <ClInclude Include="Map.h">
-      <Filter>World</Filter>
-    </ClInclude>
     <ClInclude Include="GameModel.h">
       <Filter>GameScene</Filter>
     </ClInclude>
-    <ClInclude Include="TileMap.h">
-      <Filter>World</Filter>
+    <ClInclude Include="Map.h">
+      <Filter>World\Map</Filter>
     </ClInclude>
     <ClInclude Include="MapLoadObjTile.h">
-      <Filter>World</Filter>
+      <Filter>World\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="TileMap.h">
+      <Filter>World\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="MapGrid.h">
+      <Filter>World\Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +73,12 @@
     </Filter>
     <Filter Include="_DOC">
       <UniqueIdentifier>{59dac45f-00fb-48c6-8781-6501fd5a4420}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="World\Map">
+      <UniqueIdentifier>{81b9766e-231e-4f0c-9191-76159969e393}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="World\Editor">
+      <UniqueIdentifier>{6965e4e5-992e-4486-9912-4d004bbedee4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

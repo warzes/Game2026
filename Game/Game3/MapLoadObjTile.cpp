@@ -23,10 +23,7 @@ struct IndexLess
 	}
 };
 //=============================================================================
-void ProcessModelData(const ObjModelData& model_data, const BlockModelInfo& modelInfo,
-	std::vector<MeshVertex>& verticesWall, std::vector<unsigned int>& indicesWall,
-	std::vector<MeshVertex>& verticesCeil, std::vector<unsigned int>& indicesCeil,
-	std::vector<MeshVertex>& verticesFloor, std::vector<unsigned int>& indicesFloor)
+void ProcessModelData(const ObjModelData& model_data, const BlockModelInfo& modelInfo, MeshInfo& meshWall, MeshInfo& meshCeil, MeshInfo& meshFloor)
 {
 	glm::mat4 rotation_matrix(1.0f);
 
@@ -71,48 +68,48 @@ void ProcessModelData(const ObjModelData& model_data, const BlockModelInfo& mode
 		{
 			if (!modelInfo.bottomVisible) continue;
 
-			vertices = &verticesCeil;
-			indices = &indicesCeil;
+			vertices = &meshCeil.vertices;
+			indices = &meshCeil.indices;
 		}
 		else if (name == "top")
 		{
 			if (!modelInfo.topVisible) continue;
 
-			vertices = &verticesFloor;
-			indices = &indicesFloor;
+			vertices = &meshFloor.vertices;
+			indices = &meshFloor.indices;
 		}
 		else if (name == "left")
 		{
 			if (!modelInfo.leftVisible) continue;
 
-			vertices = &verticesWall;
-			indices = &indicesWall;
+			vertices = &meshWall.vertices;
+			indices = &meshWall.indices;
 		}
 		else if (name == "right")
 		{
 			if (!modelInfo.rightVisible) continue;
 
-			vertices = &verticesWall;
-			indices = &indicesWall;
+			vertices = &meshWall.vertices;
+			indices = &meshWall.indices;
 		}
 		else if (name == "forward")
 		{
 			if (!modelInfo.forwardVisible) continue;
 
-			vertices = &verticesWall;
-			indices = &indicesWall;
+			vertices = &meshWall.vertices;
+			indices = &meshWall.indices;
 		}
 		else if (name == "back")
 		{
 			if (!modelInfo.backVisible) continue;
 
-			vertices = &verticesWall;
-			indices = &indicesWall;
+			vertices = &meshWall.vertices;
+			indices = &meshWall.indices;
 		}
 		else
 		{
-			vertices = &verticesWall;
-			indices = &indicesWall;
+			vertices = &meshWall.vertices;
+			indices = &meshWall.indices;
 		}
 
 		// Используем std::map с пользовательской функцией сравнения для tinyobj::index_t
@@ -219,10 +216,7 @@ void ProcessModelData(const ObjModelData& model_data, const BlockModelInfo& mode
 	}
 }
 //=============================================================================
-void AddObjModel(const BlockModelInfo& modelInfo, 
-	std::vector<MeshVertex>& verticesWall, std::vector<unsigned int>& indicesWall,
-	std::vector<MeshVertex>& verticesCeil, std::vector<unsigned int>& indicesCeil,
-	std::vector<MeshVertex>& verticesFloor, std::vector<unsigned int>& indicesFloor)
+void AddObjModel(const BlockModelInfo& modelInfo, MeshInfo& meshWall, MeshInfo& meshCeil, MeshInfo& meshFloor)
 {
 	// Проверяем, есть ли модель в кэше
 	auto it = model_cache.find(modelInfo.modelPath);
@@ -230,7 +224,7 @@ void AddObjModel(const BlockModelInfo& modelInfo,
 	{
 		// Используем кэшированные данные
 		const auto& cached_data = it->second;
-		ProcessModelData(cached_data, modelInfo, verticesWall, indicesWall, verticesCeil, indicesCeil, verticesFloor, indicesFloor);
+		ProcessModelData(cached_data, modelInfo, meshWall, meshCeil, meshFloor);
 	}
 	else
 	{
@@ -257,7 +251,7 @@ void AddObjModel(const BlockModelInfo& modelInfo,
 		model_data.materials = materials;
 		model_cache[modelInfo.modelPath] = model_data;
 
-		ProcessModelData(model_data, modelInfo, verticesWall, indicesWall, verticesCeil, indicesCeil, verticesFloor, indicesFloor);
+		ProcessModelData(model_data, modelInfo, meshWall, meshCeil, meshFloor);
 	}
 }
 //=============================================================================
