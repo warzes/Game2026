@@ -8,14 +8,14 @@ std::vector<float> generateGrid(float size, float step)
 	for (float i = -size; i <= size; i += step) {
 		// Горизонтальные линии
 		vertices.insert(vertices.end(), {
-			-size, i, 0.0f,
-			 size, i, 0.0f
+			-size+0.5f, 0.0f, i + 0.5f,
+			 size+0.5f, 0.0f, i + 0.5f,
 			});
 
 		// Вертикальные линии
 		vertices.insert(vertices.end(), {
-			i, -size, 0.0f,
-			i,  size, 0.0f
+			i+0.5f, 0.0f, -size + 0.5f,
+			i+0.5f, 0.0f,  size + 0.5f,
 			});
 	}
 
@@ -60,8 +60,6 @@ void MapGrid::Close()
 //=============================================================================
 void MapGrid::Draw(const glm::mat4& proj, const glm::mat4& view, const glm::mat4& model)
 {
-	glDisable(GL_DEPTH_TEST);
-	//glViewport(0, 0, static_cast<int>(m_framebufferWidth), static_cast<int>(m_framebufferHeight));
 	glUseProgram(m_program.handle);
 	SetUniform(GetUniformLocation(m_program, "model"), model);
 	SetUniform(GetUniformLocation(m_program, "view"), view);

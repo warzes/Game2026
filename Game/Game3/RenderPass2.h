@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "MapGrid.h"
+
 struct GameWorldData;
 
 class RenderPass2 final
@@ -30,4 +32,6 @@ private:
 	Framebuffer   m_fbo;
 
 	SamplerHandle m_sampler{ 0 };
+
+	MapGrid m_mapGrid;
 };

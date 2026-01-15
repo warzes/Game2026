@@ -10,4 +10,4 @@
 - подзагрузка/выгрузка чанков
 
 
-![Screenshot](img/281225.jpg)
+![Screenshot](img/150126.jpg)

@@ -17,11 +17,15 @@ bool RenderPass2::Init(uint16_t framebufferWidth, uint16_t framebufferHeight)
 	samperCI.magFilter = TextureFilter::Nearest;
 	m_sampler = CreateSamplerState(samperCI);
 
+	if (!m_mapGrid.Init())
+		return false;
+
 	return true;
 }
 //=============================================================================
 void RenderPass2::Close()
 {
+	m_mapGrid.Close();
 	m_fbo.Destroy();
 	glDeleteProgram(m_program.handle);
 }
@@ -29,10 +33,11 @@ void RenderPass2::Close()
 void RenderPass2::Draw(const GameWorldData& gameData)
 {
 	m_fbo.Bind();
-	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, static_cast<int>(m_framebufferWidth), static_cast<int>(m_framebufferHeight));
 	glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
 
 	glUseProgram(m_program.handle);
 	SetUniform(GetUniformLocation(m_program, "projectionMatrix"), m_perspective);
@@ -42,6 +47,9 @@ void RenderPass2::Draw(const GameWorldData& gameData)
 	glBindSampler(0, m_sampler.handle);
 	drawScene(gameData);
 	glBindSampler(0, 0);
+
+	//glDisable(GL_DEPTH_TEST);
+	m_mapGrid.Draw(m_perspective, gameData.camera->GetViewMatrix(), glm::mat4(1.0f));
 }
 //=============================================================================
 void RenderPass2::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)

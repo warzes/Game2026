@@ -11,7 +11,6 @@ namespace
 	GameModel modelLevel;
 
 	MapChunk maps;
-	MapGrid mapGrid;
 }
 //=============================================================================
 void GameApp()
@@ -25,8 +24,6 @@ void GameApp()
 			return;
 
 		if (!maps.Init())
-			return;
-		if (!mapGrid.Init())
 			return;
 
 		camera.MovementSpeed = 10.0f;
@@ -65,8 +62,6 @@ void GameApp()
 			scene.Bind(maps.GetModel());
 			scene.Draw();
 
-			mapGrid.Draw();
-
 			// ui
 
 			{
@@ -97,7 +92,6 @@ void GameApp()
 		puts(exc.what());
 	}
 
-	mapGrid.Close();
 	maps.Close();
 	engine::Close();
 }
