@@ -8,9 +8,6 @@
     <ClInclude Include="Framebuffer.h">
       <Filter>Engine\addon</Filter>
     </ClInclude>
-    <ClInclude Include="NanoMath.h">
-      <Filter>Engine\core</Filter>
-    </ClInclude>
     <ClInclude Include="NanoCore.h">
       <Filter>Engine\core</Filter>
     </ClInclude>
@@ -74,6 +71,9 @@
     <ClInclude Include="OGLBuffer.h">
       <Filter>Engine\OpenGL\OGLResources</Filter>
     </ClInclude>
+    <ClInclude Include="NanoMath.h">
+      <Filter>Engine\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -82,9 +82,6 @@
     </ClCompile>
     <ClCompile Include="GridAxis.cpp">
       <Filter>Engine\addon</Filter>
-    </ClCompile>
-    <ClCompile Include="NanoMath.cpp">
-      <Filter>Engine\core</Filter>
     </ClCompile>
     <ClCompile Include="NanoCore.cpp">
       <Filter>Engine\core</Filter>
@@ -140,6 +137,9 @@
     <ClCompile Include="OGLBuffer.cpp">
       <Filter>Engine\OpenGL\OGLResources</Filter>
     </ClCompile>
+    <ClCompile Include="NanoMath.cpp">
+      <Filter>Engine\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -171,6 +171,9 @@
     </Filter>
     <Filter Include="Engine\OpenGL\OGLResources">
       <UniqueIdentifier>{8512fdc1-3326-4780-98e6-6faf852185a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\math">
+      <UniqueIdentifier>{c3d3e897-ec73-41a3-bc59-42650cbda9cd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

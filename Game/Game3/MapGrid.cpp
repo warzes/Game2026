@@ -48,24 +48,33 @@ bool MapGrid::Init()
 
 	glUseProgram(0);
 
+	if (!m_cursor.Init())
+		return false;
+
 	return true;
 }
 //=============================================================================
 void MapGrid::Close()
 {
+	m_cursor.Close();
 	glDeleteVertexArrays(1, &m_vao);
 	glDeleteBuffers(1, &m_vbo.handle);
 	glDeleteProgram(m_program.handle);
 }
 //=============================================================================
-void MapGrid::Draw(const glm::mat4& proj, const glm::mat4& view, const glm::mat4& model)
+void MapGrid::Draw(const glm::mat4& proj, const glm::mat4& view)
 {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glUseProgram(m_program.handle);
-	SetUniform(GetUniformLocation(m_program, "model"), model);
+	SetUniform(GetUniformLocation(m_program, "model"), glm::mat4(1.0f));
 	SetUniform(GetUniformLocation(m_program, "view"), view);
 	SetUniform(GetUniformLocation(m_program, "proj"), proj);
 
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_LINES, 0, m_vertSize / 3);
+	glBindVertexArray(0);
+
+	m_cursor.Draw(proj, view);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 //=============================================================================

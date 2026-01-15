@@ -1,8 +1,9 @@
 ﻿#include "stdafx.h"
 #include "GameApp.h"
 #include "GameScene.h"
-#include "Map.h"
+#include "GeomMap.h"
 #include "MapGrid.h"
+#include "Map.h"
 //=============================================================================
 namespace
 {
@@ -10,7 +11,8 @@ namespace
 	Camera camera;
 	GameModel modelLevel;
 
-	MapChunk maps;
+	Map map;
+	MapChunk geommaps;
 }
 //=============================================================================
 void GameApp()
@@ -23,7 +25,7 @@ void GameApp()
 		if (!scene.Init())
 			return;
 
-		if (!maps.Init())
+		if (!geommaps.Init(map))
 			return;
 
 		camera.MovementSpeed = 10.0f;
@@ -57,9 +59,28 @@ void GameApp()
 				}
 			}
 
+			// cursor
+			if (input::IsMouseDown(RGFW_mouseLeft))
+			{
+				auto mpos = input::GetCursorPos();
+				glm::vec3 rayOrigin = camera.Position;
+				glm::vec3 rayDirection = GetRayFromScreen(
+					mpos.x, mpos.y, window::GetWidth(), window::GetHeight(), 
+					camera.GetViewMatrix(), 
+					glm::perspective(glm::radians(60.0f), window::GetAspect(), 0.01f, 1000.0f));
+
+				auto selectedTile = map.RaycastTile(rayOrigin, rayDirection);
+
+				if (selectedTile.tile != NoTile)
+				{
+					Print("x=" + std::to_string(selectedTile.x) + ";y=" + std::to_string(selectedTile.y) + ";z=" + std::to_string(selectedTile.z));
+				}
+			}
+
+
+
 			scene.Bind(&camera);
-			//scene.Bind(&modelLevel);
-			scene.Bind(maps.GetModel());
+			scene.Bind(geommaps.GetModel());
 			scene.Draw();
 
 			// ui
@@ -76,8 +97,8 @@ void GameApp()
 					ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove))
 				{
 					ImGui::Text("Map Info :");
-					ImGui::Text("VertexCount : %i", (int)maps.GetVertexCount());
-					ImGui::Text("IndexCount  : %i", (int)maps.GetIndexCount());
+					ImGui::Text("VertexCount : %i", (int)geommaps.GetVertexCount());
+					ImGui::Text("IndexCount  : %i", (int)geommaps.GetIndexCount());
 				}
 				ImGui::End();
 			}
@@ -92,7 +113,7 @@ void GameApp()
 		puts(exc.what());
 	}
 
-	maps.Close();
+	geommaps.Close();
 	engine::Close();
 }
 //=============================================================================

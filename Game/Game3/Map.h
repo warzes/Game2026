@@ -1,25 +1,46 @@
 ﻿#pragma once
 
-#include "GameModel.h"
+#include "GeomTileMap.h"
 
-struct BlockModelInfo;
-struct TileInfo;
+constexpr const size_t MAPCHUNKSIZE = 30;
 
-class MapChunk final
+/*
+TEMP: я сейчас храню информацию о тайле только геометрическую. а возможно нужна будет еще логическая-игровая.
+*/
+struct LogicTile final
+{
+	int t;
+};
+
+struct TileSelection final
+{
+	size_t x{ 0 };
+	size_t y{ 0 };
+	size_t z{ 0 };
+
+	size_t tile{ NoTile };
+};
+
+class Map final
 {
 public:
-	bool Init();
-	void Close();
+	Map();
 
-	GameModel* GetModel() noexcept { return &m_model; }
-	size_t GetVertexCount() const { return m_vertCount; }
-	size_t GetIndexCount() const { return m_indexCount; }
+	void Clear();
+	void ClearGeomTile(size_t x, size_t y, size_t z);
+	void SetGeomTile(size_t tile, size_t x, size_t y, size_t z);
+	size_t GetGeomTile(size_t x, size_t y, size_t z) const;
+
+	// находится ли позиция внутри карты
+	bool IsInBounds(size_t x, size_t y, size_t z) const;
+
+	// Найти тайл, над которым находится курсор 
+	TileSelection RaycastTile(const glm::vec3& rayOrigin, const glm::vec3& rayDirection) const;
+
+	bool SaveToFile(const std::string& filename) const;
+	bool LoadFromFile(const std::string& filename);
+
 private:
-	void generateBufferMap();
-	void setVisibleBlock(const TileInfo& ti, BlockModelInfo& blockModelInfo, size_t x, size_t y, size_t z);
-
-	GameModel m_model;
-
-	size_t m_vertCount;
-	size_t m_indexCount;
+	size_t m_geomMap[MAPCHUNKSIZE][MAPCHUNKSIZE][MAPCHUNKSIZE] = { 0 };
+	LogicTile m_logicMap[MAPCHUNKSIZE][MAPCHUNKSIZE][MAPCHUNKSIZE] = {};
 };

@@ -1,223 +1,204 @@
 ﻿#include "stdafx.h"
 #include "Map.h"
-#include "TileMap.h"
-#include "MapLoadObjTile.h"
-#define MAPCHUNKSIZE 30
-size_t tempMap[MAPCHUNKSIZE][MAPCHUNKSIZE][MAPCHUNKSIZE] = { 0 };
 //=============================================================================
-size_t addMeshInfo(std::vector<MeshInfo>& meshInfo, Texture2D texId)
+Map::Map()
 {
-	for (size_t i = 0; i < meshInfo.size(); i++)
-	{
-		if (meshInfo[i].material->diffuseTextures[0] == texId)
-		{
-			return i;
-		}
-	}
-
-	MeshInfo nmi{};
-	nmi.material = Material();
-	nmi.material->diffuseTextures.push_back(texId);
-	meshInfo.push_back(nmi);
-	return meshInfo.size() - 1;
+	Clear();
 }
 //=============================================================================
-void optimizeMesh(std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indices)
+void Map::Clear()
 {
-	// TODO:
-
-	// не работает
-	//// Шаг 1: Удаление дублирующихся вершин
-	//std::vector<unsigned int> remap(vertices.size());
-	//size_t uniqueVertices = meshopt_generateVertexRemap(remap.data(), indices.data(), indices.size(), vertices.data(), vertices.size(), sizeof(MeshVertex));
-
-	//std::vector<MeshVertex> optimizedVertices(uniqueVertices);
-	//meshopt_remapVertexBuffer(optimizedVertices.data(), vertices.data(), vertices.size(), sizeof(MeshVertex), remap.data());
-
-	//meshopt_remapIndexBuffer(indices.data(), indices.data(), indices.size(), remap.data());
-
-	//// Шаг 2: Удаление вырожденных и дублирующихся треугольников
-	//std::vector<unsigned int> uniqueIndices;
-	//std::set<std::array<unsigned int, 3>> triangleSet; // Используем set для уникальности треугольников
-
-	//for (size_t i = 0; i < indices.size(); i += 3)
-	//{
-	//	std::array<unsigned int, 3> triangle = { indices[i], indices[i + 1], indices[i + 2] };
-	//	std::sort(triangle.begin(), triangle.end()); // Сортируем вершины треугольника для уникальности (т.к. треугольник ABC == BCA == CAB)
-
-	//	if (triangleSet.find(triangle) == triangleSet.end())
-	//	{
-	//		triangleSet.insert(triangle);
-	//		uniqueIndices.push_back(indices[i]);
-	//		uniqueIndices.push_back(indices[i + 1]);
-	//		uniqueIndices.push_back(indices[i + 2]);
-	//	}
-	//}
-
-	//indices = uniqueIndices;
-
-	//vertices = optimizedVertices;
-}
-//=============================================================================
-inline std::string getFileNameBlock(TileGeometryType type)
-{
-	switch (type)
-	{
-	case TileGeometryType::Block00: return "data/tiles/Block00.obj";
-	case TileGeometryType::Block01: return "data/tiles/Block01.obj";
-	case TileGeometryType::Block02: return "data/tiles/Block02.obj";
-	case TileGeometryType::Block03: return "data/tiles/Block03.obj";
-	case TileGeometryType::Block04: return "data/tiles/Block04.obj";
-	case TileGeometryType::Block05: return "data/tiles/Block05.obj";
-	case TileGeometryType::Block06: return "data/tiles/Block06.obj";
-	case TileGeometryType::Block07: return "data/tiles/Block07.obj";
-	case TileGeometryType::Block08: return "data/tiles/Block08.obj";
-	case TileGeometryType::Block09: return "data/tiles/Block09.obj";
-	case TileGeometryType::Block10: return "data/tiles/Block10.obj";
-	default: std::unreachable();
-	}
-}
-//=============================================================================
-inline glm::vec3 getRotateAngle(RotateAngleY angle)
-{
-	glm::vec3 r(0.0f);
-	if (angle == RotateAngleY::Rotate0)        r.y = 0.0f;
-	else if (angle == RotateAngleY::Rotate90)  r.y = glm::radians(90.0f);
-	else if (angle == RotateAngleY::Rotate180) r.y = glm::radians(180.0f);
-	else if (angle == RotateAngleY::Rotate270) r.y = glm::radians(270.0f);
-	return r;
-}
-//=============================================================================
-bool MapChunk::Init()
-{
-	TileInfo tempTile;
-	tempTile.type = TileGeometryType::Block00;
-	tempTile.textureWall = textures::LoadTexture2D("data/tiles/grass01_wall.png", ColorSpace::Linear, true);
-	tempTile.textureCeil = textures::LoadTexture2D("data/tiles/grass01_ceil.png");
-	tempTile.textureFloor = textures::LoadTexture2D("data/tiles/grass01.png");
 	for (size_t y = 0; y < MAPCHUNKSIZE; y++)
 	{
 		for (size_t x = 0; x < MAPCHUNKSIZE; x++)
 		{
 			for (size_t z = 0; z < MAPCHUNKSIZE; z++)
 			{
-				tempMap[x][y][z] = NoTile;
+				m_geomMap[x][y][z] = NoTile;
 			}
-
-			tempMap[x][y][0] = TileBank::AddTileInfo(tempTile);
 		}
 	}
-
-	tempMap[14][14][0] = NoTile;
-	tempMap[14][15][0] = NoTile;
-	tempMap[14][16][0] = NoTile;
-	tempMap[15][14][0] = NoTile;
-	tempMap[15][16][0] = NoTile;
-	tempMap[16][14][0] = NoTile;
-	tempMap[16][15][0] = NoTile;
-
-	tempTile.type = TileGeometryType::Block01;
-	tempTile.textureWall = textures::LoadTexture2D("data/tiles/grass01_wall.png", ColorSpace::Linear, true);
-	tempTile.textureCeil = textures::LoadTexture2D("data/tiles/grass01_ceil.png");
-	tempTile.textureFloor = textures::LoadTexture2D("data/tiles/grass01.png");
-	tempTile.rotate = RotateAngleY::Rotate270;
-	tempMap[16][17][1] = TileBank::AddTileInfo(tempTile);
-	tempTile.rotate = RotateAngleY::Rotate0;
-	tempMap[17][16][1] = TileBank::AddTileInfo(tempTile);
-	tempTile.rotate = RotateAngleY::Rotate180;
-	tempMap[17][18][1] = TileBank::AddTileInfo(tempTile);
-	tempTile.rotate = RotateAngleY::Rotate90;
-	tempMap[18][17][1] = TileBank::AddTileInfo(tempTile);
-
-	tempTile.type = TileGeometryType::Block00;
-	tempTile.rotate = RotateAngleY::Rotate0;
-	tempMap[17][17][1] = TileBank::AddTileInfo(tempTile);
-
-	generateBufferMap();
-
-	return true;
 }
 //=============================================================================
-void MapChunk::Close()
+void Map::ClearGeomTile(size_t x, size_t y, size_t z)
 {
+	SetGeomTile(NoTile, x, y, z);
 }
 //=============================================================================
-void MapChunk::generateBufferMap()
+void Map::SetGeomTile(size_t tile, size_t x, size_t y, size_t z)
 {
-	std::vector<MeshInfo> meshInfo;
+	if (IsInBounds(x, y, z)) 
+		m_geomMap[x][y][z] = tile;
+}
+//=============================================================================
+size_t Map::GetGeomTile(size_t x, size_t y, size_t z) const
+{
+	if (IsInBounds(x, y, z)) 
+		return m_geomMap[x][y][z];
+	
+	return NoTile;
+}
+//=============================================================================
+bool Map::IsInBounds(size_t x, size_t y, size_t z) const
+{
+	if (x < MAPCHUNKSIZE && y < MAPCHUNKSIZE && z < MAPCHUNKSIZE) return true;
+	else return false;
+}
+//=============================================================================
+TileSelection Map::RaycastTile(const glm::vec3& rayOrigin, const glm::vec3& rayDirection) const
+{
+	// Алгоритм лучевого пересечения с воксельной сеткой (алгоритм цифровой дифференциальной аналого-вычислительной машины)
+	glm::ivec3 currentPos = glm::ivec3(
+		static_cast<int>(std::floor(rayOrigin.x)),
+		static_cast<int>(std::floor(rayOrigin.y)),
+		static_cast<int>(std::floor(rayOrigin.z))
+	);
+
+	// Определяем шаги
+	glm::ivec3 step(
+		rayDirection.x > 0 ? 1 : (rayDirection.x < 0 ? -1 : 0),
+		rayDirection.y > 0 ? 1 : (rayDirection.y < 0 ? -1 : 0),
+		rayDirection.z > 0 ? 1 : (rayDirection.z < 0 ? -1 : 0)
+	);
+
+	// Вычисляем расстояния до следующих плоскостей
+	glm::vec3 tMax(
+		(step.x > 0) ? (currentPos.x + 1 - rayOrigin.x) / rayDirection.x :
+		(rayDirection.x != 0 ? (currentPos.x - rayOrigin.x) / rayDirection.x : std::numeric_limits<float>::max()),
+		(step.y > 0) ? (currentPos.y + 1 - rayOrigin.y) / rayDirection.y :
+		(rayDirection.y != 0 ? (currentPos.y - rayOrigin.y) / rayDirection.y : std::numeric_limits<float>::max()),
+		(step.z > 0) ? (currentPos.z + 1 - rayOrigin.z) / rayDirection.z :
+		(rayDirection.z != 0 ? (currentPos.z - rayOrigin.z) / rayDirection.z : std::numeric_limits<float>::max())
+	);
+
+	// Вычисляем шаги по осям
+	glm::vec3 tDelta(
+		(rayDirection.x != 0) ? std::abs(1.0f / rayDirection.x) : std::numeric_limits<float>::max(),
+		(rayDirection.y != 0) ? std::abs(1.0f / rayDirection.y) : std::numeric_limits<float>::max(),
+		(rayDirection.z != 0) ? std::abs(1.0f / rayDirection.z) : std::numeric_limits<float>::max()
+	);
 
 	const float mapOffset = MAPCHUNKSIZE / 2.0f;
-	for (size_t iy = 0; iy < MAPCHUNKSIZE; iy++)
+	currentPos.x += mapOffset;
+	currentPos.y -= 0.5;
+	currentPos.z += mapOffset;
+
+	// Проходим по вокселям, пока не найдем блок или не выйдем за границы
+	for (int i = 0; i < MAPCHUNKSIZE * MAPCHUNKSIZE * MAPCHUNKSIZE; ++i)
 	{
-		for (size_t ix = 0; ix < MAPCHUNKSIZE; ix++)
+		// Проверяем, находится ли текущая позиция в пределах карты
+		if (IsInBounds(currentPos.x, currentPos.y, currentPos.z))
 		{
-			for (size_t iz = 0; iz < MAPCHUNKSIZE; iz++)
+			size_t tile = GetGeomTile(currentPos.x, currentPos.y, currentPos.z);
+			// Если в этой позиции есть блок, возвращаем его
+			if (tile != NoTile)
 			{
-				if (tempMap[ix][iy][iz] == NoTile) continue;
-
-				const auto& id = TileBank::GetTileInfo(tempMap[ix][iy][iz]);
-
-				const glm::vec3 center = glm::vec3(
-					float(ix) - mapOffset,
-					float(iz) + 0.5f,
-					float(iy) - mapOffset);
-
-				BlockModelInfo blockModelInfo{};
-				blockModelInfo.color = id.color;
-				blockModelInfo.center = center;
-				blockModelInfo.rotate = getRotateAngle(id.rotate);
-				setVisibleBlock(id, blockModelInfo, ix, iy, iz);
-				blockModelInfo.modelPath = getFileNameBlock(id.type);
-
-				size_t idWall  = addMeshInfo(meshInfo, id.textureWall);
-				size_t idFloor = addMeshInfo(meshInfo, id.textureFloor);
-				size_t idCeil  = addMeshInfo(meshInfo, id.textureCeil);
-
-				AddObjModel(blockModelInfo, meshInfo[idWall], meshInfo[idCeil], meshInfo[idFloor]);
+				TileSelection sel;
+				sel.tile = tile;
+				sel.x = currentPos.x;
+				sel.y = currentPos.y;
+				sel.z = currentPos.z;
+				return sel;
 			}
-		}
-	}
-
-	for (size_t i = 0; i < meshInfo.size(); i++)
-	{
-		optimizeMesh(meshInfo[i].vertices, meshInfo[i].indices);
-
-		m_vertCount += meshInfo[i].vertices.size();
-		m_indexCount += meshInfo[i].indices.size();
-	}
-
-	m_model.model.Create(meshInfo);
-}
-//=============================================================================
-bool testVisBlock(TileGeometryType tile, size_t x, size_t y, size_t z)
-{
-	if ((x >= MAPCHUNKSIZE) || (y >= MAPCHUNKSIZE) || (z >= MAPCHUNKSIZE)) return false;
-	if (tempMap[x][y][z] == NoTile) return false;
-
-	if (tile == TileGeometryType::Block00)
-	{
-		const auto& b = TileBank::GetTileInfo(tempMap[x][y][z]);
-		if (b.type == TileGeometryType::Block00)
-		{
-			return true;
 		}
 		else
 		{
-			// TODO: другие варианты блоков
+			// Если вышли за границы, прекращаем поиск
+			break;
+		}
+
+		// Определяем, по какой оси двигаться дальше
+		if (tMax.x < tMax.y && tMax.x < tMax.z)
+		{
+			if (tMax.x > 100.0f) break; // Ограничение дистанции
+			currentPos.x += step.x;
+			tMax.x += tDelta.x;
+		}
+		else if (tMax.y < tMax.z) {
+			if (tMax.y > 100.0f) break; // Ограничение дистанции
+			currentPos.y += step.y;
+			tMax.y += tDelta.y;
+		}
+		else {
+			if (tMax.z > 100.0f) break; // Ограничение дистанции
+			currentPos.z += step.z;
+			tMax.z += tDelta.z;
 		}
 	}
-	return false;
+
+	// Если блок не найден, возвращаем невалидный результат
+	return {};
 }
 //=============================================================================
-void MapChunk::setVisibleBlock(const TileInfo& ti, BlockModelInfo& blockModelInfo, size_t x, size_t y, size_t z)
+bool Map::SaveToFile(const std::string& filename) const
 {
-	if (x > 0) blockModelInfo.rightVisible = !testVisBlock(ti.type, x - 1, y, z);
-	if (x < MAPCHUNKSIZE - 1) blockModelInfo.leftVisible = !testVisBlock(ti.type, x + 1, y, z);
+	std::ofstream file(filename, std::ios::binary);
+	if (!file.is_open())
+	{
+		Error("Could not open file for writing: " + filename);
+		return false;
+	}
 
-	if (y > 0) blockModelInfo.forwardVisible = !testVisBlock(ti.type, x, y - 1, z);
-	if (y < MAPCHUNKSIZE - 1) blockModelInfo.backVisible = !testVisBlock(ti.type, x, y + 1, z);
+	// Записываем размеры карты
+	file.write(reinterpret_cast<const char*>(&MAPCHUNKSIZE), sizeof(int));
+	file.write(reinterpret_cast<const char*>(&MAPCHUNKSIZE), sizeof(int));
+	file.write(reinterpret_cast<const char*>(&MAPCHUNKSIZE), sizeof(int));
 
-	if (z > 0) blockModelInfo.bottomVisible = !testVisBlock(ti.type, x, y, z - 1);
-	if (z < MAPCHUNKSIZE - 1) blockModelInfo.topVisible = !testVisBlock(ti.type, x, y, z + 1);
+	// Записываем данные блоков
+	for (int x = 0; x < MAPCHUNKSIZE; ++x)
+	{
+		for (int y = 0; y < MAPCHUNKSIZE; ++y)
+		{
+			for (int z = 0; z < MAPCHUNKSIZE; ++z)
+			{
+				auto tile = GetGeomTile(x, y, z);
+				file.write(reinterpret_cast<const char*>(&tile), sizeof(size_t));
+			}
+		}
+	}
+
+	file.close();
+	return true;
+}
+//=============================================================================
+bool Map::LoadFromFile(const std::string& filename)
+{
+	std::ifstream file(filename, std::ios::binary);
+	if (!file.is_open())
+	{
+		Error("Could not open file for reading: " + filename);
+		return false;
+	}
+
+	// Читаем размеры карты
+	int sizeX, sizeY, sizeZ;
+	file.read(reinterpret_cast<char*>(&sizeX), sizeof(int));
+	file.read(reinterpret_cast<char*>(&sizeY), sizeof(int));
+	file.read(reinterpret_cast<char*>(&sizeZ), sizeof(int));
+
+	// Проверяем совместимость размеров
+	if (sizeX != MAPCHUNKSIZE || sizeY != MAPCHUNKSIZE || sizeZ != MAPCHUNKSIZE)
+	{
+		Error("Map dimensions in file don't match expected dimensions.");
+		file.close();
+		return false;
+	}
+
+	// Читаем данные блоков
+	for (int x = 0; x < MAPCHUNKSIZE; ++x)
+	{
+		for (int y = 0; y < MAPCHUNKSIZE; ++y)
+		{
+			for (int z = 0; z < MAPCHUNKSIZE; ++z)
+			{
+				size_t tile;
+				file.read(reinterpret_cast<char*>(&tile), sizeof(size_t));
+				SetGeomTile(tile, x, y, z);
+			}
+		}
+	}
+
+	file.close();
+	return true;
 }
 //=============================================================================

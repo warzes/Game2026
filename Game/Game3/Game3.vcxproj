@@ -94,9 +94,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EditorCursor.cpp" />
     <ClCompile Include="GameApp.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="GeomMap.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MapGrid.cpp" />
     <ClCompile Include="MapLoadObjTile.cpp" />
@@ -106,21 +108,23 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TileMap.cpp" />
+    <ClCompile Include="GeomTileMap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EditorCursor.h" />
     <ClInclude Include="GameApp.h" />
     <ClInclude Include="GameConfig.h" />
     <ClInclude Include="GameModel.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="GameWorldData.h" />
+    <ClInclude Include="GeomMap.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapGrid.h" />
     <ClInclude Include="MapLoadObjTile.h" />
     <ClInclude Include="RenderPass2.h" />
     <ClInclude Include="RenderPassFinal.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="TileMap.h" />
+    <ClInclude Include="GeomTileMap.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BlockInfo.md" />

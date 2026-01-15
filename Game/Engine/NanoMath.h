@@ -244,3 +244,28 @@ inline void GetFrustumCorners(glm::mat4 viewProj, glm::vec4* points)
 		points[i] = q / q.w;
 	}
 }
+
+// Функция для получения луча из позиции курсора
+inline glm::vec3 GetRayFromScreen(float screenX, float screenY, int screenWidth, int screenHeight, const glm::mat4& view, const glm::mat4& projection)
+{
+	// Нормализуем координаты экрана (-1 до 1)
+	float x = (2.0f * screenX) / screenWidth - 1.0f;
+	float y = 1.0f - (2.0f * screenY) / screenHeight; // Инвертируем y
+
+	// Создаем векторы
+	glm::vec4 rayClip = glm::vec4(x, y, -1.0f, 1.0f); // Ближняя плоскость
+
+	// Преобразуем в мировые координаты
+	glm::mat4 invProjection = glm::inverse(projection);
+	glm::mat4 invView = glm::inverse(view);
+
+	glm::vec4 rayEye = invProjection * rayClip;
+	rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f); // Устанавливаем w=0 для направления
+
+	glm::vec4 rayWorld = invView * rayEye;
+
+	// Нормализуем вектор направления
+	glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld.x, rayWorld.y, rayWorld.z));
+
+	return rayDir;
+}

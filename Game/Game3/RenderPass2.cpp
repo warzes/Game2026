@@ -49,7 +49,7 @@ void RenderPass2::Draw(const GameWorldData& gameData)
 	glBindSampler(0, 0);
 
 	//glDisable(GL_DEPTH_TEST);
-	m_mapGrid.Draw(m_perspective, gameData.camera->GetViewMatrix(), glm::mat4(1.0f));
+	m_mapGrid.Draw(m_perspective, gameData.camera->GetViewMatrix());
 }
 //=============================================================================
 void RenderPass2::Resize(uint16_t framebufferWidth, uint16_t framebufferHeight)
