@@ -252,20 +252,29 @@ inline glm::vec3 GetRayFromScreen(float screenX, float screenY, int screenWidth,
 	float x = (2.0f * screenX) / screenWidth - 1.0f;
 	float y = 1.0f - (2.0f * screenY) / screenHeight; // Инвертируем y
 
-	// Создаем векторы
-	glm::vec4 rayClip = glm::vec4(x, y, -1.0f, 1.0f); // Ближняя плоскость
+	// Создаем два вектора для ближней и дальней плоскости
+	glm::vec4 rayClipNear = glm::vec4(x, y, -1.0f, 1.0f); // Ближняя плоскость
+	glm::vec4 rayClipFar  = glm::vec4(x, y, 1.0f, 1.0f);  // Дальняя плоскость
 
 	// Преобразуем в мировые координаты
 	glm::mat4 invProjection = glm::inverse(projection);
 	glm::mat4 invView = glm::inverse(view);
 
-	glm::vec4 rayEye = invProjection * rayClip;
-	rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f); // Устанавливаем w=0 для направления
+	// Преобразуем обе точки
+	glm::vec4 rayEyeNear = invProjection * rayClipNear;
+	rayEyeNear /= rayEyeNear.w; // Перспективное деление
 
-	glm::vec4 rayWorld = invView * rayEye;
+	glm::vec4 rayEyeFar = invProjection * rayClipFar;
+	rayEyeFar /= rayEyeFar.w; // Перспективное деление
 
-	// Нормализуем вектор направления
-	glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld.x, rayWorld.y, rayWorld.z));
+	// Преобразуем в мировые координаты
+	glm::vec4 rayWorldNear = invView * rayEyeNear;
+	glm::vec4 rayWorldFar = invView * rayEyeFar;
+
+	// Вычисляем направление луча
+	glm::vec3 rayDir = glm::normalize(
+		glm::vec3(rayWorldFar) - glm::vec3(rayWorldNear)
+	);
 
 	return rayDir;
 }

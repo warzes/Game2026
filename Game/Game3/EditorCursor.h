@@ -19,3 +19,5 @@ private:
 
 	glm::vec3     m_position;
 };
+
+inline EditorCursor* gEditorCursor{ nullptr };

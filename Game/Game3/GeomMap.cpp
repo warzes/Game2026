@@ -58,9 +58,9 @@ bool MapChunk::Init(Map& map)
 	tempTile.textureCeil = textures::LoadTexture2D("data/tiles/grass01_ceil.png");
 	tempTile.textureFloor = textures::LoadTexture2D("data/tiles/grass01.png");
 
-	for (size_t x = 0; x < 7; x++)
+	for (size_t x = 0; x < 11; x++)
 	{
-		for (size_t y = 0; y < 7; y++)
+		for (size_t y = 0; y < 11; y++)
 		{
 			map.SetGeomTile(TileBank::AddTileInfo(tempTile), x, 14 + y, 0);
 		}

@@ -11,33 +11,33 @@ bool EditorCursor::Init()
 	}
 	glUseProgram(m_program.handle);
 
-	//std::vector<float> vertices = {
-	//	// передняя грань
-	//	-0.5f, -0.5f,  0.5f,
-	//	 0.5f, -0.5f,  0.5f,
-	//	 0.5f,  0.5f,  0.5f,
-	//	-0.5f,  0.5f,  0.5f,
-
-	//	// задняя грань
-	//	-0.5f, -0.5f, -0.5f,
-	//	-0.5f,  0.5f, -0.5f,
-	//	 0.5f,  0.5f, -0.5f,
-	//	 0.5f, -0.5f, -0.5f,
-	//};
-
 	std::vector<float> vertices = {
 		// передняя грань
-		0.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f,
+		-0.5f, 0.0f,  0.5f,
+		 0.5f, 0.0f,  0.5f,
+		 0.5f, 1.0f,  0.5f,
+		-0.5f, 1.0f,  0.5f,
 
 		// задняя грань
-		0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
+		-0.5f, 0.0f, -0.5f,
+		-0.5f, 1.0f, -0.5f,
+		 0.5f, 1.0f, -0.5f,
+		 0.5f, 0.0f, -0.5f,
 	};
+
+	//std::vector<float> vertices = {
+	//	// передняя грань
+	//	0.0f, 0.0f, 1.0f,
+	//	1.0f, 0.0f, 1.0f,
+	//	1.0f, 1.0f, 1.0f,
+	//	0.0f, 1.0f, 1.0f,
+
+	//	// задняя грань
+	//	0.0f, 0.0f, 0.0f,
+	//	0.0f, 1.0f, 0.0f,
+	//	1.0f, 1.0f, 0.0f,
+	//	1.0f, 0.0f, 0.0f,
+	//};
 	std::vector<unsigned int> indices = {
 		// передняя грань
 		0, 1, 1, 2, 2, 3, 3, 0,
@@ -65,11 +65,14 @@ bool EditorCursor::Init()
 
 	glUseProgram(0);
 
+	gEditorCursor = this;
+
 	return true;
 }
 //=============================================================================
 void EditorCursor::Close()
 {
+	gEditorCursor = nullptr;
 	glDeleteVertexArrays(1, &m_vao);
 	glDeleteBuffers(1, &m_ibo.handle);
 	glDeleteBuffers(1, &m_vbo.handle);
@@ -78,7 +81,7 @@ void EditorCursor::Close()
 //=============================================================================
 void EditorCursor::Draw(const glm::mat4& proj, const glm::mat4& view)
 {
-	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.5, 0.0, 0.5) + m_position);
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), /*glm::vec3(0.5, 0.0, 0.5) +*/ m_position);
 
 	glDisable(GL_DEPTH_TEST);
 	glUseProgram(m_program.handle);
